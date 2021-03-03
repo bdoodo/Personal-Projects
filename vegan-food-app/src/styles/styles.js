@@ -1,12 +1,9 @@
-import {mergeStyleSets, getTheme} from '@fluentui/react'
+import {mergeStyleSets, getTheme} from '@fluentui/react-northstar'
 
 const theme = getTheme()
 
 const classNames = () => {
   return mergeStyleSets({
-    card: {
-      boxShadow: theme.effects.elevation4
-    },
     
   })
 }
