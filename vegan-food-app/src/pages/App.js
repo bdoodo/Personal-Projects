@@ -2,11 +2,13 @@ import {
   BrowserRouter as Router,
   Route,
   Switch
-} from "react-router-dom";
+} from "react-router-dom"
 import {useState, useEffect} from "react"
 import Onboarding from "./Onboarding"
 import { 
-  Link, Card, Flex, Image, Text, Provider, teamsTheme, teamsDarkV2Theme
+  Provider, 
+  teamsTheme, teamsDarkV2Theme,
+  Segment
 } from '@fluentui/react-northstar'
 
 
@@ -14,28 +16,34 @@ function App() {
   const {latitude, longitude} = useLocation()
   const {hours} = useTime()
 
-  //change theme according to user theme color preference
+  //change theme according to user theme color preference  
   let darkThemePreference = window.matchMedia('(prefers-color-scheme: dark)')
+
   const [theme, setTheme] = useState(teamsTheme)
+  useEffect(() => {
+    setTheme(darkThemePreference.matches ? teamsDarkV2Theme : teamsTheme)
+  }, [darkThemePreference])
   darkThemePreference.addEventListener('change', () => {
     setTheme(darkThemePreference.matches ? teamsDarkV2Theme : teamsTheme)
   })
 
   return (
     <Provider theme={theme}>
-    <Router>
-      <Switch>
-        <Route path="/secondPage">
-          <h1>hi</h1>
-        </Route>
-        <Route path="/thirdPage">
-          <h1>ho</h1>
-        </Route>
-        <Route path="/">
-          <Onboarding hours={hours}/>
-        </Route>
-      </Switch>
-    </Router>
+      <Segment styles={{height: '100%', width: '100%', position: 'absolute'}}>
+      <Router>
+        <Switch>
+          <Route path="/secondPage">
+            <h1>hi</h1>
+          </Route>
+          <Route path="/thirdPage">
+            <h1>ho</h1>
+          </Route>
+          <Route path="/">
+            <Onboarding hours={hours}/>
+          </Route>
+        </Switch>
+      </Router>
+      </Segment>
     </Provider>
   );
 }
