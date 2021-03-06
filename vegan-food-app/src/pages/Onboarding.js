@@ -1,7 +1,8 @@
 import React from 'react'
 import { Card, Image, Text, Flex } from '@fluentui/react-northstar'
+import { Link } from 'react-router-dom'
 
-const Onboarding = ({hours}) => {
+const Onboarding = ({hours, addFilters}) => {
   const timeOfDay = hours <= 11 ? 'breakfast'
     : hours <= 16 ? 'lunch' 
     : 'dinner'
@@ -23,29 +24,41 @@ const Onboarding = ({hours}) => {
 
   return (
     <>
-      <Text align="center" as="h1" size="large">Vegoons</Text>
-      <h2>What's for {timeOfDay}?</h2>
+      <Flex column gap="gap.large" styles={{marginBottom: '50px'}}>
+        <Text align="center" as="h1" size="large">Vegoons</Text>
+        <Text as="h2">What's for {timeOfDay}?</Text>
+      </Flex>
       <Flex hAlign='center'>
         <Flex column gap="gap.small">
-          <Card elevated aria-roledescription="card with image and text" styles={{height: 'auto'}}>
+          <Link to='/categories' style={{color: 'white', textDecoration: 'none'}}>
+            <Card elevated aria-roledescription="card for going out" 
+              onClick={() => {
+                addFilters({goingOut: true})
+              }}
+            >
             <Card.Header>
-              <Text size="large" variables=''>{timeOfDay === 'dinner' ? 'Night out,' : 'Going out,'}</Text>
+              <Text size="large">{timeOfDay === 'dinner' ? 'Night out,' : 'Going out,'}</Text>
             </Card.Header>
             <Card.Body fitted>
                 <Image src={getImage('goingOut')} fluid/>
             </Card.Body>
           </Card>
-          <Flex hAlign='center'>
-            <Text size="large">or</Text>
-          </Flex>
-          <Card elevated aria-roledescription="card with image and text" styles={{height: 'auto'}}>
-            <Card.Header>
-              <Text size="large">{timeOfDay === 'dinner' ? 'night in?' : 'staying in?'}</Text>
-            </Card.Header>
-            <Card.Body fitted styles={{maxHeight: '175px', overflow: 'hidden'}}>
-              <Image src={getImage('stayingIn')} fluid/>
-            </Card.Body>
-          </Card>
+          </Link>
+          <Text align="center" size="large">or</Text>
+          <Link to='/categories' style={{color: 'white', textDecoration: 'none'}}>
+            <Card elevated aria-roledescription="card for staying in" 
+              onClick={() => {
+                addFilters({goingOut: false})
+              }}
+            >
+              <Card.Header>
+                <Text size="large">{timeOfDay === 'dinner' ? 'night in?' : 'staying in?'}</Text>
+              </Card.Header>
+              <Card.Body fitted styles={{maxHeight: '150px', overflow: 'hidden'}}>
+                <Image src={getImage('stayingIn')} fluid styles={{position: 'relative', bottom: '50%'}}/>
+              </Card.Body>
+            </Card>
+          </Link>
         </Flex>
       </Flex>
     </>

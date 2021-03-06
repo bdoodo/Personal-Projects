@@ -1,45 +1,58 @@
 import {
   BrowserRouter as Router,
   Route,
-  Switch
+  Switch,
+  Link
 } from "react-router-dom"
 import {useState, useEffect} from "react"
 import Onboarding from "./Onboarding"
+import Categories from './Categories'
 import { 
   Provider, 
-  teamsTheme, teamsDarkV2Theme,
+  teamsV2Theme, teamsDarkV2Theme, mergeFontFaces,
   Segment
 } from '@fluentui/react-northstar'
-
 
 function App() {
   const {latitude, longitude} = useLocation()
   const {hours} = useTime()
+  const [filters, setFilters] = useState({})
+
+  function addFilters(newFilter) {
+    setFilters(Object.assign(filters, newFilter))
+  }
 
   //change theme according to user theme color preference  
   let darkThemePreference = window.matchMedia('(prefers-color-scheme: dark)')
 
-  const [theme, setTheme] = useState(teamsTheme)
+  const [theme, setTheme] = useState(teamsV2Theme)
   useEffect(() => {
-    setTheme(darkThemePreference.matches ? teamsDarkV2Theme : teamsTheme)
+    setTheme(darkThemePreference.matches ? teamsDarkV2Theme : teamsV2Theme)
   }, [darkThemePreference])
+
   darkThemePreference.addEventListener('change', () => {
-    setTheme(darkThemePreference.matches ? teamsDarkV2Theme : teamsTheme)
+    setTheme(darkThemePreference.matches ? teamsDarkV2Theme : teamsV2Theme)
   })
 
   return (
-    <Provider theme={theme}>
+    <Provider theme={{
+      ...theme, 
+      siteVariables: {
+        ...theme.siteVariables,
+        bodyFontFamily: '"sutro", "karmina-sans"'
+      }
+    }}>
       <Segment styles={{height: '100%', width: '100%', position: 'absolute'}}>
       <Router>
         <Switch>
-          <Route path="/secondPage">
-            <h1>hi</h1>
+          <Route path="/categories">
+            <Categories filters={filters} addFilters={addFilters}/>
           </Route>
           <Route path="/thirdPage">
             <h1>ho</h1>
           </Route>
           <Route path="/">
-            <Onboarding hours={hours}/>
+            <Onboarding hours={hours} addFilters={addFilters}/>
           </Route>
         </Switch>
       </Router>
