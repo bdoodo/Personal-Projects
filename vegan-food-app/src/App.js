@@ -5,8 +5,9 @@ import {
   Link
 } from "react-router-dom"
 import {useState, useEffect} from "react"
-import Onboarding from "./Onboarding"
-import Categories from './Categories'
+import Onboarding from "./pages/Onboarding"
+import Categories from './pages/Categories'
+import Results from './pages/Results'
 import { 
   Provider, 
   teamsV2Theme, teamsDarkV2Theme, mergeFontFaces,
@@ -24,7 +25,7 @@ function App() {
 
   //change theme according to user theme color preference  
   let darkThemePreference = window.matchMedia('(prefers-color-scheme: dark)')
-
+console.log(teamsV2Theme)
   const [theme, setTheme] = useState(teamsV2Theme)
   useEffect(() => {
     setTheme(darkThemePreference.matches ? teamsDarkV2Theme : teamsV2Theme)
@@ -39,17 +40,18 @@ function App() {
       ...theme, 
       siteVariables: {
         ...theme.siteVariables,
+        bodyColor: 'white',
         bodyFontFamily: '"sutro", "karmina-sans"'
       }
     }}>
-      <Segment styles={{height: '100%', width: '100%', position: 'absolute'}}>
+      <Segment styles={{minHeight: '100%', width: '100%', position: 'absolute'}}>
       <Router>
         <Switch>
           <Route path="/categories">
-            <Categories filters={filters} addFilters={addFilters}/>
+            <Categories hours={hours} filters={filters} addFilters={addFilters}/>
           </Route>
-          <Route path="/thirdPage">
-            <h1>ho</h1>
+          <Route path="/results">
+            <Results filters={filters} addFilters={addFilters}/>
           </Route>
           <Route path="/">
             <Onboarding hours={hours} addFilters={addFilters}/>

@@ -3,7 +3,7 @@ import { Card, Image, Text, Flex } from '@fluentui/react-northstar'
 import { Link } from 'react-router-dom'
 
 const Onboarding = ({hours, addFilters}) => {
-  const timeOfDay = hours <= 11 ? 'breakfast'
+  const timeOfDay = hours <= 10 ? 'breakfast'
     : hours <= 16 ? 'lunch' 
     : 'dinner'
 
@@ -30,7 +30,7 @@ const Onboarding = ({hours, addFilters}) => {
       </Flex>
       <Flex hAlign='center'>
         <Flex column gap="gap.small">
-          <Link to='/categories' style={{color: 'white', textDecoration: 'none'}}>
+          <Link to='/categories' style={{textDecoration: 'none'}}>
             <Card elevated aria-roledescription="card for going out" 
               onClick={() => {
                 addFilters({goingOut: true})
@@ -45,7 +45,7 @@ const Onboarding = ({hours, addFilters}) => {
           </Card>
           </Link>
           <Text align="center" size="large">or</Text>
-          <Link to='/categories' style={{color: 'white', textDecoration: 'none'}}>
+          <Link to='/categories' style={{textDecoration: 'none'}}>
             <Card elevated aria-roledescription="card for staying in" 
               onClick={() => {
                 addFilters({goingOut: false})
