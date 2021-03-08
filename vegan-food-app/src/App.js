@@ -25,7 +25,7 @@ function App() {
 
   //change theme according to user theme color preference  
   let darkThemePreference = window.matchMedia('(prefers-color-scheme: dark)')
-console.log(teamsV2Theme)
+
   const [theme, setTheme] = useState(teamsV2Theme)
   useEffect(() => {
     setTheme(darkThemePreference.matches ? teamsDarkV2Theme : teamsV2Theme)
@@ -51,7 +51,7 @@ console.log(teamsV2Theme)
             <Categories hours={hours} filters={filters} addFilters={addFilters}/>
           </Route>
           <Route path="/results">
-            <Results filters={filters} addFilters={addFilters}/>
+            <Results filters={filters} addFilters={addFilters} location={{latitude: latitude, longitude: longitude}}/>
           </Route>
           <Route path="/">
             <Onboarding hours={hours} addFilters={addFilters}/>
