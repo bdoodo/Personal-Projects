@@ -1,8 +1,7 @@
 import {
   BrowserRouter as Router,
   Route,
-  Switch,
-  Link
+  Switch
 } from "react-router-dom"
 import {useState, useEffect} from "react"
 import Onboarding from "./pages/Onboarding"
@@ -10,7 +9,7 @@ import Categories from './pages/Categories'
 import Results from './pages/Results'
 import { 
   Provider, 
-  teamsV2Theme, teamsDarkV2Theme, mergeFontFaces,
+  teamsV2Theme, teamsDarkV2Theme,
   Segment
 } from '@fluentui/react-northstar'
 
