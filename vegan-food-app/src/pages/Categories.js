@@ -42,19 +42,19 @@ const Categories = ({filters, addFilters, hours}) => {
           <Card.Body>
             <Flex fill wrap  gap='gap.smaller' hAlign='center' styles={{height:'100px'}}>
               <Link to='/results'>
-                <Button circular content='🍣 Japanese' onClick={() => {addFilters({filters: 'japanese'})}}/>
+                <Button circular content='🍣 Japanese' onClick={() => {addFilters({cuisine: 'japanese'})}}/>
               </Link>
               <Link to='/results'>
-                <Button circular content='🥡 Chinese' onClick={() => {addFilters({filters: 'chinese'})}}/>
+                <Button circular content='🥡 Chinese' onClick={() => {addFilters({cuisine: 'chinese'})}}/>
               </Link>
               <Link to='/results'>
-                <Button circular content='🥐 French' onClick={() => {addFilters({filters: 'french'})}}/>
+                <Button circular content='🥐 French' onClick={() => {addFilters({cuisine: 'french'})}}/>
               </Link>
               <Link to='/results'>
-                <Button circular content='🥢 Korean' onClick={() => {addFilters({filters: 'korean'})}}/>
+                <Button circular content='🥢 Korean' onClick={() => {addFilters({cuisine: 'korean'})}}/>
               </Link>
               <Link to='/results'>
-                <Button circular content='🥣 Vietnamese' onClick={() => {addFilters({filters: 'vietnamese'})}}/>
+                <Button circular content='🥣 Vietnamese' onClick={() => {addFilters({cuisine: 'vietnamese'})}}/>
               </Link>
             </Flex>          
           </Card.Body>
@@ -66,7 +66,7 @@ const Categories = ({filters, addFilters, hours}) => {
             type="search" 
             styles={{textAlign: 'center'}}
             label="Or try searching something:"
-            onChange={(e) => {addFilters({filters: e.target.value})}}
+            onChange={e => {addFilters({search: e.target.value})}}
           />
           <FormButton content='Search' styles={{textAlign: "center"}}/>
         </Form>

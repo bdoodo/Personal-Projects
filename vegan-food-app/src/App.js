@@ -13,10 +13,18 @@ import {
   Segment
 } from '@fluentui/react-northstar'
 
+
+
 function App() {
   const {latitude, longitude} = useLocation()
   const {hours} = useTime()
   const [filters, setFilters] = useState({})
+  const timeOfDay = hours <= 10 ? 'breakfast'
+    : hours <= 16 ? 'lunch' 
+    : 'dinner'
+  useEffect(() => {
+    addFilters({course: timeOfDay})
+  }, [timeOfDay])
 
   function addFilters(newFilter) {
     setFilters(Object.assign(filters, newFilter))
@@ -39,7 +47,6 @@ function App() {
       ...theme, 
       siteVariables: {
         ...theme.siteVariables,
-        bodyColor: 'white',
         bodyFontFamily: '"sutro", "karmina-sans"'
       }
     }}>

@@ -36,13 +36,13 @@ const Onboarding = ({hours, addFilters}) => {
                 addFilters({goingOut: true})
               }}
             >
-            <Card.Header>
-              <Text size="large">{timeOfDay === 'dinner' ? 'Night out,' : 'Going out,'}</Text>
-            </Card.Header>
-            <Card.Body fitted>
-                <Image src={getImage('goingOut')} fluid/>
-            </Card.Body>
-          </Card>
+              <Card.Header>
+                <Text size="large">{timeOfDay === 'dinner' ? 'Night out,' : 'Going out,'}</Text>
+              </Card.Header>
+              <Card.Body fitted>
+                  <Image src={getImage('goingOut')} fluid/>
+              </Card.Body>
+            </Card>
           </Link>
           <Text align="center" size="large">or</Text>
           <Link to='/categories' style={{textDecoration: 'none'}}>

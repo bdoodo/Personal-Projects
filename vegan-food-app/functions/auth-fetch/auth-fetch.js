@@ -1,22 +1,44 @@
 const fetch = require('node-fetch')
+const {Headers} = fetch
+const url = require('url')
 
-const handler = async function (event, context) {
-  const {filters, goingOut} = event.queryStringParameters.filters
-  const latitude = event.queryStringParameters.latitude
-  const longitude = event.queryStringParameters.longitude
+const handler = async event => {
+  const filters = JSON.parse(event.queryStringParameters.filters)
+  const {show} = event.queryStringParameters
   const {YELP_API_KEY, EDAMAM_APP_ID, EDAMAM_APP_KEY} = process.env
 
+
+  let url
+  let headers
+
   try {
-    const response = await fetch(`https://api.yelp.com/v3/businesses/search?term=${filters}&latitude=${latitude}&longitude=${longitude}`, {
-      headers: {'Authorization': `Bearer ${YELP_API_KEY}`}
+    //restaurants
+    if (show === 'restaurants') {
+      const location = JSON.parse(event.queryStringParameters.location)
+      const searchType = filters.goingOut ? 'businesses' : 'transactions/delivery'
+
+      url = new URL(`https://api.yelp.com/v3/${searchType}/search`)
+      let searchParams = new URLSearchParams([['term', `${filters.search ? filters.search : ''} ${filters.cuisine ? filters.cuisine : ''} vegan`], ['latitude', location.latitude], ['longitude', location.longitude]])
+      url.search = searchParams.toString()
+      console.log(url.href)
+      headers = [['Authorization', `Bearer ${YELP_API_KEY}`]]
+    } // recipes
+    else {
+      const {search = 'noodles'} = filters
+      
+      url = new URL(`https://api.edamam.com/search`)
+      let searchParams = new URLSearchParams([['health', 'vegan'], ['mealType', filters.course], ['q', search], ['app_id', EDAMAM_APP_ID], ['app_key', EDAMAM_APP_KEY]])
+      if (filters.cuisine) searchParams.append('cuisineType', filters.cuisine)
+      url.search = searchParams.toString()
+      console.log(url.href)
+    }
+
+    const response = await fetch(url.href, {
+      headers: new Headers(headers)
     })
     if (!response.ok) {
       return { statusCode: response.status, body: response.statusText }
-    }
-    let response2
-    if (goingOut) {
-      reponse2 = await fetch()
-    }
+    }    
     const data = await response.json()
 
     return {
