@@ -18,7 +18,7 @@ const handler = async event => {
       const searchType = filters.goingOut ? 'businesses' : 'transactions/delivery'
 
       url = new URL(`https://api.yelp.com/v3/${searchType}/search`)
-      let searchParams = new URLSearchParams([['term', `${filters.search ? filters.search : ''} ${filters.cuisine ? filters.cuisine : ''} vegan`], ['latitude', location.latitude], ['longitude', location.longitude]])
+      let searchParams = new URLSearchParams([['term', `${filters.search ? filters.search : ''} ${filters.cuisine ? filters.cuisine : ''} vegan`], ['latitude', location.latitude], ['longitude', location.longitude], ['open_now', true], ['radius', 16093]])
       url.search = searchParams.toString()
       console.log(url.href)
       headers = [['Authorization', `Bearer ${YELP_API_KEY}`]]

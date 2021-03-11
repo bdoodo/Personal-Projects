@@ -8,20 +8,28 @@ const ItemList = ({filters, location, selected}) => {
   const [page, setPage] = useState(0)
 
   const [results, setResults] = useState([])
+  const [message, setMessage] = useState('Loading')
   useEffect(() => {
     fetch(`/.netlify/functions/auth-fetch?show=${selected}&filters=${JSON.stringify(filters)}&location=${JSON.stringify(location)}`)
       .then(response => response.json())
       .then(result => chunk(result.businesses || result.hits, itemsPerPage))
       .then(chunkedItems => {
-        setResults(chunkedItems)
+        if (chunkedItems.length >= 1) setResults(chunkedItems)
+        else setMessage('No results to display')
+      })
+      .catch(e => {
+        console.error(e)
+        setMessage("Uh oh ... that wasn't supposed to happen 👀")
       })
       return (
         setResults([])
       )
-  }, [selected])
+  }, [selected, filters.search, location])
 
-  function nextPage() {
-    setPage(page + 1)
+  function handlePage(next) {
+    if (next) setPage(page + 1)
+    else setPage(page - 1)
+    console.log(page)
   }
 
   return (
@@ -29,12 +37,19 @@ const ItemList = ({filters, location, selected}) => {
       {results[page] ? 
         results[page].map((result, index) =>
           selected === 'restaurants' ?
-            <RestaurantCard info={result} key={index}/>
+            <RestaurantCard info={result} key={index} goingOut={filters.goingOut}/>
             : <RecipeCard info={result} key={index}/>
         )
-        : <Text>Loading</Text>
+        : <Text>{message}</Text>
       }
-      <Button onClick={nextPage} content='Show more'/>
+      <Flex gap='gap.large'>
+        {page > 0 ? <Button onClick={() => {handlePage(false)}} content='Go back'/>
+          : null
+        }
+        {results[page + 1] ? <Button onClick={() => {handlePage(true)}} content='Next page'/>
+          : null
+        }
+      </Flex>
     </Flex>
   )
 }
