@@ -17,19 +17,17 @@ const ItemList = ({filters, location, selected}) => {
         if (chunkedItems.length >= 1) setResults(chunkedItems)
         else setMessage('No results to display')
       })
-      .catch(e => {
-        console.error(e)
-        setMessage("Uh oh ... that wasn't supposed to happen 👀")
-      })
-      return (
-        setResults([])
-      )
+    .catch(e => {
+      console.error(e)
+      setMessage("Uh oh ... that wasn't supposed to happen 👀")
+    })
+
+    return setResults([])
   }, [selected, filters.search, location])
 
   function handlePage(next) {
     if (next) setPage(page + 1)
     else setPage(page - 1)
-    console.log(page)
   }
 
   return (
@@ -43,10 +41,12 @@ const ItemList = ({filters, location, selected}) => {
         : <Text>{message}</Text>
       }
       <Flex gap='gap.large'>
-        {page > 0 ? <Button onClick={() => {handlePage(false)}} content='Go back'/>
+        {page > 0 ? 
+          <Button onClick={() => {handlePage(false)}} content='Go back'/>
           : null
         }
-        {results[page + 1] ? <Button onClick={() => {handlePage(true)}} content='Next page'/>
+        {results[page + 1] ? 
+          <Button onClick={() => {handlePage(true)}} content='Next page'/>
           : null
         }
       </Flex>

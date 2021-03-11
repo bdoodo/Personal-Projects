@@ -18,8 +18,8 @@ const Onboarding = ({hours, addFilters}) => {
       }
     }
     function getImage(inOut) {
-      if (timeOfDay === 'dinner') return cardImages.night[`${inOut}`]
-      return cardImages.day[`${inOut}`]
+      return timeOfDay === 'dinner' ? cardImages.night[`${inOut}`]
+        : cardImages.day[`${inOut}`]
     }
 
   return (
@@ -31,25 +31,25 @@ const Onboarding = ({hours, addFilters}) => {
       <Flex hAlign='center'>
         <Flex column gap="gap.small">
           <Link to='/categories' style={{textDecoration: 'none'}}>
-            <Card elevated aria-roledescription="card for going out" 
-              onClick={() => {
-                addFilters({goingOut: true})
-              }}
+            <Card 
+              elevated 
+              aria-roledescription="card for going out" 
+              onClick={() => {addFilters({goingOut: true})}}
             >
               <Card.Header>
                 <Text size="large">{timeOfDay === 'dinner' ? 'Night out,' : 'Going out,'}</Text>
               </Card.Header>
               <Card.Body fitted>
-                  <Image src={getImage('goingOut')} fluid/>
+                <Image src={getImage('goingOut')} fluid/>
               </Card.Body>
             </Card>
           </Link>
           <Text align="center" size="large">or</Text>
           <Link to='/categories' style={{textDecoration: 'none'}}>
-            <Card elevated aria-roledescription="card for staying in" 
-              onClick={() => {
-                addFilters({goingOut: false})
-              }}
+            <Card 
+              elevated 
+              aria-roledescription="card for staying in" 
+              onClick={() => {addFilters({goingOut: false})}}
             >
               <Card.Header>
                 <Text size="large">{timeOfDay === 'dinner' ? 'night in?' : 'staying in?'}</Text>

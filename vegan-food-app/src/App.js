@@ -18,6 +18,7 @@ import {
 function App() {
   const {latitude, longitude} = useLocation()
   const {hours} = useTime()
+
   const [filters, setFilters] = useState({})
   const timeOfDay = hours <= 10 ? 'breakfast'
     : hours <= 16 ? 'lunch' 
@@ -35,11 +36,17 @@ function App() {
 
   const [theme, setTheme] = useState(teamsV2Theme)
   useEffect(() => {
-    setTheme(darkThemePreference.matches ? teamsDarkV2Theme : teamsV2Theme)
+    setTheme(darkThemePreference.matches ? 
+      teamsDarkV2Theme 
+      : teamsV2Theme
+    )
   }, [darkThemePreference])
 
   darkThemePreference.addEventListener('change', () => {
-    setTheme(darkThemePreference.matches ? teamsDarkV2Theme : teamsV2Theme)
+    setTheme(darkThemePreference.matches ? 
+      teamsDarkV2Theme 
+      : teamsV2Theme
+    )
   })
 
   return (

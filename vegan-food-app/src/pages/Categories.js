@@ -31,7 +31,12 @@ const Categories = ({filters, addFilters, hours}) => {
             styles={{position: 'absolute', top: '20px', left: '20px'}}
             onClick={() => {window.history.back()}}
           />
-          <Image fluid src={filters.goingOut === true ? images[`${dayOrNight}`].goingOut : images[`${dayOrNight}`].stayingIn}/>
+          <Image 
+            fluid 
+            src={filters.goingOut ? 
+              images[`${dayOrNight}`].goingOut 
+              : images[`${dayOrNight}`].stayingIn}
+          />
         </div>
       </Flex.Item>
       <Flex column space='between' gap='gap.large' vAlign='stretch' styles={{marginTop: '5%'}}>
@@ -61,9 +66,9 @@ const Categories = ({filters, addFilters, hours}) => {
         </Card>
         <Form onSubmit={() => {history.push('/results')}}>
           <FormInput 
+            type="search"
             icon={<SearchIcon/>} 
             iconPosition="start" 
-            type="search" 
             styles={{textAlign: 'center'}}
             label="Or try searching something:"
             onChange={e => {addFilters({search: e.target.value})}}

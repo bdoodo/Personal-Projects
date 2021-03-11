@@ -18,10 +18,7 @@ const Results = ({filters, addFilters, location}) => {
           iconPosition="start" 
           fluid
           defaultValue= {filters.search}
-          onChange={e => {
-            addFilters({search: e.target.value})
-            console.log(filters.search)
-          }}
+          onChange={e => {addFilters({search: e.target.value})}}
         />
       </Form>
       <ListPicker location={location} filters={filters} addFilters={addFilters}/>
@@ -31,23 +28,24 @@ const Results = ({filters, addFilters, location}) => {
 
 const ListPicker = ({location, filters, addFilters}) => {
   const randomSearches = ['soup', 'noodles', 'rice', 'spicy', 'sour', 'hot']
+  const randomNumber = ceil => Math.round(Math.random() * ceil)
 
   const [selected, setSelected] = useState('restaurants')
   useEffect(() => {
     if (selected === 'recipes' && !filters.search) {
-      addFilters({search: randomSearches[Math.round(Math.random() * randomSearches.length)]})
+      addFilters({search: randomSearches[randomNumber(randomSearches.length)]})
     }
   }, [selected])
 
   return(
     <>
-        {!filters.goingOut ? 
-          <Flex gap='gap.medium' hAlign='center' styles={{marginBottom: '30px'}}>
-            <Button circular content='restaurants' styles={{width: '100px'}} onClick={() => {setSelected('restaurants')}}/>
-            <Button circular content='recipes' styles={{width: '70px'}} onClick={() => {setSelected('recipes')}}/>
-          </Flex>
-          : null
-        }
+      {!filters.goingOut ? 
+        <Flex gap='gap.medium' hAlign='center' styles={{marginBottom: '30px'}}>
+          <Button circular content='restaurants' styles={{width: '100px'}} onClick={() => {setSelected('restaurants')}}/>
+          <Button circular content='recipes' styles={{width: '70px'}} onClick={() => {setSelected('recipes')}}/>
+        </Flex>
+        : null
+      }
       <Text size='larger' styles={{marginBottom: '1em'}}>{selected === 'restaurants' ? 'Open now:' : 'Hot in the kitchen:'}</Text>
       <ItemList location={location} filters={filters} selected={selected}/>
     </>

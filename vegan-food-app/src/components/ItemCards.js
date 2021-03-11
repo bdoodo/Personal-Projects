@@ -47,11 +47,12 @@ const RestaurantCard = ({info, goingOut}) => {
         </Card.Body>
         <Card.Footer>
           <Flex space='between' styles={{padding: '0 10px 0'}}>
-              {info.distance ? 
-                <Flex.Item>
-                  <Text>{(info.distance/1609).toFixed(1)} mi</Text>
-                </Flex.Item>
-                : null}
+            {info.distance ? 
+              <Flex.Item>
+                <Text>{(info.distance/1609).toFixed(1)} mi</Text>
+              </Flex.Item>
+              : null
+            }
             <Flex.Item push styles={{maxWidth: '20px'}}>
               <Image fluid src={'https://s3-media4.fl.yelpcdn.com/assets/srv0/styleguide/c910e279d123/assets/img/brand_guidelines/burst_icon@2x.png'}/>
             </Flex.Item>
