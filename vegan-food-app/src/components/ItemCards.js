@@ -50,9 +50,11 @@ const RestaurantCard = ({info, goingOut}) => {
               </Flex.Item>
               : null
             }
-            <Flex.Item push styles={{maxWidth: '20px'}}>
-              <Image fluid src={'https://s3-media4.fl.yelpcdn.com/assets/srv0/styleguide/c910e279d123/assets/img/brand_guidelines/burst_icon@2x.png'}/>
-            </Flex.Item>
+            <Box styles={{maxHeight: '20px'}}>
+              <Flex.Item push styles={{maxWidth: '20px'}}>
+                <Image fluid src={'https://s3-media4.fl.yelpcdn.com/assets/srv0/styleguide/c910e279d123/assets/img/brand_guidelines/burst_icon@2x.png'}/>
+              </Flex.Item>
+            </Box>
           </Flex>
         </Card.Footer>
       </Card>
