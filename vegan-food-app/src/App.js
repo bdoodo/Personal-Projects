@@ -24,12 +24,8 @@ function App() {
     : hours <= 16 ? 'lunch' 
     : 'dinner'
   useEffect(() => {
-    addFilters({course: timeOfDay})
+    setFilters({...filters, course: timeOfDay})
   }, [timeOfDay])
-
-  function addFilters(newFilter) {
-    setFilters(Object.assign(filters, newFilter))
-  }
 
   //change theme according to user theme color preference  
   let darkThemePreference = window.matchMedia('(prefers-color-scheme: dark)')
@@ -61,13 +57,13 @@ function App() {
       <Router>
         <Switch>
           <Route path="/categories">
-            <Categories hours={hours} filters={filters} addFilters={addFilters}/>
+            <Categories hours={hours} filters={filters} setFilters={setFilters}/>
           </Route>
           <Route path="/results">
-            <Results filters={filters} addFilters={addFilters} location={{latitude: latitude, longitude: longitude}}/>
+            <Results filters={filters} setFilters={setFilters} location={{latitude: latitude, longitude: longitude}}/>
           </Route>
           <Route path="/">
-            <Onboarding hours={hours} addFilters={addFilters}/>
+            <Onboarding hours={hours} filters={filters} setFilters={setFilters}/>
           </Route>
         </Switch>
       </Router>

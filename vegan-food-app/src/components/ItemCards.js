@@ -17,30 +17,27 @@ const icons = {0: small_0, 1: small_1, 1.5: small_1_half, 2: small_2, 2.5: small
 
 
 const RestaurantCard = ({info, goingOut}) => {
-  const ratingRound = (rating) => {
-    return Math.round(rating*2)/2
-    //return Number.isInteger(rounded) ? `${rounded}` : `${Math.trunc(rounded)}_half`
-  }
+  const ratingRound = rating => Math.round(rating*2)/2
 
   return (
     <a href={info.url} target='_blank'>
       <Card elevated>
         <Card.Header>
           <Text size='large' weight='light'>{info.name}</Text>
-          <Text size='smaller' styles={{color:'grey'}}>{info.location?.address1}, {info.location?.city}</Text>
+          <Text size='smaller' styles={{color:'grey'}}>{info.location?.address1}{`, ${info.location?.city}`}</Text>
         </Card.Header>
         <Card.Body>
           <Flex gap="gap.medium">
             <Flex.Item styles={{maxWidth: '33%'}}>
-              <Image fluid src={info.image_url} styles={{borderRadius: '3px', height:'100%'}}/>
+              <Image fluid src={info.image_url} styles={{borderRadius: '3px', maxHeight: '100%'}}/>
             </Flex.Item>
             <Flex.Item grow>
               <Flex column gap='gap.smaller'>
                 <Image src={icons[ratingRound(info.rating)]} styles={{maxWidth: '80px'}}/>
                 <Text size='small'>
-                  {info.price ? `${info.price} • ` : null}{info.categories?.map(x => x.title + ' ')}
+                  {info.price ? `${info.price} • ` : null}{info.categories?.map(x => x.title).join(', ')}
                 </Text>
-                <Text>{info.transactions?.join('/')}</Text>
+                <Text weight={goingOut ? null : 'bold'}>{info.transactions?.join('/')}</Text>
               </Flex>
             </Flex.Item>
           </Flex>
@@ -64,11 +61,18 @@ const RestaurantCard = ({info, goingOut}) => {
 }
 
 const RecipeCard = ({info}) => {
+  const sentenceCase = str => str.charAt(0).toUpperCase() + str.slice(1)
+
   return (
     <a href={info.recipe?.url} target='_blank'>
       <Card elevated>
         <Card.Header>
           <Text size='large' weight='light'>{info.recipe?.label}</Text>
+          <Text size='smaller' styles={{color: 'grey'}}>
+            {info.recipe?.cuisineType?.map(x => 
+              sentenceCase(x)
+            ).join(', ')}
+            </Text>
         </Card.Header>
         <Card.Body>
           <Flex gap="gap.medium">
@@ -76,12 +80,15 @@ const RecipeCard = ({info}) => {
               <Image fluid src={info.recipe?.image} styles={{borderRadius: '3px'}}/>
             </Flex.Item>
             <Flex.Item grow>
-              <Flex column vAlign='center'>
+              <Flex column gap='gap.smaller'>
                 <Flex.Item grow>
                 </Flex.Item>
+                <Text>{info.recipe?.dishType?.join(', ')}</Text>
                 <Text>{info.recipe?.mealType}</Text>
-                <Text>{info.recipe?.dishType.join(', ')}</Text>
-                <Text>{info.recipe?.totalTime} mins</Text>
+                {info.recipe?.totalTime 
+                  ? <Text size='small'>{info.recipe?.totalTime} mins</Text>
+                  : null
+                }
               </Flex>
             </Flex.Item>
           </Flex>

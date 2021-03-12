@@ -2,9 +2,9 @@ import React from 'react'
 import { Card, Image, Text, Flex } from '@fluentui/react-northstar'
 import { Link } from 'react-router-dom'
 
-const Onboarding = ({hours, addFilters}) => {
+const Onboarding = ({hours, setFilters, filters}) => {
   const timeOfDay = hours <= 10 ? 'breakfast'
-    : hours <= 16 ? 'lunch' 
+    : hours <= 15 ? 'lunch' 
     : 'dinner'
 
     const cardImages = {
@@ -18,7 +18,8 @@ const Onboarding = ({hours, addFilters}) => {
       }
     }
     function getImage(inOut) {
-      return timeOfDay === 'dinner' ? cardImages.night[`${inOut}`]
+      return timeOfDay === 'dinner'
+        ? cardImages.night[`${inOut}`]
         : cardImages.day[`${inOut}`]
     }
 
@@ -34,7 +35,7 @@ const Onboarding = ({hours, addFilters}) => {
             <Card 
               elevated 
               aria-roledescription="card for going out" 
-              onClick={() => {addFilters({goingOut: true})}}
+              onClick={() => {setFilters({...filters, goingOut: true})}}
             >
               <Card.Header>
                 <Text size="large">{timeOfDay === 'dinner' ? 'Night out,' : 'Going out,'}</Text>
@@ -49,13 +50,13 @@ const Onboarding = ({hours, addFilters}) => {
             <Card 
               elevated 
               aria-roledescription="card for staying in" 
-              onClick={() => {addFilters({goingOut: false})}}
+              onClick={() => {setFilters({...filters, goingOut: false})}}
             >
               <Card.Header>
                 <Text size="large">{timeOfDay === 'dinner' ? 'night in?' : 'staying in?'}</Text>
               </Card.Header>
-              <Card.Body fitted styles={{maxHeight: '150px', overflow: 'hidden'}}>
-                <Image src={getImage('stayingIn')} fluid styles={{position: 'relative', bottom: '50%'}}/>
+              <Card.Body fitted styles={{maxHeight: '200px', overflow: 'hidden'}}>
+                <Image src={getImage('stayingIn')} fluid styles={{position: 'relative'}}/>
               </Card.Body>
             </Card>
           </Link>

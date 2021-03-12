@@ -3,6 +3,8 @@ import {Flex, Button, Text} from '@fluentui/react-northstar'
 import {RestaurantCard, RecipeCard} from './ItemCards'
 const chunk = require('lodash.chunk')
 
+//set up loading icon
+
 const ItemList = ({filters, location, selected}) => {
   const itemsPerPage = 10
   const [page, setPage] = useState(0)
@@ -22,7 +24,8 @@ const ItemList = ({filters, location, selected}) => {
       setMessage("Uh oh ... that wasn't supposed to happen 👀")
     })
 
-    return setResults([])
+    //cleanup function
+    return () => {setResults([])}
   }, [selected, filters.search, location])
 
   function handlePage(next) {
@@ -42,11 +45,14 @@ const ItemList = ({filters, location, selected}) => {
       }
       <Flex gap='gap.large'>
         {page > 0 ? 
-          <Button onClick={() => {handlePage(false)}} content='Go back'/>
+          <>
+            <Button onClick={() => {handlePage(false)}} content='Go back'/>
+            <Text weight='bold'>pp.{page + 1}</Text>
+          </>
           : null
         }
         {results[page + 1] ? 
-          <Button onClick={() => {handlePage(true)}} content='Next page'/>
+            <Button onClick={() => {handlePage(true)}} content='Next page'/>
           : null
         }
       </Flex>

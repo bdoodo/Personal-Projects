@@ -15,16 +15,16 @@ const handler = async event => {
     //restaurants
     if (show === 'restaurants') {
       const location = JSON.parse(event.queryStringParameters.location)
-      const searchType = filters.goingOut ? 'businesses' : 'transactions/delivery'
+      //const searchType = filters.goingOut ? 'businesses' : 'transactions/delivery'
 
-      url = new URL(`https://api.yelp.com/v3/${searchType}/search`)
+      url = new URL(`https://api.yelp.com/v3/businesses/search`)
       let searchParams = new URLSearchParams([['term', `${filters.search ? filters.search : ''} ${filters.cuisine ? filters.cuisine : ''} vegan`], ['latitude', location.latitude], ['longitude', location.longitude], ['open_now', true], ['radius', 16093]])
       url.search = searchParams.toString()
       console.log(url.href)
       headers = [['Authorization', `Bearer ${YELP_API_KEY}`]]
     } // recipes
     else {
-      const {search = 'noodles'} = filters
+      const {search = ''} = filters
       
       url = new URL(`https://api.edamam.com/search`)
       let searchParams = new URLSearchParams([['health', 'vegan'], ['mealType', filters.course], ['q', search], ['app_id', EDAMAM_APP_ID], ['app_key', EDAMAM_APP_KEY]])

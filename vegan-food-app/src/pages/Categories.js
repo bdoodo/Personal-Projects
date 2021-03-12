@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import {Button, UndoIcon, Flex, Image, Text, 
   Form, FormInput, SearchIcon, FormButton,
   Card
@@ -17,8 +17,8 @@ const images = {
 }
 
 
-const Categories = ({filters, addFilters, hours}) => {
-  const dayOrNight = hours > 16 ? 'night' : 'day'
+const Categories = ({filters, setFilters, hours}) => {
+  const dayOrNight = hours > 15 ? 'night' : 'day'
   const history = useHistory()
 
   return (
@@ -47,19 +47,19 @@ const Categories = ({filters, addFilters, hours}) => {
           <Card.Body>
             <Flex fill wrap  gap='gap.smaller' hAlign='center' styles={{height:'100px'}}>
               <Link to='/results'>
-                <Button circular content='🍣 Japanese' onClick={() => {addFilters({cuisine: 'japanese'})}}/>
+                <Button circular content='🍣 Japanese' onClick={() => {setFilters({...filters, cuisine: 'japanese'})}}/>
               </Link>
               <Link to='/results'>
-                <Button circular content='🥡 Chinese' onClick={() => {addFilters({cuisine: 'chinese'})}}/>
+                <Button circular content='🥡 Chinese' onClick={() => {setFilters({...filters, cuisine: 'chinese'})}}/>
               </Link>
               <Link to='/results'>
-                <Button circular content='🥐 French' onClick={() => {addFilters({cuisine: 'french'})}}/>
+                <Button circular content='🥐 French' onClick={() => {setFilters({...filters, cuisine: 'french'})}}/>
               </Link>
               <Link to='/results'>
-                <Button circular content='🥢 Asian' onClick={() => {addFilters({cuisine: 'asian'})}}/>
+                <Button circular content='🥢 Asian' onClick={() => {setFilters({...filters, cuisine: 'asian'})}}/>
               </Link>
               <Link to='/results'>
-                <Button circular content='🥣 Southeast Asian' onClick={() => {addFilters({cuisine: 'south east asian'})}}/>
+                <Button circular content='🥣 Southeast Asian' onClick={() => {setFilters({...filters, cuisine: 'south east asian'})}}/>
               </Link>
             </Flex>          
           </Card.Body>
@@ -71,7 +71,7 @@ const Categories = ({filters, addFilters, hours}) => {
             iconPosition="start" 
             styles={{textAlign: 'center'}}
             label="Or try searching something:"
-            onChange={e => {addFilters({search: e.target.value})}}
+            onChange={e => {setFilters({...filters, search: e.target.value})}}
           />
           <FormButton content='Search' styles={{textAlign: "center"}}/>
         </Form>
