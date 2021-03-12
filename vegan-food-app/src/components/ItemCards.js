@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react'
-import {Card, Image, Flex, Text} from '@fluentui/react-northstar'
+import {Card, Image, Flex, Text, Box} from '@fluentui/react-northstar'
 
 //import rating icons
 import small_0 from '../assets/yelp-rating-icons/small_0.png'
@@ -28,9 +28,9 @@ const RestaurantCard = ({info, goingOut}) => {
         </Card.Header>
         <Card.Body>
           <Flex gap="gap.medium">
-            <Flex.Item styles={{maxWidth: '33%'}}>
-              <Image fluid src={info.image_url} styles={{borderRadius: '3px', maxHeight: '100%'}}/>
-            </Flex.Item>
+            <Box styles={{maxWidth: '33%', maxHeight: '120px', overflow: 'hidden'}}>
+              <Image fluid src={info.image_url} styles={{borderRadius: '3px'}}/>
+            </Box>
             <Flex.Item grow>
               <Flex column gap='gap.smaller'>
                 <Image src={icons[ratingRound(info.rating)]} styles={{maxWidth: '80px'}}/>
@@ -76,9 +76,9 @@ const RecipeCard = ({info}) => {
         </Card.Header>
         <Card.Body>
           <Flex gap="gap.medium">
-          <Flex.Item styles={{maxWidth: '33%'}}>
+          <Box styles={{maxWidth: '88px', maxHeight: '120px', overflow: 'hidden'}}>
               <Image fluid src={info.recipe?.image} styles={{borderRadius: '3px'}}/>
-            </Flex.Item>
+            </Box>
             <Flex.Item grow>
               <Flex column gap='gap.smaller'>
                 <Flex.Item grow>

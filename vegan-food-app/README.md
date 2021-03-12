@@ -1,6 +1,6 @@
 # Vegoons
 
-This app hasn't been given a version number yet, but it'll soon be ready.
+Version 0.1.0
 
 *[Link to current staging deploy](https://staging--sleepy-lalande-155723.netlify.app/)*
 
