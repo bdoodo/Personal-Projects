@@ -1,13 +1,14 @@
 import React, {useState, useEffect} from 'react'
 import {Flex, Button, Text} from '@fluentui/react-northstar'
-import ItemList from './ItemList'
+import {RestaurantList, RecipeList} from './ItemLists'
 
 const ListPicker = ({location, filters}) => {
   const [selected, setSelected] = useState('restaurants')
 
   return (
     <>
-      {!filters.goingOut ? 
+      { /** display restaurants/recipes toggle if not going out */
+        !filters.goingOut &&
         <Flex gap='gap.medium' hAlign='center' styles={{marginBottom: '30px'}}>
           <Button 
             circular 
@@ -24,10 +25,19 @@ const ListPicker = ({location, filters}) => {
             primary={selected === 'recipes' ? true : false}
           />
         </Flex>
-        : null
+      } 
+      
+      { /**call restaurant list or recipe list depending on toggle state */
+        selected === 'restaurants'
+          ? <>
+              <Text size='larger' styles={{marginBottom: '1em'}}>Open now:</Text>
+              <RestaurantList location={location} filters={filters}/>
+            </>
+          : <>
+              <Text size='larger' styles={{marginBottom: '1em'}}>Hot in the kitchen:</Text>
+              <RecipeList filters={filters}/>
+            </>
       }
-      <Text size='larger' styles={{marginBottom: '1em'}}>{selected === 'restaurants' ? 'Open now:' : 'Hot in the kitchen:'}</Text>
-      <ItemList location={location} filters={filters} selected={selected}/>
     </>
   )
 }

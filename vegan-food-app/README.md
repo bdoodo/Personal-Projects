@@ -1,8 +1,8 @@
 # Vegoons
 
-Version 0.1.0
+Version 0.2.0
 
-*[Link to current staging deploy](https://staging--sleepy-lalande-155723.netlify.app/)*
+*[Link to current staging deploy](https://staging--vegoons.netlify.app/)*
 
 ## Concept
 
