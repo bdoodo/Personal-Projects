@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React from 'react'
 import {Button, UndoIcon, Flex, Image, Text, 
   Form, FormInput, SearchIcon, FormButton,
   Card
@@ -22,7 +22,7 @@ const Categories = ({filters, setFilters, hours}) => {
   const history = useHistory()
 
   return (
-    <Flex column fill>
+    <Flex column fill padding='padding.medium'>
       <Flex.Item size='size.quarter'>
         <div>
           <Button 

@@ -1,6 +1,5 @@
 const fetch = require('node-fetch')
 const {Headers} = fetch
-const url = require('url')
 
 const handler = async event => {
   const filters = JSON.parse(event.queryStringParameters.filters)
@@ -15,7 +14,6 @@ const handler = async event => {
     //restaurants
     if (show === 'restaurants') {
       const location = JSON.parse(event.queryStringParameters.location)
-      //const searchType = filters.goingOut ? 'businesses' : 'transactions/delivery'
 
       url = new URL(`https://api.yelp.com/v3/businesses/search`)
       let searchParams = new URLSearchParams([['term', `${filters.search ? filters.search : ''} ${filters.cuisine ? filters.cuisine : ''} vegan`], ['latitude', location.latitude], ['longitude', location.longitude], ['open_now', true], ['radius', 16093]])

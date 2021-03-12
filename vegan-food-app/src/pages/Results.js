@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import { Button, UndoIcon, Form, FormInput, SearchIcon, Flex, Text } from '@fluentui/react-northstar'
+import { Button, UndoIcon, Form, FormInput, SearchIcon, Flex } from '@fluentui/react-northstar'
 import ListPicker from '../components/ListPicker'
 
 const Results = ({filters, location, setFilters}) => {
@@ -13,7 +13,7 @@ const Results = ({filters, location, setFilters}) => {
   const [search, setSearch] = useState(filters.search)
 
   return (
-    <Flex column>
+    <Flex column padding='padding.medium'>
       <Button 
         circular 
         icon={<UndoIcon/>} 

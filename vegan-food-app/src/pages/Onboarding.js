@@ -25,7 +25,7 @@ const Onboarding = ({hours, setFilters, filters}) => {
 
   return (
     <>
-      <Flex column gap="gap.large" styles={{marginBottom: '50px'}}>
+      <Flex column gap="gap.large" styles={{marginBottom: '50px'}} padding='padding.medium'>
         <Text align="center" as="h1" size="large">Vegoons</Text>
         <Text as="h2">What's for {timeOfDay}?</Text>
       </Flex>

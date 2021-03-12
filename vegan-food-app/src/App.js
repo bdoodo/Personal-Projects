@@ -7,12 +7,7 @@ import {useState, useEffect} from "react"
 import Onboarding from "./pages/Onboarding"
 import Categories from './pages/Categories'
 import Results from './pages/Results'
-import { 
-  Provider, 
-  teamsV2Theme, teamsDarkV2Theme,
-  Segment
-} from '@fluentui/react-northstar'
-
+import { Provider, teamsV2Theme, teamsDarkV2Theme} from '@fluentui/react-northstar'
 
 
 function App() {
@@ -53,7 +48,6 @@ function App() {
         bodyFontFamily: '"sutro", "karmina-sans"'
       }
     }}>
-      <Segment styles={{minHeight: '100%', width: '100%', position: 'absolute'}}>
       <Router>
         <Switch>
           <Route path="/categories">
@@ -67,7 +61,6 @@ function App() {
           </Route>
         </Switch>
       </Router>
-      </Segment>
     </Provider>
   );
 }
