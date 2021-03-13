@@ -9,24 +9,27 @@ const itemsPerPage = 10
 const RestaurantList = ({filters, location}) => {
   const [page, setPage] = useState(0)
   const [message, setMessage] = useState('Loading')
+  const [search, setSearch] = useState(filters.search)
 
   const [results, setResults] = useState([])
   useEffect(() => {
-    if (!results[0] || results.length === page + 1) {
-      fetch(`/.netlify/functions/auth-fetch?show=restaurants&filters=${JSON.stringify(filters)}&location=${JSON.stringify(location)}&from=${page*20}`)
+    try {
+      if (!results[0] || results.length === page + 1 || search !== filters.search) {
+        fetch(`/.netlify/functions/auth-fetch?show=restaurants&filters=${JSON.stringify(filters)}&location=${JSON.stringify(location)}&from=${page*20}`)
         .then(response => response.json())
         .then(result => chunk(result.businesses, itemsPerPage))
         .then(chunkedItems => {
           if (chunkedItems.length >= 1) {
             const newResults = results.concat(chunkedItems)
-            setResults(newResults)
+            setResults(search === filters.search ? newResults : chunkedItems)
+            setSearch(filters.search)
           }
           else setMessage('No results to display')
         })
-      .catch(e => {
-        console.error(e)
-        setMessage("Uh oh ... that wasn't supposed to happen 👀")
-      })
+      }
+    } catch (e) {
+          console.error(e)
+          setMessage("Uh oh ... that wasn't supposed to happen 👀")
     }
   }, [filters, location, page])
 
@@ -58,27 +61,31 @@ const RestaurantList = ({filters, location}) => {
   )
 }
 
-const RecipeList = ({filters, selected}) => {
+const RecipeList = ({filters}) => {
   const [page, setPage] = useState(0)
+  const [message, setMessage] = useState('Loading')
+  const [search, setSearch] = useState(filters.search)
 
   const [results, setResults] = useState([])
-  const [message, setMessage] = useState('Loading')
   useEffect(() => {
-    if (!results[0] || results.length === page + 1) {
-      fetch(`/.netlify/functions/auth-fetch?show=recipes&filters=${JSON.stringify(filters)}&from=${page*20}`)
-        .then(response => response.json())
-        .then(result => chunk(result.hits, itemsPerPage))
-        .then(chunkedItems => {
-          if (chunkedItems.length >= 1) {
-            const newResults = results.concat(chunkedItems)
-            setResults(newResults)
-          }
-          else setMessage('No results to display')
-        })
-      .catch(e => {
-        console.error(e)
-        setMessage("Uh oh ... that wasn't supposed to happen 👀")
-      })
+    try {
+      if (!results[0] || results.length === page + 1 || search !== filters.search) {
+        fetch(`/.netlify/functions/auth-fetch?show=recipes&filters=${JSON.stringify(filters)}&from=${page*20}`)
+          .then(response => response.json())
+          .then(result => chunk(result.hits, itemsPerPage))
+          .then(chunkedItems => {
+            if (chunkedItems.length >= 1) {
+              const newResults = results.concat(chunkedItems)
+              setResults(search === filters.search ? newResults : chunkedItems)
+              setSearch(filters.search)
+            }
+            else setMessage('No results to display')
+          })
+      }
+      
+    } catch (e) {
+      console.error(e)
+      setMessage("Uh oh ... that wasn't supposed to happen 👀")
     }
   }, [filters, page])
 

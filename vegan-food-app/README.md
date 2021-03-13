@@ -1,6 +1,6 @@
 # Vegoons
 
-Version 0.2.0
+Version 0.2.1
 
 *[Link to current staging deploy](https://staging--vegoons.netlify.app/)*
 
