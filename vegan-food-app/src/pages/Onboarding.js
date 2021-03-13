@@ -2,6 +2,9 @@ import React from 'react'
 import { Card, Image, Text, Flex } from '@fluentui/react-northstar'
 import { Link } from 'react-router-dom'
 
+import dayHouse from '../assets/card-images/day-house.svg'
+import nightCity from '../assets/card-images/night-city.png'
+
 const Onboarding = ({hours, setFilters, filters}) => {
   const timeOfDay = hours <= 10 ? 'breakfast'
     : hours <= 15 ? 'lunch' 
@@ -10,10 +13,10 @@ const Onboarding = ({hours, setFilters, filters}) => {
     const cardImages = {
       night: {
         stayingIn: 'https://i.pinimg.com/originals/85/2a/6a/852a6a539530feca6b0b6987f9431d14.png',
-        goingOut: 'https://image.freepik.com/free-vector/night-city-futuristic-landscape-background_1441-2737.jpg'
+        goingOut: nightCity
       },
       day: {
-        stayingIn: 'https://img.freepik.com/free-vector/hi-tech-home-nature-illustration_53876-43779.jpg?size=338&ext=jpg',
+        stayingIn: dayHouse,
         goingOut: 'https://media.istockphoto.com/vectors/futuristic-city-day-vector-id1087611152?k=6&m=1087611152&s=170667a&w=0&h=cs1HrfXMwwds0kfX82J0ntP5a4cfgbbpR0GS709yBTE='
       }
     }

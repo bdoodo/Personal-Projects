@@ -8,7 +8,7 @@ import { useHistory, Link } from 'react-router-dom'
 const images = {
   day: {
     stayingIn: 'https://i.pinimg.com/originals/9c/3b/a3/9c3ba37ed4fe401a41ba77ef3a036e6e.gif',
-    goingOut: 'https://image.freepik.com/free-vector/people-walking-along-street-city-park_74855-7808.jpg'
+    goingOut: 'https://image.freepik.com/free-vector/crowd-people-practicing-activities-enjoying-leisure-street-near-city-park_74855-10550.jpg'
   },
   night: {
     stayingIn: 'https://i.pinimg.com/originals/0c/a0/dd/0ca0ddd9bf8dfee8a2c26227bf21f6b8.gif',
