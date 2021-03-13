@@ -13,8 +13,13 @@ const RestaurantList = ({filters, location}) => {
 
   const [results, setResults] = useState([])
   useEffect(() => {
-    try {
-      if (!results[0] || results.length === page + 1 || search !== filters.search) {
+    if (search !== filters.search || (results.length === page + 1 && results[results.length - 1].length === 10) || !results[0]) {
+      try {
+        if (search !== filters.search)  {
+          setPage(0)
+          setResults([])
+          setSearch(filters.search)
+        }
         fetch(`/.netlify/functions/auth-fetch?show=restaurants&filters=${JSON.stringify(filters)}&location=${JSON.stringify(location)}&from=${page*20}`)
         .then(response => response.json())
         .then(result => chunk(result.businesses, itemsPerPage))
@@ -22,14 +27,14 @@ const RestaurantList = ({filters, location}) => {
           if (chunkedItems.length >= 1) {
             const newResults = results.concat(chunkedItems)
             setResults(search === filters.search ? newResults : chunkedItems)
-            setSearch(filters.search)
+
           }
           else setMessage('No results to display')
         })
-      }
-    } catch (e) {
+      } catch (e) {
           console.error(e)
           setMessage("Uh oh ... that wasn't supposed to happen 👀")
+      }
     }
   }, [filters, location, page])
 
@@ -68,24 +73,27 @@ const RecipeList = ({filters}) => {
 
   const [results, setResults] = useState([])
   useEffect(() => {
-    try {
-      if (!results[0] || results.length === page + 1 || search !== filters.search) {
+    if (search !== filters.search || (results.length === page + 1 && results[results.length - 1].length === 9) || !results[0]) {
+      try {
+        if (search !== filters.search)  {
+          setPage(0)
+          setResults([])
+          setSearch(filters.search)
+        }
         fetch(`/.netlify/functions/auth-fetch?show=recipes&filters=${JSON.stringify(filters)}&from=${page*20}`)
-          .then(response => response.json())
-          .then(result => chunk(result.hits, itemsPerPage))
-          .then(chunkedItems => {
-            if (chunkedItems.length >= 1) {
-              const newResults = results.concat(chunkedItems)
-              setResults(search === filters.search ? newResults : chunkedItems)
-              setSearch(filters.search)
-            }
-            else setMessage('No results to display')
-          })
+        .then(response => response.json())
+        .then(result => chunk(result.hits, itemsPerPage))
+        .then(chunkedItems => {
+          if (chunkedItems.length >= 1) {
+            const newResults = results.concat(chunkedItems)
+            setResults(search === filters.search ? newResults : chunkedItems)
+          }
+          else setMessage('No results to display')
+        })
+      } catch (e) {
+          console.error(e)
+          setMessage("Uh oh ... that wasn't supposed to happen 👀")
       }
-      
-    } catch (e) {
-      console.error(e)
-      setMessage("Uh oh ... that wasn't supposed to happen 👀")
     }
   }, [filters, page])
 
