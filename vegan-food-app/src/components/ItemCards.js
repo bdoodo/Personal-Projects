@@ -20,7 +20,7 @@ const RestaurantCard = ({info, goingOut}) => {
   const ratingRound = rating => Math.round(rating*2)/2
 
   return (
-    <a href={info.url} target='_blank'>
+    <a href={info.url} target='_blank' rel='noreferrer'>
       <Card elevated>
         <Card.Header>
           <Text size='large' weight='light'>{info.name}</Text>
@@ -66,7 +66,7 @@ const RecipeCard = ({info}) => {
   const sentenceCase = str => str.charAt(0).toUpperCase() + str.slice(1)
 
   return (
-    <a href={info.recipe?.url} target='_blank'>
+    <a href={info.recipe?.url} target='_blank' rel='noreferrer'>
       <Card elevated>
         <Card.Header>
           <Text size='large' weight='light'>{info.recipe?.label}</Text>

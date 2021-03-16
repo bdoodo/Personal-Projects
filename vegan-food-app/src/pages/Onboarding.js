@@ -3,7 +3,6 @@ import { Card, Image, Text, Flex } from '@fluentui/react-northstar'
 import { Link } from 'react-router-dom'
 
 import dayHouse from '../assets/card-images/day-house.svg'
-import nightCity from '../assets/card-images/night-city.png'
 
 const Onboarding = ({hours, setFilters, filters}) => {
   const timeOfDay = hours <= 10 ? 'breakfast'
@@ -13,7 +12,7 @@ const Onboarding = ({hours, setFilters, filters}) => {
     const cardImages = {
       night: {
         stayingIn: 'https://i.pinimg.com/originals/85/2a/6a/852a6a539530feca6b0b6987f9431d14.png',
-        goingOut: nightCity
+        goingOut: 'https://image.freepik.com/free-vector/night-city-futuristic-landscape-background_1441-2737.jpg'
       },
       day: {
         stayingIn: dayHouse,
