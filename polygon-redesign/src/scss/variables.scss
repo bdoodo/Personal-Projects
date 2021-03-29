@@ -1,0 +1,37 @@
+@font-face {
+  font-family: 'Helvetica Neue';
+  src: url(/src/assets/fonts/FreeSans.otf) format('opentype');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'Helvetica Neue';
+  src: url(/src/assets/fonts/FreeSansBold.otf) format('opentype');
+  font-weight: bold;
+}
+
+$body-font-family: 'Helvetica Neue', sans-serif;
+$font-size-root: 62.5%;
+
+$headings: (
+  'h1': (
+    'size': 4.8rem,
+    'weight': bold,
+    'line-height': 5rem
+  ),
+  'subtitle-1': (
+    'size': 2.4rem,
+    'weight': normal,
+    'line-height': 1.25
+  ),
+  'h2': (
+    'size': 2.4rem,
+    'weight': bold,
+    'line-height': 1.17
+  ),
+  'body-1': (
+    'size': 1.6rem,
+    'weight': normal,
+    'line-height': 1.5
+  ),
+);
