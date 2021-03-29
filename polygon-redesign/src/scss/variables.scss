@@ -34,4 +34,11 @@ $headings: (
     'weight': normal,
     'line-height': 1.5
   ),
+  'button': (
+    'size': 1.6rem,
+    'weight': bold,
+    'text-transform': false
+  )
 );
+
+$btn-text-transform: none;
