@@ -1,7 +1,6 @@
 <template>
   <v-app>
     <v-main class='primary pb-16'>
-      <service-card/>
       <v-container fluid>
         <nav-menu/>
         <section id='intro' 
