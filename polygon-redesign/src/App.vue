@@ -30,7 +30,6 @@
               <v-img id='curious-poly'
                 src='./assets/curious-poly.svg' 
                 lazy-src='./assets/curious-poly.svg'
-                class='d-none d-lg-block'
               />
               <v-col 
                 v-for='service in services'
@@ -138,6 +137,12 @@ export default {
   position: absolute; 
   left: 10%; 
   bottom: 0;
+  display: none;
+}
+@media screen and (min-width: 1400px) {
+  #curious-poly {
+    display: block;
+  }
 }
 
 /**mission */
