@@ -1,5 +1,6 @@
 # Polygon-DuckDuckGo Landing Page
 [Live Link](https://polyduck.netlify.app)
+
 This project is a landing page made with DuckDuckGo's layout and Polygon's branding elements.
 
 ## Design
