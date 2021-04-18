@@ -1,6 +1,6 @@
 # Vegoons
 
-*[Link to current staging deploy](https://staging--vegoons.netlify.app/)*
+*[Link to current deploy](https://vegoons.netlify.app/)*
 
 ## Concept
 
@@ -18,7 +18,13 @@ I chose the font and styles to be fun yet relaxed since I think eating shouldn't
 
 ## Technical points
 
-To source data, I call a custom API that returns data from Yelp or Edamam (for recipes). The app is serverless and the custom API is built with netlify (serverless) functions, which runs on AWS. 
+The initial challenges with this app were state management, using a css-in-js design library, then of course calling and displaying API data.
+
+Before development, I researched several state management methods, including Redux. Based on its own suggestion to *not* use it for everything, I looked at React contexts before realzing simple prop passing would suffice. So the structure is simple: The app has a collection of user inputs which can be updated from each of the app's routes.
+
+The app was originally to be created with Gatsby and make use of GraphQL data. To pick the tools needed for the specific task at hand, I realized a simple SPA and rest APIs would be more expedient. While Yelp has a beta endpoint for GraphQL as well as a Rest endpoint, Edamam only provides regular Rest APIs, so it was also be easier to take in all API data in Rest format. 
+
+During development, an unexpected challenge was displaying list data. Formatting varying data, as well as incorporating page logic was unexpectedly buggy at first. My thought was to call 20 results at a time, then make another call every 2 pages (with 10 results per page). Doing this takes state management, chunking data into 10 item lists, and programming when to make a new API call.
 
 The UI library used is Microsoft's experimental version of fluentUI, [@fluentui/react-northstar](https://github.com/microsoft/fluentui).
 
