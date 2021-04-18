@@ -1,9 +1,9 @@
 import React from 'react'
-import {Button, UndoIcon, Flex, Image, Text, 
+import {Button, Flex, Text, 
   Form, FormInput, SearchIcon, FormButton,
-  Card
+  Card, Animation
 } from '@fluentui/react-northstar'
-import { useHistory, Link } from 'react-router-dom'
+import {useHistory, Link} from 'react-router-dom'
 
 const images = {
   day: {
@@ -17,64 +17,61 @@ const images = {
 }
 
 
-const Categories = ({filters, setFilters, hours}) => {
-  const dayOrNight = hours > 15 ? 'night' : 'day'
+const Categories = ({filters, setFilters}) => {
   const history = useHistory()
+
+  function setCuisine() {
+    setFilters({...filters, cuisine: this.content.match(/[A-Za-z ]+/)})
+  }
 
   return (
     <Flex column fill padding='padding.medium'>
       <Flex.Item size='size.quarter'>
-        <div>
-          <Button 
-            circular 
-            icon={<UndoIcon/>} 
-            styles={{position: 'absolute', top: '20px', left: '20px'}}
-            onClick={() => {window.history.back()}}
-          />
-          <Image 
-            fluid 
-            src={filters.goingOut ? 
-              images[`${dayOrNight}`].goingOut 
-              : images[`${dayOrNight}`].stayingIn}
-          />
-        </div>
+        <Flex column gap="gap.large" padding='padding.medium'>
+          <Text align="center" as="h1" size="large">Vegoons</Text>
+          <Text as="h2">What's for {filters.course}?</Text>
+        </Flex>
       </Flex.Item>
       <Flex column space='between' gap='gap.large' vAlign='stretch' styles={{marginTop: '5%'}}>
-        <Card fluid styles={{alignSelf: 'center'}}>
-          <Card.Header>
-            <Text as='h2'>Feeling Saucy?</Text>
-          </Card.Header>
-          <Card.Body>
-            <Flex fill wrap  gap='gap.smaller' hAlign='center' styles={{height:'100px'}}>
-              <Link to='/results'>
-                <Button circular content='🍣 Japanese' onClick={() => {setFilters({...filters, cuisine: 'japanese'})}}/>
-              </Link>
-              <Link to='/results'>
-                <Button circular content='🥡 Chinese' onClick={() => {setFilters({...filters, cuisine: 'chinese'})}}/>
-              </Link>
-              <Link to='/results'>
-                <Button circular content='🥐 French' onClick={() => {setFilters({...filters, cuisine: 'french'})}}/>
-              </Link>
-              <Link to='/results'>
-                <Button circular content='🥢 Asian' onClick={() => {setFilters({...filters, cuisine: 'asian'})}}/>
-              </Link>
-              <Link to='/results'>
-                <Button circular content='🥣 Southeast Asian' onClick={() => {setFilters({...filters, cuisine: 'south east asian'})}}/>
-              </Link>
-            </Flex>          
-          </Card.Body>
-        </Card>
-        <Form onSubmit={() => {history.push('/results')}}>
-          <FormInput 
-            type="search"
-            icon={<SearchIcon/>} 
-            iconPosition="start" 
-            styles={{textAlign: 'center'}}
-            label="Or try searching something:"
-            onChange={e => {setFilters({...filters, search: e.target.value})}}
-          />
-          <FormButton content='Search' styles={{textAlign: "center"}}/>
-        </Form>
+        <Animation name='slideUp' timingFunction='ease-out'>
+          <Card fluid styles={{alignSelf: 'center'}}>
+            <Card.Header>
+              <Text as='h3'>Try a cuisine</Text>
+            </Card.Header>
+            <Card.Body>
+              <Flex fill wrap  gap='gap.smaller' hAlign='center' styles={{height:'100px'}}>
+                  <Link to='/results'>
+                    <Button circular content='🍣 Japanese' onClick={setCuisine} styles={{padding: '0 0.5em'}}/>
+                  </Link>
+                  <Link to='/results'>
+                    <Button circular content='🥡 Chinese' onClick={setCuisine} styles={{padding: '0 0.5em'}}/>
+                  </Link>
+                  <Link to='/results'>
+                    <Button circular content='🥐 French' onClick={setCuisine} styles={{padding: '0 0.5em'}}/>
+                  </Link>
+                  <Link to='/results'>
+                    <Button circular content='🥢 Asian' onClick={setCuisine} styles={{padding: '0 0.5em'}}/>
+                  </Link>
+                  <Link to='/results'>
+                    <Button circular content='🥣 Southeast Asian' onClick={setCuisine} styles={{padding: '0 0.5em'}}/>
+                  </Link>
+              </Flex>
+            </Card.Body>
+          </Card>
+        </Animation>
+        <Animation name='slideUp' delay='0.2s' timingFunction='ease-out'>
+          <Form onSubmit={() => {history.push('/results')}} styles={{opacity: 0}}>
+            <FormInput 
+              type="search"
+              icon={<SearchIcon/>} 
+              iconPosition="start" 
+              styles={{textAlign: 'center'}}
+              label="Or try searching something:"
+              onChange={e => {setFilters({...filters, search: e.target.value})}}
+            />
+            <FormButton content='Search' styles={{textAlign: "center"}}/>
+          </Form>
+        </Animation>
       </Flex>
     </Flex>
   )

@@ -8,7 +8,7 @@ const Results = ({filters, location, setFilters}) => {
     return () => {
       setFilters({...filters, search: '', cuisine: ''})
     }
-  }, [])
+  }, []) //console keeps says there are 'missing dependencies' here, but the app will break if I add them
 
   const [search, setSearch] = useState(filters.search)
 

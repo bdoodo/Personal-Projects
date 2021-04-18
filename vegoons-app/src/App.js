@@ -17,7 +17,8 @@ const slideUp = {
     },
   },
   duration: '0.2s',
-  fillMode: 'forwards'
+  fillMode: 'forwards',
+  timingFunction: 'ease-out'
 }
 const fadeIn = {
   keyframe: {
@@ -29,6 +30,21 @@ const fadeIn = {
     },
   },
   duration: '0.3s',
+}
+const slideRight = {
+  keyframe: {
+    from: {
+      transform: 'translateX(-5px)',
+      opacity: 0
+    },
+    to: {
+      transform: 'translateX(0)',
+      opacity: 1
+    },
+  },
+  duration: '0.5s',
+  fillMode: 'forwards',
+  timingfunction: 'ease-out'
 }
 
 function App() {
@@ -70,7 +86,8 @@ function App() {
       },
       animations: {
         slideUp,
-        fadeIn
+        fadeIn,
+        slideRight
       }
     }}>
       <Router>

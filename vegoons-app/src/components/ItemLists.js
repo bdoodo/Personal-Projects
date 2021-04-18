@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {Flex, Button, Text} from '@fluentui/react-northstar'
+import {Flex, Button, Text, Animation} from '@fluentui/react-northstar'
 import {RestaurantCard, RecipeCard} from './ItemCards'
 const chunk = require('lodash.chunk')
 
@@ -39,30 +39,38 @@ const RestaurantList = ({filters, location}) => {
   }, [filters, location, page])
 
   function handlePage() {
-    if (this.content === 'Next page') setPage(page + 1)
+    if (this.content === 'Next page') {
+      setPage(page + 1)
+      window.scrollTo(0, 0)
+    }
     else setPage(page - 1)
   }
 
   return (
-    <Flex column hAlign='center' gap='gap.smaller'>
-      {results[page]
-        ?  results[page].map((result, index) => 
-            <RestaurantCard info={result} key={index} goingOut={filters.goingOut}/>
-          )
-        : <Text>{message}</Text>
-      }
-      <Flex gap='gap.large'>
-        {page > 0 &&
-          <>
-            <Button onClick={handlePage} content='Go back'/>
-            <Text weight='bold'>pp.{page + 1}</Text>
-          </>
+    <>
+      <Animation name='slideRight'>
+        <Text size='larger' styles={{marginBottom: '1em'}}>Open now:</Text>
+      </Animation>
+      <Flex column hAlign='center' gap='gap.smaller'>
+        {results[page]
+          ?  results[page].map((result, index) => 
+              <RestaurantCard info={result} key={index} delay={index}/>
+            )
+          : <Text>{message}</Text>
         }
-        {results[page + 1] && 
-          <Button onClick={handlePage} content='Next page'/>
-        }
+        <Flex gap='gap.large'>
+          {page > 0 &&
+            <>
+              <Button onClick={handlePage} content='Go back'/>
+              <Text weight='bold'>pp.{page + 1}</Text>
+            </>
+          }
+          {results[page + 1] && 
+            <Button onClick={handlePage} content='Next page'/>
+          }
+        </Flex>
       </Flex>
-    </Flex>
+    </>
   )
 }
 
@@ -98,30 +106,38 @@ const RecipeList = ({filters}) => {
   }, [filters, page])
 
   function handlePage() {
-    if (this.content === 'Next page') setPage(page + 1)
+    if (this.content === 'Next page') {
+      setPage(page + 1)
+      window.scrollTo(0, 0)
+    }
     else setPage(page - 1)
   }
 
   return (
-    <Flex column hAlign='center' gap='gap.smaller'>
-      {results[page]
-        ?  results[page].map((result, index) =>
-            <RecipeCard info={result} key={index}/>
-          )
-        : <Text>{message}</Text>
-      }
-      <Flex gap='gap.large'>
-        {page > 0 &&
-          <>
-            <Button onClick={handlePage} content='Go back'/>
-            <Text weight='bold'>pp.{page + 1}</Text>
-          </>
+    <>
+      <Animation name='slideRight'>
+        <Text size='larger' styles={{marginBottom: '1em'}}>Hot in the kitchen:</Text>
+      </Animation>
+      <Flex column hAlign='center' gap='gap.smaller'>
+        {results[page]
+          ? results[page].map((result, index) =>
+              <RecipeCard info={result} key={index} delay={index}/>
+            )
+          : <Text>{message}</Text>
         }
-        {results[page + 1] &&
-          <Button onClick={handlePage} content='Next page'/>
-        }
+        <Flex gap='gap.large'>
+          {page > 0 &&
+            <>
+              <Button onClick={handlePage} content='Go back'/>
+              <Text weight='bold'>pp.{page + 1}</Text>
+            </>
+          }
+          {results[page + 1] &&
+            <Button onClick={handlePage} content='Next page'/>
+          }
+        </Flex>
       </Flex>
-    </Flex>
+    </>
   )
 }
 

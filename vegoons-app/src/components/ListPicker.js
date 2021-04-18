@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState} from 'react'
 import {Flex, Button, Text} from '@fluentui/react-northstar'
 import {RestaurantList, RecipeList} from './ItemLists'
 
@@ -29,14 +29,8 @@ const ListPicker = ({location, filters}) => {
       
       { /**call restaurant list or recipe list depending on toggle state */
         selected === 'restaurants'
-          ? <>
-              <Text size='larger' styles={{marginBottom: '1em'}}>Open now:</Text>
-              <RestaurantList location={location} filters={filters}/>
-            </>
-          : <>
-              <Text size='larger' styles={{marginBottom: '1em'}}>Hot in the kitchen:</Text>
-              <RecipeList filters={filters}/>
-            </>
+          ? <RestaurantList location={location} filters={filters}/>
+          : <RecipeList filters={filters}/>
       }
     </>
   )
