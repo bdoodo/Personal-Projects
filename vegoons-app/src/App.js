@@ -1,14 +1,35 @@
-import {
-  BrowserRouter as Router,
-  Route,
-  Switch
-} from "react-router-dom"
+import {BrowserRouter as Router, Route, Switch} from "react-router-dom"
 import {useState, useEffect} from "react"
-import Onboarding from "./pages/Onboarding"
 import Categories from './pages/Categories'
 import Results from './pages/Results'
-import { Provider, teamsV2Theme, teamsDarkV2Theme} from '@fluentui/react-northstar'
+import {Provider, teamsV2Theme, teamsDarkV2Theme} from '@fluentui/react-northstar'
 
+//animations
+const slideUp = {
+  keyframe: {
+    from: {
+      transform: 'translateY(5px)',
+      opacity: 0
+    },
+    to: {
+      transform: 'translateY(0)',
+      opacity: 1
+    },
+  },
+  duration: '0.2s',
+  fillMode: 'forwards'
+}
+const fadeIn = {
+  keyframe: {
+    from: {
+      opacity: 0
+    },
+    to: {
+      opacity: 1
+    },
+  },
+  duration: '0.3s',
+}
 
 function App() {
   const {latitude, longitude} = useLocation()
@@ -16,8 +37,8 @@ function App() {
 
   const [filters, setFilters] = useState({})
   const timeOfDay = hours <= 10 ? 'breakfast'
-    : hours <= 16 ? 'lunch' 
-    : 'dinner'
+  : hours <= 16 ? 'lunch' 
+  : 'dinner'
   useEffect(() => {
     setFilters({...filters, course: timeOfDay})
   }, [timeOfDay])
@@ -46,23 +67,24 @@ function App() {
       siteVariables: {
         ...theme.siteVariables,
         bodyFontFamily: '"sutro", "karmina-sans"'
+      },
+      animations: {
+        slideUp,
+        fadeIn
       }
     }}>
       <Router>
         <Switch>
-          <Route path="/categories">
-            <Categories hours={hours} filters={filters} setFilters={setFilters}/>
-          </Route>
           <Route path="/results">
             <Results filters={filters} setFilters={setFilters} location={{latitude: latitude, longitude: longitude}}/>
           </Route>
           <Route path="/">
-            <Onboarding hours={hours} filters={filters} setFilters={setFilters}/>
+            <Categories filters={filters} setFilters={setFilters} theme={theme}/>
           </Route>
         </Switch>
       </Router>
     </Provider>
-  );
+  )
 }
 
 //custom hooks
