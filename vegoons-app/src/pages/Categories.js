@@ -1,20 +1,9 @@
 import React from 'react'
 import {Button, Flex, Text, 
   Form, FormInput, SearchIcon, FormButton,
-  Card, Animation
+  Card, Animation, useCSS
 } from '@fluentui/react-northstar'
 import {useHistory, Link} from 'react-router-dom'
-
-const images = {
-  day: {
-    stayingIn: 'https://i.pinimg.com/originals/9c/3b/a3/9c3ba37ed4fe401a41ba77ef3a036e6e.gif',
-    goingOut: 'https://image.freepik.com/free-vector/crowd-people-practicing-activities-enjoying-leisure-street-near-city-park_74855-10550.jpg'
-  },
-  night: {
-    stayingIn: 'https://i.pinimg.com/originals/0c/a0/dd/0ca0ddd9bf8dfee8a2c26227bf21f6b8.gif',
-    goingOut: 'https://cdn.dribbble.com/users/497199/screenshots/1920576/city.gif'
-  }
-}
 
 
 const Categories = ({filters, setFilters}) => {
@@ -25,7 +14,7 @@ const Categories = ({filters, setFilters}) => {
   }
 
   return (
-    <Flex column fill padding='padding.medium'>
+    <Flex column fill padding='padding.medium' className='page-spacing'>
       <Flex.Item size='size.quarter'>
         <Flex column gap="gap.large" padding='padding.medium'>
           <Text align="center" as="h1" size="large">Vegoons</Text>

@@ -2,50 +2,8 @@ import {BrowserRouter as Router, Route, Switch} from "react-router-dom"
 import {useState, useEffect} from "react"
 import Categories from './pages/Categories'
 import Results from './pages/Results'
-import {Provider, teamsV2Theme, teamsDarkV2Theme} from '@fluentui/react-northstar'
+import {Provider, teamsV2Theme, teamsDarkV2Theme, useCSS} from '@fluentui/react-northstar'
 
-//animations
-const slideUp = {
-  keyframe: {
-    from: {
-      transform: 'translateY(5px)',
-      opacity: 0
-    },
-    to: {
-      transform: 'translateY(0)',
-      opacity: 1
-    },
-  },
-  duration: '0.2s',
-  fillMode: 'forwards',
-  timingFunction: 'ease-out'
-}
-const fadeIn = {
-  keyframe: {
-    from: {
-      opacity: 0
-    },
-    to: {
-      opacity: 1
-    },
-  },
-  duration: '0.3s',
-}
-const slideRight = {
-  keyframe: {
-    from: {
-      transform: 'translateX(-5px)',
-      opacity: 0
-    },
-    to: {
-      transform: 'translateX(0)',
-      opacity: 1
-    },
-  },
-  duration: '0.5s',
-  fillMode: 'forwards',
-  timingfunction: 'ease-out'
-}
 
 function App() {
   const {latitude, longitude} = useLocation()
@@ -138,6 +96,52 @@ const useTime = () => {
   }, [])
 
   return time
+}
+
+//animations
+
+const slideUp = {
+  keyframe: {
+    from: {
+      transform: 'translateY(5px)',
+      opacity: 0
+    },
+    to: {
+      transform: 'translateY(0)',
+      opacity: 1
+    },
+  },
+  duration: '0.2s',
+  fillMode: 'forwards',
+  timingFunction: 'ease-out'
+}
+
+const fadeIn = {
+  keyframe: {
+    from: {
+      opacity: 0
+    },
+    to: {
+      opacity: 1
+    },
+  },
+  duration: '0.3s',
+}
+
+const slideRight = {
+  keyframe: {
+    from: {
+      transform: 'translateX(-5px)',
+      opacity: 0
+    },
+    to: {
+      transform: 'translateX(0)',
+      opacity: 1
+    },
+  },
+  duration: '0.5s',
+  fillMode: 'forwards',
+  timingfunction: 'ease-out'
 }
 
 export default App;
