@@ -34,7 +34,7 @@ const RestaurantCard = ({info, delay}) => {
               </Box>
               <Flex.Item grow>
                 <Flex column gap='gap.smaller'>
-                  <Image src={icons[ratingRound(info.rating)]} styles={{maxWidth: '80px'}}/>
+                  <Image src={icons[ratingRound(info.rating)]} styles={{maxWidth: '80px'}} alt='yelp rating' />
                   <Text size='small'>
                     {info.price && `${info.price} • `}{info.categories?.map(x => x.title).join(', ')}
                   </Text>
