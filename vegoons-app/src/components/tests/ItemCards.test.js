@@ -3,7 +3,7 @@ import {render, screen} from '@testing-library/react'
 import {within} from '@testing-library/dom'
 import {RestaurantCard} from '../ItemCards'
 
-const mockData = {
+const mockData = { //sample data from Postman
   "id": "FmGF1B-Rpsjq1f5b56qMwg",
   "alias": "molinari-delicatessen-san-francisco",
   "name": "Molinari Delicatessen",
