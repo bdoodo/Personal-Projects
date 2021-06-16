@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-reverie-dev-185016-authRole",
+      "UnauthRoleArn": "arn:aws:iam::750892430448:role/amplify-reverie-dev-185016-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::750892430448:role/amplify-reverie-dev-185016-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-reverie-dev-185016-deployment",
+      "UnauthRoleName": "amplify-reverie-dev-185016-unauthRole",
+      "StackName": "amplify-reverie-dev-185016",
+      "StackId": "arn:aws:cloudformation:us-west-2:750892430448:stack/amplify-reverie-dev-185016/e35beeb0-ccb2-11eb-b790-02a0352905d3",
+      "AmplifyAppId": "d1u19tu6spl9ux"
+    }
+  }
+}
