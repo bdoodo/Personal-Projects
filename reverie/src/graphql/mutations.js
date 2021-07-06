@@ -1,43 +1,40 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const createTodo = /* GraphQL */ `
-  mutation CreateTodo(
-    $input: CreateTodoInput!
-    $condition: ModelTodoConditionInput
+export const createWord = /* GraphQL */ `
+  mutation CreateWord(
+    $input: CreateWordInput!
+    $condition: ModelWordConditionInput
   ) {
-    createTodo(input: $input, condition: $condition) {
+    createWord(input: $input, condition: $condition) {
       id
       name
-      description
       createdAt
       updatedAt
     }
   }
 `;
-export const updateTodo = /* GraphQL */ `
-  mutation UpdateTodo(
-    $input: UpdateTodoInput!
-    $condition: ModelTodoConditionInput
+export const updateWord = /* GraphQL */ `
+  mutation UpdateWord(
+    $input: UpdateWordInput!
+    $condition: ModelWordConditionInput
   ) {
-    updateTodo(input: $input, condition: $condition) {
+    updateWord(input: $input, condition: $condition) {
       id
       name
-      description
       createdAt
       updatedAt
     }
   }
 `;
-export const deleteTodo = /* GraphQL */ `
-  mutation DeleteTodo(
-    $input: DeleteTodoInput!
-    $condition: ModelTodoConditionInput
+export const deleteWord = /* GraphQL */ `
+  mutation DeleteWord(
+    $input: DeleteWordInput!
+    $condition: ModelWordConditionInput
   ) {
-    deleteTodo(input: $input, condition: $condition) {
+    deleteWord(input: $input, condition: $condition) {
       id
       name
-      description
       createdAt
       updatedAt
     }
