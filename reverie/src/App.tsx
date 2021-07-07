@@ -4,17 +4,19 @@ import Amplify, { API, graphqlOperation } from 'aws-amplify'
 import { createWord } from './graphql/mutations'
 import { listWords } from './graphql/queries'
 
-import awsExports from "./aws-exports";
-import { stringify } from 'querystring';
+import { RekognitionClient, DetectLabelsCommand } from '@aws-sdk/client-rekognition'
+
+import awsExports from './aws-exports';
 Amplify.configure(awsExports);
+
+const client = new RekognitionClient({})
 
 const initialState = {name: ''}
 
 const App = () => {
   const [formState, setFormState] = useState(initialState)
-  const [words, setWords] = useState<Word[]>([])
+  const [words, setWords] = useState(new Array<Word>())
   const [associations, setAssociations] = useState([])
-  const [imgUrls, setImgUrls] = useState([])
 
   useEffect(() => {
     fetchWords()
@@ -44,8 +46,16 @@ const App = () => {
     }
   }
 
-  async function getImageUrls() {
+  /**For each word in words, this function gets Google images with it 
+   * as a query, then fetches these images and converts them to bytes 
+   * (uInt8Arrays) for Amazon Rekognition to use. These bytes are stored
+   * in an array, so that each word has an array of bytes, then these arrays
+   * are in turn returned in an array.
+   */
+  const getImageBytes = async () => {
     const urls = words.map(async word => {
+
+      //fetch an array containing Google image urls
       const url = new URL(`https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/Search/ImageSearchAPI`)
       const searchParams = new URLSearchParams(
         [['q', word.name], ['pageNumber', 1], ['pageSize', 10], ['autoCorrect', false]] as string[][]
@@ -53,26 +63,74 @@ const App = () => {
       url.search = searchParams.toString()
 
       const fetchConfig = {
-        "method": "GET",
-        "headers": {
-          "x-rapidapi-key": "e9d24164f4msh7c129df4ebbe15dp141c4cjsn05d5e1ca14eb",
-          "x-rapidapi-host": "contextualwebsearch-websearch-v1.p.rapidapi.com"
+        method: 'GET',
+        headers: {
+          'x-rapidapi-key': process.env.REACT_APP_RAPIDAPI_KEY,
+          'x-rapidapi-host': process.env.REACT_APP_RAPIDAPI_HOST
         }
       }
 
       const res = await fetch(url.href, fetchConfig)
-      const data: {value: {url: string}[]} = await res.json()
-      const urlArray = data.value.map(img => img.url)
-      return urlArray
+      const data = await res.json() as {value: {url: string}[]} //an array of objs with urls
+      const urlArray = data.value.map(img => img.url) //take just the urls
+      const httpsUrls = urlArray.filter(url => url.startsWith('https')) //Only accept image urls hosted on https
+
+      //fetch image urls and convert each to an Uint8Array for Rekognition to use
+      const uInt8ArrayUrls = httpsUrls.map(async url => {
+        const res = await fetch(url)
+        const imageBytes = await res.arrayBuffer()
+        const ua = new Uint8Array(imageBytes)
+
+        return ua
+      })
+
+      return Promise.all(uInt8ArrayUrls)
     })
 
-    setImgUrls(urls)
+    return await Promise.all(urls)
   }
 
-  async function analyzeImages() {
-    const imageUrls = await getImageUrls()
+  /**Passes images to Rekognition for label detection */
+  const analyzeImages = async () => {
+    const imageBytes = await getImageBytes()
 
-    
+    let allLabels = new Array<Set<string>>()
+
+    //With Rekognition, get all labels from images
+    imageBytes.forEach(listOfBytes => {
+      const wordLabels = new Set<string>()
+
+      listOfBytes.forEach(async bytes => {
+        const command = new DetectLabelsCommand(
+          {
+            Image: {Bytes: bytes}
+          }
+        )
+        const response = await client.send(command)
+
+        response.Labels?.forEach(label => {
+          wordLabels.add(label.Name)
+        })
+      })
+
+      allLabels.push(wordLabels)
+    })
+
+    //group common labels between words
+    const commonLabels = new Map<string, number>()
+
+    allLabels.forEach(wordLabelsList => {
+      wordLabelsList.forEach(wordLabel => {//increments count of wordLabel in commonLabels or initializes it to 1
+        const labelCount = commonLabels.has(wordLabel) ? commonLabels.get(wordLabel) + 1
+          : 1
+        commonLabels.set(wordLabel, labelCount)
+      })
+    })
+
+    //sort common labels by occurences
+    const sortedLabels = [...commonLabels.entries()].sort((a, b) => a[1] - b[1])
+
+    return sortedLabels
   }
 
   return (
@@ -82,7 +140,7 @@ const App = () => {
         onChange={event => setInput('name', event.target.value)}
         style={styles.input}
         value={formState.name}
-        placeholder="Name"
+        placeholder='Name'
       />
       <button style={styles.button} onClick={addWord}>Create Word</button>
       {
@@ -92,10 +150,7 @@ const App = () => {
           </div>
         ))
       }
-      {
-        //getImageUrls().map(url => )
-      }
-      <button onClick={getImageUrls}>Get images</button>
+      <button onClick={()=>{}}>Get images</button>
     </div>
   )
 }
