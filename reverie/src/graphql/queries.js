@@ -28,3 +28,42 @@ export const listWords = /* GraphQL */ `
     }
   }
 `;
+export const getAssociations = /* GraphQL */ `
+  query GetAssociations($id: ID!) {
+    getAssociations(id: $id) {
+      id
+      list
+      word {
+        id
+        name
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listAssociationss = /* GraphQL */ `
+  query ListAssociationss(
+    $filter: ModelAssociationsFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listAssociationss(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        list
+        word {
+          id
+          name
+          createdAt
+          updatedAt
+        }
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;

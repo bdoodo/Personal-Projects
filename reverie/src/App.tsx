@@ -16,7 +16,8 @@ const initialState = {name: ''}
 const App = () => {
   const [formState, setFormState] = useState(initialState)
   const [words, setWords] = useState(new Array<Word>())
-  const [associations, setAssociations] = useState([])
+  const [imageUrls, setImageUrls] = useState(new Array<string>())
+  const [associations, setAssociations] = useState(new Array<[string, number]>())
 
   useEffect(() => {
     fetchWords()
@@ -46,15 +47,11 @@ const App = () => {
     }
   }
 
-  /**For each word in words, this function gets Google images with it 
-   * as a query, then fetches these images and converts them to bytes 
-   * (uInt8Arrays) for Amazon Rekognition to use. These bytes are stored
-   * in an array, so that each word has an array of bytes, then these arrays
-   * are in turn returned in an array.
-   */
+  /**Returns an array containing an array of image bytes for each word.
+   * The number of images for each word is determined by 'pageSize.'
+  */
   const getImageBytes = async () => {
     const urls = words.map(async word => {
-
       //fetch an array containing Google image urls
       const url = new URL(`https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/Search/ImageSearchAPI`)
       const searchParams = new URLSearchParams(
@@ -71,9 +68,11 @@ const App = () => {
       }
 
       const res = await fetch(url.href, fetchConfig)
-      const data = await res.json() as {value: {url: string}[]} //an array of objs with urls
+      const data = await res.json() as {value: {url: string}[]} //fetch returns an array of objs with urls
       const urlArray = data.value.map(img => img.url) //take just the urls
       const httpsUrls = urlArray.filter(url => url.startsWith('https')) //Only accept image urls hosted on https
+
+      setImageUrls(httpsUrls)
 
       //fetch image urls and convert each to an Uint8Array for Rekognition to use
       const uInt8ArrayUrls = httpsUrls.map(async url => {
@@ -84,16 +83,16 @@ const App = () => {
         return ua
       })
 
-      return Promise.all(uInt8ArrayUrls)
+      return await Promise.all(uInt8ArrayUrls)
     })
 
     return await Promise.all(urls)
   }
 
-  /**Passes images to Rekognition for label detection */
-  const analyzeImages = async () => {
-    const imageBytes = await getImageBytes()
-
+  /**Passes images to Rekognition for label detection. A label is
+   * something Rekognition sees in an image: E.g., a person or a window.
+   */
+  const analyzeImages = (imageBytes: Uint8Array[][], labelsToReturn: number) => {
     let allLabels = new Array<Set<string>>()
 
     //With Rekognition, get all labels from images
@@ -101,14 +100,14 @@ const App = () => {
       const wordLabels = new Set<string>()
 
       listOfBytes.forEach(async bytes => {
-        const command = new DetectLabelsCommand(
+        const rekognitionCommand = new DetectLabelsCommand(
           {
             Image: {Bytes: bytes}
           }
         )
-        const response = await client.send(command)
+        const rekognitionResponse = await client.send(rekognitionCommand)
 
-        response.Labels?.forEach(label => {
+        rekognitionResponse.Labels?.forEach(label => {
           wordLabels.add(label.Name)
         })
       })
@@ -130,7 +129,17 @@ const App = () => {
     //sort common labels by occurences
     const sortedLabels = [...commonLabels.entries()].sort((a, b) => a[1] - b[1])
 
-    return sortedLabels
+    //return labelsToReturn labels or all labels if there are fewer than labelsToReturn
+    const returnLength = sortedLabels.length >= labelsToReturn ? labelsToReturn 
+      : sortedLabels.length
+
+    setAssociations(sortedLabels.slice(0, returnLength))
+  }
+
+  const getAssociations = async () => {
+    const imageBytes = await getImageBytes()
+
+    analyzeImages(imageBytes, 5)
   }
 
   return (
@@ -150,7 +159,27 @@ const App = () => {
           </div>
         ))
       }
-      <button onClick={()=>{}}>Get images</button>
+      <button onClick={getAssociations}>Get images</button>
+      <h2>Associations between words</h2>
+      <table>
+        <tr>
+          <th>Label</th>
+          <th>Occurrences</th>
+        </tr>
+        {
+          associations.map(association => (
+            <tr>
+              <td>{association[0]}</td>
+              <td>{association[1]}</td>
+            </tr>
+          ))
+        }
+      </table>
+      {
+        imageUrls.map(imageUrl => (
+          <img src={imageUrl}/>
+        ))
+      }
     </div>
   )
 }

@@ -31,3 +31,51 @@ export const onDeleteWord = /* GraphQL */ `
     }
   }
 `;
+export const onCreateAssociations = /* GraphQL */ `
+  subscription OnCreateAssociations {
+    onCreateAssociations {
+      id
+      list
+      word {
+        id
+        name
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateAssociations = /* GraphQL */ `
+  subscription OnUpdateAssociations {
+    onUpdateAssociations {
+      id
+      list
+      word {
+        id
+        name
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteAssociations = /* GraphQL */ `
+  subscription OnDeleteAssociations {
+    onDeleteAssociations {
+      id
+      list
+      word {
+        id
+        name
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;

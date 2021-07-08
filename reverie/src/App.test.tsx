@@ -1,9 +1,14 @@
-import { render, screen } from '@testing-library/react';
+import { render, fireEvent, waitFor, screen } from '@testing-library/react';
 import App from './App';
+import {rest} from 'msw'
+import {setupServer} from 'msw/node'
+import '@testing-library/jest-dom/extend-expect'
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
-});
 
+const server = setupServer(
+  rest.get('/testGoogleImageApi', (req, res, ctx) => {})
+)
+
+test('displays images', () => {
+
+})

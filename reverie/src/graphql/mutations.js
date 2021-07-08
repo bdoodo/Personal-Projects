@@ -40,3 +40,60 @@ export const deleteWord = /* GraphQL */ `
     }
   }
 `;
+export const createAssociations = /* GraphQL */ `
+  mutation CreateAssociations(
+    $input: CreateAssociationsInput!
+    $condition: ModelAssociationsConditionInput
+  ) {
+    createAssociations(input: $input, condition: $condition) {
+      id
+      list
+      word {
+        id
+        name
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateAssociations = /* GraphQL */ `
+  mutation UpdateAssociations(
+    $input: UpdateAssociationsInput!
+    $condition: ModelAssociationsConditionInput
+  ) {
+    updateAssociations(input: $input, condition: $condition) {
+      id
+      list
+      word {
+        id
+        name
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteAssociations = /* GraphQL */ `
+  mutation DeleteAssociations(
+    $input: DeleteAssociationsInput!
+    $condition: ModelAssociationsConditionInput
+  ) {
+    deleteAssociations(input: $input, condition: $condition) {
+      id
+      list
+      word {
+        id
+        name
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
