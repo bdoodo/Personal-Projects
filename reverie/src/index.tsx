@@ -3,9 +3,14 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { worker } from './mocks/browser';
 import Amplify from "aws-amplify";
 import awsExports from "./aws-exports";
 Amplify.configure(awsExports);
+
+if (process.env.NODE_ENV === 'development') {
+  worker.start()
+}
 
 ReactDOM.render(
   <React.StrictMode>
