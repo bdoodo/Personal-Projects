@@ -10,6 +10,14 @@
       "StackName": "amplify-reverie-dev-185016",
       "StackId": "arn:aws:cloudformation:us-west-2:750892430448:stack/amplify-reverie-dev-185016/e35beeb0-ccb2-11eb-b790-02a0352905d3",
       "AmplifyAppId": "d1u19tu6spl9ux"
+    },
+    "categories": {
+      "function": {
+        "getImages": {
+          "deploymentBucketName": "amplify-reverie-dev-185016-deployment",
+          "s3Key": "amplify-builds/getImages-7a356930394a326b494a-build.zip"
+        }
+      }
     }
   }
 }

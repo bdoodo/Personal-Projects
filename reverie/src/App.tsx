@@ -59,12 +59,18 @@ const App = () => {
   const getImageBytes = async () => {
     //fetch an array containing lists, one for each word, of Google image urls
     const urlLists = words.map(async word => {
-      let url = (process.env.NODE_ENV === 'development' //for end-to-end testing in dev mode
-        ? `https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/Search/ImageSearchAPI?`
-        : '/testGoogleImageApi?'
+      let url = (process.env.NODE_ENV !== 'development' //for end-to-end testing in dev mode
+        ? '/testGoogleImageApi?'
+        : `https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/Search/ImageSearchAPI?`
       )
       const searchParams = new URLSearchParams(
-        [['q', word.name], ['pageNumber', 1], ['pageSize', 10], ['autoCorrect', false]] as string[][]
+        [
+          ['q', word.name], 
+          ['pageNumber', 1], 
+          ['pageSize', 10], 
+          ['autoCorrect', false],
+          ['safeSearch', true]
+        ] as string[][]
       )
       url += searchParams.toString()
 
@@ -78,9 +84,9 @@ const App = () => {
       
       const res = await fetch(url, fetchConfig)
       const data = await res.json() as {value: {url: string}[]} //fetch returns an array of objs with urls
-      const urls = data.value.flatMap(img => (
+      const urls = data.value.flatMap(img => (//take just the urls hosted on https
         img.url.startsWith('https') ? [img.url] : []
-      )) //take just the urls hosted on https
+      ))
 
       setImageUrls(urls)
 
@@ -89,15 +95,21 @@ const App = () => {
 
     //fetch image urls and convert each to an Uint8Array for Rekognition to use
     const uInt8ArrayBytesList = (await Promise.all(urlLists)).map(async urlList => {
-      const uInt8ArrayBytes = urlList.map(async url => {
-        const res = await fetch(url)
-        const imageBytes = await res.arrayBuffer()
-        const ua = new Uint8Array(imageBytes)
+      let uInt8ArrayBytes: Promise<Uint8Array[]>[] | Uint8Array[] = urlList.map(async url => {
+        try {
+          const res = await fetch(url)
+          const imageBytes = await res.arrayBuffer()
+          const ua = new Uint8Array(imageBytes)
 
-        return ua
+          return [ua]
+        } catch (error) {
+          console.log('error fetching image', error)
+          return []
+        }
       })
+      uInt8ArrayBytes = (await Promise.all(uInt8ArrayBytes)).flat()
 
-      return await Promise.all(uInt8ArrayBytes)
+      return uInt8ArrayBytes
     })
 
       return await Promise.all(uInt8ArrayBytesList)
@@ -106,31 +118,48 @@ const App = () => {
   /**Passes images to Rekognition for label detection. A label is
    * something Rekognition sees in an image: E.g., a person or a window.
    */
-  const analyzeImages = (imageBytesLists: Uint8Array[][], labelsToReturn: number) => {
-    //list containing sets of labels from images for each word
-    const listOfLabelLists = imageBytesLists.map(imageByteList => {
-      const wordLabels = new Set<string>()
-
-      imageByteList.forEach(async bytes => {//call Rekognition for labels
+  const analyzeImages = async (imageBytesLists: Uint8Array[][], labelsToReturn: number) => {
+    const wordLabelLists = imageBytesLists.map(async imageByteList => {
+      let wordLabelList: Promise<string[][]>[] | string[][] = imageByteList.map(async imageBytes => {//call Rekognition for labels
         const rekognitionCommand = new DetectLabelsCommand(
           {
-            Image: {Bytes: bytes}
+            Image: {Bytes: imageBytes}
           }
         )
-        const rekognitionResponse = await client.send(rekognitionCommand)
 
-        rekognitionResponse.Labels?.forEach(label => {
-          label.Name && wordLabels.add(label.Name)
+        try {
+          const rekognitionResponse = await client.send(rekognitionCommand)
+
+          const imageLabels = rekognitionResponse.Labels?.flatMap(label => {
+            return label.Name ? [label.Name] : []
+          })
+
+          return imageLabels ? [imageLabels] : []
+        } catch (error) {
+          console.log('error analyzing image', error)
+          return []
+        }
+      })
+      wordLabelList = (await Promise.all(wordLabelList)).flat()
+
+      //make a set of labels for each word (no label duplicates per word)
+      const uniqueWordLabelList = new Set<string>();
+
+      (await Promise.all(wordLabelList)).forEach(imageLabelList => {
+        imageLabelList.forEach(label => {
+          uniqueWordLabelList.add(label)
         })
       })
 
-      return wordLabels
+      console.log('uniqueWordLabelList:', uniqueWordLabelList)
+
+      return uniqueWordLabelList
     })
 
     //common labels between label lists
-    const commonLabels = new Map<string, number>()
+    const commonLabels = new Map<string, number>();
 
-    listOfLabelLists.forEach(labelList => {//ERR: Not read?
+    (await Promise.all(wordLabelLists)).forEach(labelList => {
       labelList.forEach(wordLabel => {//increments count of wordLabel in commonLabels or initializes it to 1
         const labelCount = (commonLabels.has(wordLabel) 
           ? commonLabels.get(wordLabel)! + 1
@@ -144,10 +173,9 @@ const App = () => {
     const sortedLabels = [...commonLabels.entries()].sort((a, b) => a[1] - b[1])
 
     //return labelsToReturn labels or all labels if there are fewer than labelsToReturn
-    const returnLength = (sortedLabels.length >= labelsToReturn 
+    const returnLength = sortedLabels.length >= labelsToReturn 
       ? labelsToReturn 
       : sortedLabels.length
-    )
     setAssociations(sortedLabels.slice(0, returnLength))
   }
 
