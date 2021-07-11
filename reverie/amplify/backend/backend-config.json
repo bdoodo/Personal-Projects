@@ -11,13 +11,34 @@
           "additionalAuthenticationProviders": []
         }
       }
+    },
+    "getImageBytesApi": {
+      "service": "API Gateway",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "getImageBytes",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        }
+      ]
     }
   },
   "function": {
-    "getImages": {
+    "getImageBytes": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
+    }
+  },
+  "auth": {
+    "cognito235f370e": {
+      "service": "Cognito",
+      "serviceType": "managed",
+      "providerPlugin": "awscloudformation"
     }
   }
 }

@@ -1,0 +1,35 @@
+{
+  "paths": [
+    {
+      "name": "/getBytes",
+      "lambdaFunction": "getImageBytes",
+      "privacy": {
+        "open": true
+      },
+      "policyResourceName": "/getBytes"
+    }
+  ],
+  "resourceName": "getImageBytesApi",
+  "apiName": "getImageBytesApi",
+  "functionArns": [
+    {
+      "lambdaFunction": "getImageBytes"
+    }
+  ],
+  "privacy": {
+    "auth": 0,
+    "unauth": 0,
+    "authRoleName": "amplify-reverie-dev-185016-authRole",
+    "unAuthRoleName": "amplify-reverie-dev-185016-unauthRole"
+  },
+  "dependsOn": [
+    {
+      "category": "function",
+      "resourceName": "getImageBytes",
+      "attributes": [
+        "Name",
+        "Arn"
+      ]
+    }
+  ]
+}

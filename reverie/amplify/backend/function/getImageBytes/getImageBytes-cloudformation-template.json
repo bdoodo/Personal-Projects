@@ -47,12 +47,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "getImages",
+            "getImageBytes",
             {
               "Fn::Join": [
                 "",
                 [
-                  "getImages",
+                  "getImageBytes",
                   "-",
                   {
                     "Ref": "env"
@@ -89,12 +89,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "reverieLambdaRole6a86926c",
+            "reverieLambdaRole3a22e969",
             {
               "Fn::Join": [
                 "",
                 [
-                  "reverieLambdaRole6a86926c",
+                  "reverieLambdaRole3a22e969",
                   "-",
                   {
                     "Ref": "env"
