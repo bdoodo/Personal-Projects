@@ -17,17 +17,25 @@ export const App = () => {
   const [imageUrls, setImageUrls] = useState(new Array<string>())
   const [associations, setAssociations] = useState(new Array<[string, number]>())
   const [activeWords, setActiveWords] = useState(new Array<Word>())
+  const [processing, setProcessing] = useState(false)
 
   
   const getAssociations = async () => {
-    const imgUrlLists = await fetchUrlLists(activeWords)
-    setImageUrls(imgUrlLists.flat())
+    setProcessing(true)
 
+    console.log('fetching urls')
+    const imgUrlLists = await fetchUrlLists(activeWords)
+    setImageUrls([...imageUrls, ...imgUrlLists.flat()])
+
+    console.log('converting urls to bytes')
     const imgBytesLists = await imagesToBytes(imgUrlLists)
+
+    console.log('analyzing images')
     const labels = await analyzeImages(imgBytesLists)
     const sortedLabels = sortLabels(labels, 10)
 
     setAssociations(sortedLabels)
+    setProcessing(false)
   }
 
   return (
@@ -35,25 +43,28 @@ export const App = () => {
       <WordList setActiveWords={setActiveWords} />
       <button onClick={getAssociations}>Get images</button>
       <h2>Associations between words</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Label</th>
-            <th>Occurrences</th>
-          </tr>
-        </thead>
-        <tbody>
-        {
-          associations.map((association, index) => (
-            <tr key={index}>
-              <td>{association[0]}</td>
-              <td>{association[1]}</td>
-            </tr>
-          ))
-        }
-        </tbody>
-      </table>
-      <ImageGrid imgUrls={imageUrls} />
+      {processing && !associations[0]
+        ? 'Loading associations ...'
+        : <table>
+            <thead>
+              <tr>
+                <th>Label</th>
+                <th>Occurrences</th>
+              </tr>
+            </thead>
+            <tbody>
+            {
+              associations.map((association, index) => (
+                <tr key={index}>
+                  <td>{association[0]}</td>
+                  <td>{association[1]}</td>
+                </tr>
+              ))
+            }
+            </tbody>
+          </table>
+      }
+      <ImageGrid imgUrls={imageUrls} processing={processing} />
     </div>
   )
 }

@@ -1,25 +1,44 @@
-import React, {useEffect} from 'react'
-import {Paper, Grid} from '@material-ui/core'
+import {useEffect} from 'react'
+import {Paper, Grid, makeStyles} from '@material-ui/core'
 
-export const ImageGrid = ({imgUrls}: {imgUrls: string[]}) => {
+export const ImageGrid = ({imgUrls, processing}: {imgUrls: string[], processing: boolean}) => {
   useEffect(() => {
     shuffleArray(imgUrls)
-  }, [])
+  }, imgUrls)
+
+  const styles = setStyles()
 
   return (
-    <Grid container spacing={3}>
-    {
-      imgUrls.map((url, index) => (
-        <Grid key={index} item xs={3}>
-          <Paper>
-            <img src={url} />
-          </Paper>
-        </Grid>
-      ))
-    }
-    </Grid>
+    <>
+      {processing && !imgUrls[0]
+        ? 'Loading images ...'
+        : <Grid container spacing={3}>
+            {imgUrls.map((url, index) => (
+              <Grid key={index} item xs={2}>
+                <Paper className={styles.paper}>
+                  <img src={url} className={styles.img} />
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
+      }
+    </>
   )
 }
+
+const setStyles = makeStyles({
+  img: {
+    maxWidth: '100%',
+    borderRaius: '4px',
+    objectFit: 'cover'
+  },  
+  paper: {
+    height: '200px',
+    padding: '2%',
+    display: 'flex',
+    justifyContent: 'center'
+  }
+})
 
 /**
  * Shuffles an array in place.
@@ -28,7 +47,7 @@ export const ImageGrid = ({imgUrls}: {imgUrls: string[]}) => {
  * 
  * @param array The array to be shuffled
  */
-export const shuffleArray = (array: any[]) => {
+const shuffleArray = (array: any[]) => {
   let currentIndex = array.length
   while (currentIndex) {
     const randomIndex = Math.floor(Math.random() * currentIndex--)
