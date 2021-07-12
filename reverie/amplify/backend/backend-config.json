@@ -34,11 +34,5 @@
       "service": "Lambda"
     }
   },
-  "auth": {
-    "cognito235f370e": {
-      "service": "Cognito",
-      "serviceType": "managed",
-      "providerPlugin": "awscloudformation"
-    }
-  }
+  "auth": {}
 }

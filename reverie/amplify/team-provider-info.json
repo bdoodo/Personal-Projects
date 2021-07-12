@@ -12,9 +12,6 @@
       "AmplifyAppId": "d1u19tu6spl9ux"
     },
     "categories": {
-      "auth": {
-        "cognito235f370e": {}
-      },
       "function": {
         "getImageBytes": {
           "deploymentBucketName": "amplify-reverie-dev-185016-deployment",
