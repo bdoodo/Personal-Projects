@@ -1,11 +1,24 @@
 import { ImageGrid } from '..'
 import { render, screen } from '@testing-library/react'
+import {setupServer} from 'msw/node'
 
-const imgUrls = new Array<string>(10)
-for (let i = 0; i < imgUrls.length; i++) {
-  imgUrls[i] = `fakeUrl${i}`
+const wordImagesList = new Array<WordImages>(3)
+for (let i = 0; i < wordImagesList.length; i++) {
+  const wordImages = {
+    word: {name: `word${i}`},
+    images: {
+      urls: [], //urls not tested
+      bytes: 
+    }
+  }
+  for (let j = 0; j < wordImage.urls.length; j++) {
+    wordImage.urls[j] = fetch(`fake`)
+  }
+
+  imgUrls[i] = wordImage
 }
 
+/*
 test.each(imgUrls)('hasUrl%#', url => {
   const {container} = render(<ImageGrid imgUrls={imgUrls} />)
 
@@ -30,4 +43,4 @@ test('shuffles images', () => {//this test may incorrectly fail, although it is 
   const img2 = container.querySelector('img')?.getAttribute('src') as string //src of top img on second render
 
   expect(img1).not.toBe(img2)
-})
+})*/

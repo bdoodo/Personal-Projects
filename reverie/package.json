@@ -2,10 +2,16 @@
   "name": "reverie",
   "version": "0.1.0",
   "private": true,
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "arrowParens": "avoid"
+  },
   "dependencies": {
     "@aws-amplify/ui-react": "^1.2.2",
     "@aws-sdk/client-rekognition": "^3.20.0",
     "@material-ui/core": "^4.12.1",
+    "@material-ui/icons": "^4.11.2",
     "@material-ui/styles": "^4.11.4",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
