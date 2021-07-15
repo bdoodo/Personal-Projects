@@ -25,7 +25,7 @@ export const fetchUrlLists = async (words: Word[]) => {
       new URLSearchParams([
         ['q', word.name],
         ['pageNumber', 1],
-        ['pageSize', 50],
+        ['pageSize', 5],
         ['autoCorrect', false],
         ['safeSearch', true],
       ] as string[][]).toString()
@@ -75,7 +75,7 @@ export const imagesToBytes = async (
 
         return ua
       } catch (error) {
-        console.log('error fetching image', error)
+        console.log('error fetching image')
         return null
       }
     })
@@ -105,6 +105,7 @@ export const imagesToBytes = async (
 export const analyzeImages = async (wordImagesList: WordImages[]) => {
   const updatedWordImagesList = wordImagesList.map(async wordImages => {
     const WordImagesLabels = wordImages.images.map(async image => {
+      if (!image.bytes) return
       try {
         //call Rekognition for labels
         const rekognitionCommand = new DetectLabelsCommand({
@@ -117,7 +118,7 @@ export const analyzeImages = async (wordImagesList: WordImages[]) => {
 
         return imageLabels
       } catch (error) {
-        console.log('error analyzing image')
+        console.log('error analyzing image', error)
         return
       }
     })

@@ -4,10 +4,11 @@ import Amplify, { API, graphqlOperation } from 'aws-amplify'
 import {
   List,
   ListItem,
-  ListItemIcon,
   IconButton,
   ListItemText,
   Button,
+  ListItemSecondaryAction,
+  makeStyles,
 } from '@material-ui/core'
 import { DeleteOutlined } from '@material-ui/icons'
 
@@ -62,14 +63,17 @@ export const WordList = ({
   }
 
   const removeWord = async (word: string) => {
-    const newWords = words.splice(
+    const tempWords = words
+    //Cut out the word to be deleted
+    tempWords.splice(
       words.findIndex(e => e.name === word),
       1
     )
     try {
-      setWords(newWords)
-      setActiveWords(newWords)
-      filters.words.includes(word) && filterByWord(word) //If the removed word was in filters, remove it from filters
+      //If the removed word was in filters, remove it from filters
+      filters.words.includes(word) && filterByWord(word)
+      setWords(tempWords)
+      setActiveWords(tempWords)
       await API.graphql(graphqlOperation(deleteWord, { input: { name: word } }))
     } catch (err) {
       console.log('error deleting word:', err)
@@ -80,8 +84,8 @@ export const WordList = ({
     //If the clicked word is already in 'filters,' remove it from filters; otherwise, add it.
     if (filters.words.includes(word)) {
       const tempWords = filters.words
-      const newWordsFilters = tempWords.splice(tempWords.indexOf(word), 1)
-      setFilters({ ...filters, words: newWordsFilters })
+      tempWords.splice(tempWords.indexOf(word), 1)
+      setFilters({ ...filters, words: tempWords })
     } else {
       setFilters({ ...filters, words: [...filters.words, word] })
     }
@@ -96,6 +100,8 @@ export const WordList = ({
     setSelected(tempSelected)
   }
 
+  const styles = setStyles()
+
   return (
     <>
       <h2>Word list</h2>
@@ -105,29 +111,36 @@ export const WordList = ({
         placeholder="Name"
       />
       <Button onClick={addWord}>Create Word</Button>
-      <List>
+      <List className={styles.list}>
         {words.map((word, index) => (
           <ListItem
             key={word.id}
             role="list"
+            button
             onClick={() => {
-              filterByWord(word.name)
+              handleItemClick(word.name, index)
             }}
             selected={selected[index]}
           >
             <ListItemText>{word.name}</ListItemText>
-            <ListItemIcon>
+            <ListItemSecondaryAction>
               <IconButton>
                 <DeleteOutlined
                   onClick={() => {
-                    handleItemClick(word.name, index)
+                    removeWord(word.name)
                   }}
                 />
               </IconButton>
-            </ListItemIcon>
+            </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
     </>
   )
 }
+
+const setStyles = makeStyles({
+  list: {
+    maxWidth: '30%',
+  },
+})

@@ -13,14 +13,20 @@ export const App = () => {
   const [associations, setAssociations] = useState(new Array<Association>())
   const [activeWords, setActiveWords] = useState(new Array<Word>())
   const [processing, setProcessing] = useState(false)
-  const [filters, setFilters] = useState({ words: [''], labels: [''] })
+  const [filters, setFilters] = useState({
+    words: new Array<string>(),
+    labels: new Array<string>(),
+  })
 
   const getAssociations = async () => {
     setProcessing(true)
 
     const imgUrlLists = await fetchUrlLists(activeWords)
+    console.log('after urls:', imgUrlLists)
     const imgBytesLists = await imagesToBytes(imgUrlLists)
+    console.log('after bytes:', imgBytesLists)
     const labels = await analyzeImages(imgBytesLists)
+    console.log('after labels:', labels)
     setWordImages(labels)
 
     const sortedLabels = sortLabels(labels, 10)

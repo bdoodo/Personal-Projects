@@ -6,7 +6,8 @@ import {
   createTheme,
   ThemeProvider,
 } from '@material-ui/core'
-import { orange, red } from '@material-ui/core/colors'
+import { orange, yellow } from '@material-ui/core/colors'
+import { Check } from '@material-ui/icons'
 
 export const Associations = ({
   associationList,
@@ -43,8 +44,14 @@ export const Associations = ({
       })
 
       setFilteredLabels(newFilteredLabels)
+    } else {
+      setFilteredLabels(associationList)
     }
-  }, [filters.words])
+  }, [filters.words, associationList])
+
+  const [selected, setSelected] = useState(
+    new Array<boolean>(associationList.length).fill(false)
+  )
 
   const filterByLabel = (label: string) => {
     setFilters({ ...filters, labels: [...filters.labels, label] })
@@ -68,9 +75,11 @@ export const Associations = ({
                 label={label.name}
                 color={color(label.occurrences)}
                 avatar={<Avatar>{label.occurrences}</Avatar>}
+                clickable
                 onClick={() => {
                   filterByLabel(label.name)
                 }}
+                deleteIcon={undefined}
               />
             ))}
           </ThemeProvider>
@@ -82,7 +91,7 @@ export const Associations = ({
 
 const theme = createTheme({
   palette: {
-    primary: red,
-    secondary: orange,
+    primary: orange,
+    secondary: yellow,
   },
 })
