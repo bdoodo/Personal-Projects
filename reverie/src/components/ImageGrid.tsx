@@ -101,6 +101,7 @@ export const ImageGrid = ({
 
   const styles = setStyles()
 
+  //TODO: place images in an image grid
   return (
     <>
       {processing && !wordImagesList[0] ? (

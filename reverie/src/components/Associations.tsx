@@ -61,6 +61,7 @@ export const Associations = ({
   const color = (occurrence: number) =>
     occurrence === 3 ? 'primary' : occurrence === 2 ? 'secondary' : 'default'
 
+  //TODO: place checkmarks by checked labels
   return (
     <>
       <h2>Associations between words</h2>

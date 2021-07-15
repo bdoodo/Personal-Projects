@@ -102,6 +102,8 @@ export const WordList = ({
 
   const styles = setStyles()
 
+  //TODO: Disable filter functionality before getImages.
+  //The words should be 'disabled' before they're updated to the word list
   return (
     <>
       <h2>Word list</h2>
