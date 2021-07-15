@@ -1,27 +1,122 @@
-import {useEffect} from 'react'
-import {Paper, Grid, makeStyles} from '@material-ui/core'
+import { useEffect, useState } from 'react'
+import { Paper, Grid, makeStyles } from '@material-ui/core'
+import { shuffle } from '../utils'
 
-export const ImageGrid = ({imgUrls, processing}: {imgUrls: string[], processing: boolean}) => {
+export const ImageGrid = ({
+  wordImagesList,
+  processing,
+  filters,
+}: {
+  wordImagesList: WordImages[]
+  processing: boolean
+  filters: { words: string[]; labels: string[] }
+}) => {
+  const [allImageBytes, setAllImageBytes] = useState(new Array<Uint8Array>())
+  //Extract all image bytes from each WordImages object
   useEffect(() => {
-    shuffleArray(imgUrls)
-  }, imgUrls)
+    const tempImageBytes = new Array<Uint8Array>()
+    for (const { images } of wordImagesList) {
+      images.forEach(image => {
+        image.bytes && tempImageBytes.push(image.bytes)
+      })
+    }
+    shuffle(tempImageBytes)
+    setAllImageBytes(tempImageBytes)
+  }, [wordImagesList])
+
+  const [filteredImageBytes, setFilteredImageBytes] = useState(allImageBytes)
+  //Filter images by word and label filters
+  useEffect(() => {
+    //Arrays of stringified bytes (stringified so we can compare them later)
+    let wordsFilteredImages = new Array<string>()
+    let labelsFilteredImages = new Array<string>()
+    
+    if (filters.labels[0] || filters.words[0]) {
+      if (filters.words[0]) {
+        filters.words.forEach(word => {
+          //Find the wordImages whose name matches the word filter
+          const matchingWordImages = wordImagesList.find(
+            wordImages => wordImages.word.name === word
+          )
+
+          //Push bytes from the matching wordImages to wordsFilteredImages
+          matchingWordImages!.images.forEach(image => {
+            image.bytes && wordsFilteredImages.push(JSON.stringify(image.bytes))
+          })
+        })
+      }
+
+      if (filters.labels[0]) {
+        const filteredWordNames = new Set<string>()
+
+        filters.labels.forEach(label => {
+          //find WordImages with the label filter
+          const matchingWordImages = wordImagesList.filter(wordImages =>
+            wordImages.allLabels?.includes(label)
+          )
+
+          //Add the WordImages' names to a set (so we don't get duplicates)
+          matchingWordImages.forEach(({ word }) => {
+            filteredWordNames.add(word.name)
+          })
+        })
+
+        //Find wordImages from the input wordImagesList whose names match the names in the set
+        const filteredWords = wordImagesList.filter(({ word }) =>
+          filteredWordNames.has(word.name)
+        )
+
+        //Push the bytes from these wordImages to labelsFilteredImages
+        filteredWords.forEach(wordImages => {
+          wordImages.images.forEach(image => {
+            image.bytes && labelsFilteredImages.push(JSON.stringify(image.bytes))
+          })
+        })
+      }
+
+      //If there were both label and word filters, return their union; otherwise, return the result for the existing filter
+      const newFilteredImagesStringified =
+        wordsFilteredImages[0] && labelsFilteredImages[0]
+          ? wordsFilteredImages.filter(image =>
+              labelsFilteredImages.includes(image)
+            )
+          : wordsFilteredImages[0]
+          ? wordsFilteredImages
+          : labelsFilteredImages
+
+      const newFilteredImages = newFilteredImagesStringified.map(bytes =>
+        JSON.parse(bytes)
+      )
+      setFilteredImageBytes(newFilteredImages)
+    } else {
+      setFilteredImageBytes(allImageBytes)
+    }
+  }, [filters, allImageBytes])
+
+  /**Convert bytes to an object URL */
+  const bytesToURL = (bytes: Uint8Array) => {
+    const blob = new Blob([bytes.buffer])
+    return URL.createObjectURL(blob)
+  }
 
   const styles = setStyles()
 
+  //TODO: place images in an image grid
   return (
     <>
-      {processing && !imgUrls[0]
-        ? 'Loading images ...'
-        : <Grid container spacing={3}>
-            {imgUrls.map((url, index) => (
-              <Grid key={index} item xs={2}>
-                <Paper className={styles.paper}>
-                  <img src={url} className={styles.img} />
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
-      }
+      {processing && !wordImagesList[0] ? (
+        'Loading images ...'
+      ) : (
+        <Grid container spacing={3}>
+          {filteredImageBytes.map((bytes, index) => (
+            <Grid key={index} item xs={2}>
+              <Paper className={styles.paper}>
+                <img src={bytesToURL(bytes)} className={styles.img} />
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
+      )}
     </>
   )
 }
@@ -30,29 +125,12 @@ const setStyles = makeStyles({
   img: {
     maxWidth: '100%',
     borderRaius: '4px',
-    objectFit: 'cover'
-  },  
+    objectFit: 'cover',
+  },
   paper: {
     height: '200px',
     padding: '2%',
     display: 'flex',
-    justifyContent: 'center'
-  }
+    justifyContent: 'center',
+  },
 })
-
-/**
- * Shuffles an array in place.
- * Taken from Richard Durstenfield's implementation of the Fisher-Yates shuffle:
- * https://www.w3docs.com/snippets/javascript/how-to-randomize-shuffle-a-javascript-array.html
- * 
- * @param array The array to be shuffled
- */
-const shuffleArray = (array: any[]) => {
-  let currentIndex = array.length
-  while (currentIndex) {
-    const randomIndex = Math.floor(Math.random() * currentIndex--)
-    const temp = array[currentIndex]
-    array[currentIndex] = array[randomIndex]
-    array[randomIndex] = temp
-  }
-}

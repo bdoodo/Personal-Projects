@@ -32,4 +32,4 @@ exports.handler = async (event) => {
         body: JSON.stringify(result),
     };
     return response;
-};
+}
