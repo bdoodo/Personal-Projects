@@ -10,18 +10,20 @@ import { orange, yellow } from '@material-ui/core/colors'
 import { Check } from '@material-ui/icons'
 
 export const Associations = ({
-  associationList,
+  associations,
   processing,
-  filtersState: { filters, setFilters },
+  filters: { filters, setFilters },
   wordImagesList,
 }: {
-  associationList: Association[]
+  associations: Association[]
   processing: boolean
-  filtersState: FiltersState
+  filters: FiltersState
   wordImagesList: WordImages[]
 }) => {
-  const [filteredLabels, setFilteredLabels] = useState(associationList)
+  const [filteredLabels, setFilteredLabels] = useState(associations)
   //Filters by words passed through filters
+
+  //TODO: update based on removal of words from wordlist
   useEffect(() => {
     //If there are word filters
     if (filters.words[0]) {
@@ -35,7 +37,7 @@ export const Associations = ({
 
         //Within the matching object, iterate through its labels to find matching associations to push
         matchingWordImages!.allLabels?.forEach(label => {
-          const matchingAssociation = associationList.find(
+          const matchingAssociation = associations.find(
             association => association.name === label
           )
 
@@ -45,23 +47,32 @@ export const Associations = ({
 
       setFilteredLabels(newFilteredLabels)
     } else {
-      setFilteredLabels(associationList)
+      setFilteredLabels(associations)
     }
-  }, [filters.words, associationList])
+  }, [filters.words, associations, wordImagesList])
 
-  const [selected, setSelected] = useState(
-    new Array<boolean>(associationList.length).fill(false)
-  )
+  const [selected, setSelected] = useState(new Array<string>())
 
   const filterByLabel = (label: string) => {
-    setFilters({ ...filters, labels: [...filters.labels, label] })
+    if (!filters.labels.includes(label)) {
+      setFilters({ ...filters, labels: [...filters.labels, label] })
+      setSelected([...selected, label])
+    } else {
+      const tempLabelFilters = filters.labels
+      tempLabelFilters.splice(tempLabelFilters.indexOf(label), 1)
+      setFilters({...filters, labels: tempLabelFilters})
+
+      const tempSelected = selected
+      tempSelected.splice(tempSelected.indexOf(label), 1)
+      setSelected(tempSelected)
+    }
+    
   }
 
   /**Determines color for labels depending on their occurrence */
   const color = (occurrence: number) =>
     occurrence === 3 ? 'primary' : occurrence === 2 ? 'secondary' : 'default'
 
-  //TODO: place checkmarks by checked labels
   return (
     <>
       <h2>Associations between words</h2>
@@ -80,7 +91,10 @@ export const Associations = ({
                 onClick={() => {
                   filterByLabel(label.name)
                 }}
-                deleteIcon={undefined}
+                deleteIcon={
+                  selected.includes(label.name) ? <Check /> : <></>
+                }
+                onDelete={() => {}}
               />
             ))}
           </ThemeProvider>

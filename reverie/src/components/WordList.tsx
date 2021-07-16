@@ -3,37 +3,52 @@ import { createWord, listWords, deleteWord } from '../graphql'
 import Amplify, { API, graphqlOperation } from 'aws-amplify'
 import {
   List,
-  ListItem,
   IconButton,
-  ListItemText,
-  Button,
-  ListItemSecondaryAction,
   makeStyles,
+  Container,
+  TextField,
+  Button,
+  Paper,
 } from '@material-ui/core'
-import { DeleteOutlined } from '@material-ui/icons'
+import { Add } from '@material-ui/icons'
+import {
+  analyzeImages,
+  fetchUrlLists,
+  imagesToBytes,
+  sortLabels,
+} from '../utils'
+import { WordListItem } from './'
 
 import awsExports from '../aws-exports'
 Amplify.configure(awsExports)
 
 export const WordList = ({
-  setActiveWords,
-  filtersState: { filters, setFilters },
+  filters: { filters, setFilters },
+  wordImages: { wordImages, setWordImages },
+  setAssociations,
+  setProcessing,
 }: {
-  setActiveWords: React.Dispatch<React.SetStateAction<Word[]>>
-  filtersState: FiltersState
+  filters: FiltersState
+  wordImages: {
+    wordImages: WordImages[]
+    setWordImages: React.Dispatch<React.SetStateAction<WordImages[]>>
+  }
+
+  setAssociations: React.Dispatch<React.SetStateAction<Association[]>>
+  setProcessing: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
   const [formState, setFormState] = useState({ name: '' })
-  const [words, setWords] = useState(new Array<Word>())
-  const [selected, setSelected] = useState(
-    new Array<boolean>(words.length).fill(false)
-  )
+  const [selected, setSelected] = useState(new Array<string>())
+
+  const [activeWords, setActiveWords] = useState(new Array<Word>())
+  const [inactiveWords, setInactiveWords] = useState(new Array<Word>())
 
   useEffect(() => {
     fetchWords()
   }, [])
 
-  const setInput = (key: string, value: string) => {
-    setFormState({ ...formState, [key]: value })
+  const setInput = (value: string) => {
+    setFormState({ name: value })
   }
 
   const fetchWords = async () => {
@@ -41,20 +56,20 @@ export const WordList = ({
       const wordData = (await API.graphql(graphqlOperation(listWords))) as {
         data: { listWords: { items: Word[] } }
       }
-      const words = wordData.data.listWords.items
-      setWords(words)
-      setActiveWords(words)
+      const activeWords = wordData.data.listWords.items
+      setActiveWords(activeWords)
     } catch (err) {
       console.log('error fetching words')
     }
   }
 
-  const addWord = async () => {
+  const addWord = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
     try {
       if (!formState.name) return
       const word = { ...formState }
-      setActiveWords([...words, word])
-      setWords([...words, word])
+      setInactiveWords([...inactiveWords, word])
       setFormState({ name: '' })
       await API.graphql(graphqlOperation(createWord, { input: word }))
     } catch (err) {
@@ -62,24 +77,7 @@ export const WordList = ({
     }
   }
 
-  const removeWord = async (word: string) => {
-    const tempWords = words
-    //Cut out the word to be deleted
-    tempWords.splice(
-      words.findIndex(e => e.name === word),
-      1
-    )
-    try {
-      //If the removed word was in filters, remove it from filters
-      filters.words.includes(word) && filterByWord(word)
-      setWords(tempWords)
-      setActiveWords(tempWords)
-      await API.graphql(graphqlOperation(deleteWord, { input: { name: word } }))
-    } catch (err) {
-      console.log('error deleting word:', err)
-    }
-  }
-
+  //TODO: fix this
   const filterByWord = (word: string) => {
     //If the clicked word is already in 'filters,' remove it from filters; otherwise, add it.
     if (filters.words.includes(word)) {
@@ -91,58 +89,97 @@ export const WordList = ({
     }
   }
 
-  /**On click, update word filters and toggle selected */
-  const handleItemClick = (word: string, index: number) => {
-    filterByWord(word)
+  const removeWord = async (word: string) => {
+    //Find whether the word to be removed is in activeWords or inactiveWords
+    const partOfActiveWords = activeWords.find(({ name }) => name === word)
+    try {
+      //If the deleted word was in filters, pass it to filterByWord to remove it
+      filters.words.includes(word) && filterByWord(word)
+      partOfActiveWords &&
+        setActiveWords(activeWords.filter(({ name }) => name !== word))
+      !partOfActiveWords &&
+        setInactiveWords(inactiveWords.filter(({ name }) => name !== word))
+      setWordImages(wordImages.filter(({ word: { name } }) => name !== word))
+      await API.graphql(graphqlOperation(deleteWord, { input: { name: word } }))
+    } catch (err) {
+      console.log('error deleting word:', err)
+    }
+  }
 
-    const tempSelected = selected
-    tempSelected[index] = !tempSelected[index]
-    setSelected(tempSelected)
+  const getAssociations = async () => {
+    setProcessing(true)
+
+    const imgUrlLists = await fetchUrlLists(inactiveWords)
+    console.log('after urls:', imgUrlLists)
+    const imgBytesLists = await imagesToBytes(imgUrlLists)
+    console.log('after bytes:', imgBytesLists)
+    const labels = await analyzeImages(imgBytesLists)
+    console.log('after labels:', labels)
+    setWordImages([...wordImages, ...labels])
+
+    setActiveWords([...activeWords, ...inactiveWords])
+    setInactiveWords([])
+
+    const sortedLabels = sortLabels(labels, 10)
+
+    setAssociations(sortedLabels)
+    setProcessing(false)
   }
 
   const styles = setStyles()
 
-  //TODO: Disable filter functionality before getImages.
-  //The words should be 'disabled' before they're updated to the word list
   return (
-    <>
+    <Paper className={styles.paper}>
       <h2>Word list</h2>
-      <input
-        onChange={event => setInput('name', event.target.value)}
-        value={formState.name}
-        placeholder="Name"
-      />
-      <Button onClick={addWord}>Create Word</Button>
-      <List className={styles.list}>
-        {words.map((word, index) => (
-          <ListItem
-            key={word.id}
-            role="list"
-            button
-            onClick={() => {
-              handleItemClick(word.name, index)
-            }}
-            selected={selected[index]}
-          >
-            <ListItemText>{word.name}</ListItemText>
-            <ListItemSecondaryAction>
-              <IconButton>
-                <DeleteOutlined
-                  onClick={() => {
-                    removeWord(word.name)
-                  }}
-                />
-              </IconButton>
-            </ListItemSecondaryAction>
-          </ListItem>
+      <List>
+        {activeWords.map(word => (
+          <WordListItem
+            key={word.name}
+            selected={{ selected, setSelected }}
+            word={word}
+            removeWord={removeWord}
+            filterByWord={filterByWord}
+          />
         ))}
+        {inactiveWords.map(word => (
+          <WordListItem
+            key={word.name}
+            selected={{ selected, setSelected }}
+            word={word}
+            removeWord={removeWord}
+            filterByWord={filterByWord}
+            disabled
+          />
+        ))}
+        {activeWords.length + inactiveWords.length < 3 && (
+          <Container>
+            <form autoComplete="off" onSubmit={addWord}>
+              <TextField
+                variant="filled"
+                onChange={event => setInput(event.target.value)}
+                value={formState.name}
+                label="New word"
+                color="secondary"
+              />
+              <IconButton edge="end" type="submit" color="secondary">
+                <Add />
+              </IconButton>
+            </form>
+          </Container>
+        )}
       </List>
-    </>
+      {inactiveWords[0] && (
+        <Button onClick={getAssociations} variant="contained" color="primary">
+          {!activeWords.length ? 'Create word list' : 'Update word list'}
+        </Button>
+      )}
+    </Paper>
   )
 }
 
 const setStyles = makeStyles({
-  list: {
-    maxWidth: '30%',
+  paper: {
+    padding: '1rem',
+    margin: '5em',
   },
 })

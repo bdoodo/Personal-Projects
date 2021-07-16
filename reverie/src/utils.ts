@@ -88,6 +88,9 @@ export const imagesToBytes = async (
       }
     })
 
+    //Remove all image objects not containing bytes
+    wordImages.images = wordImages.images.filter(image => image.bytes)
+
     return wordImages
   })
 
