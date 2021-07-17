@@ -5,15 +5,16 @@ import {
   Avatar,
   createTheme,
   ThemeProvider,
-  CircularProgress,
   Theme,
   makeStyles,
   createStyles,
   Typography,
   Grow,
+  IconButton,
+  Collapse,
 } from '@material-ui/core'
 import { orange, yellow } from '@material-ui/core/colors'
-import { Check } from '@material-ui/icons'
+import { Check, ExpandMore, ExpandLess } from '@material-ui/icons'
 
 export const Associations = ({
   associations,
@@ -27,7 +28,8 @@ export const Associations = ({
   wordImagesList: WordImages[]
 }) => {
   const [filteredLabels, setFilteredLabels] = useState(associations)
-  //Filters by words passed through filters
+  const [collapsed, setCollapsed] = useState(true)
+  const [selected, setSelected] = useState(new Array<string>())
 
   //Update labels by word filters
   useEffect(() => {
@@ -42,6 +44,14 @@ export const Associations = ({
         )
       )
 
+      //Remove disselected labels from label filters and
+      //selected by passing them to filterByLabel
+      selected.forEach(
+        label =>
+          !newFilteredLabels.some(newLabel => newLabel.name === label) &&
+          filterByLabel(label)
+      )
+
       setFilteredLabels(newFilteredLabels)
     } //If there are no filters, update filteredLabels with associations
     else {
@@ -49,21 +59,21 @@ export const Associations = ({
     }
   }, [filters.words, associations])
 
-  const [selected, setSelected] = useState(new Array<string>())
-
   const filterByLabel = (label: string) => {
-    if (!filters.labels.includes(label)) {
-      setFilters({ ...filters, labels: [...filters.labels, label] })
-      setSelected([...selected, label])
-    } else {
-      const tempLabelFilters = filters.labels
-      tempLabelFilters.splice(tempLabelFilters.indexOf(label), 1)
-      setFilters({ ...filters, labels: tempLabelFilters })
+    const alreadyExists = filters.labels.includes(label)
 
-      const tempSelected = selected
-      tempSelected.splice(tempSelected.indexOf(label), 1)
-      setSelected(tempSelected)
-    }
+    setFilters({
+      ...filters,
+      labels: !alreadyExists
+        ? [...filters.labels, label]
+        : filters.labels.filter(labelFilter => labelFilter !== label),
+    })
+
+    setSelected(
+      !alreadyExists
+        ? [...selected, label]
+        : selected.filter(selectedLabel => selectedLabel !== label)
+    )
   }
 
   /**Determines color for labels depending on their occurrence */
@@ -77,34 +87,44 @@ export const Associations = ({
       <Typography variant="h4" className={styles.header}>
         Associations between words
       </Typography>
-      {processing && !filteredLabels[0] ? (
-        <>
-          <div>Loading associations ...</div>
-          <CircularProgress />
-        </>
-      ) : (
-        <Container className={styles.labels}>
-          <ThemeProvider theme={theme}>
-            {filteredLabels.map((label, index) => (
-              <Grow in={!processing} timeout={index * 100} key={label.name}>
-                <Chip
-                  label={label.name}
-                  color={color(label.occurrences)}
-                  avatar={<Avatar>{label.occurrences}</Avatar>}
-                  clickable
-                  onClick={() => {
-                    filterByLabel(label.name)
-                  }}
-                  deleteIcon={selected.includes(label.name) ? <Check /> : <></>}
-                  onDelete={() => {
-                    filterByLabel(label.name)
-                  }}
-                />
-              </Grow>
-            ))}
-          </ThemeProvider>
-        </Container>
-      )}
+      <Container>
+        <Collapse in={!collapsed} collapsedSize="78px">
+          <Container className={styles.labels}>
+            <ThemeProvider theme={theme}>
+              {filteredLabels.map((label, index) => (
+                <Grow in={!processing} timeout={index * 100} key={label.name}>
+                  <Chip
+                    label={label.name}
+                    color={color(label.occurrences)}
+                    avatar={<Avatar>{label.occurrences}</Avatar>}
+                    clickable
+                    onClick={() => {
+                      filterByLabel(label.name)
+                    }}
+                    deleteIcon={
+                      selected.includes(label.name) ? <Check /> : <></>
+                    }
+                    onDelete={() => {
+                      filterByLabel(label.name)
+                    }}
+                  />
+                </Grow>
+              ))}
+            </ThemeProvider>
+          </Container>
+        </Collapse>
+        {filteredLabels.length > 10 && !processing && (
+          <Container className={styles.labels}>
+            <IconButton
+              onClick={() => {
+                setCollapsed(!collapsed)
+              }}
+            >
+              {collapsed ? <ExpandMore /> : <ExpandLess />}
+            </IconButton>
+          </Container>
+        )}
+      </Container>
     </>
   )
 }

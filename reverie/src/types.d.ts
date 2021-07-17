@@ -7,8 +7,10 @@ type WordImages = {
   word: Word,
   images:
     {
-      url?: string,
+      title: string,
+      url: string,
       bytes?: Uint8Array,
+      bytesUrl?: string,
       labels?: string[]
     }[],
   allLabels?: string[]

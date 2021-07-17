@@ -25,7 +25,7 @@ export const fetchUrlLists = async (words: Word[]) => {
       new URLSearchParams([
         ['q', word.name],
         ['pageNumber', 1],
-        ['pageSize', 20],
+        ['pageSize', 50],
         ['autoCorrect', false],
         ['safeSearch', true],
       ] as string[][]).toString()
@@ -37,22 +37,30 @@ export const fetchUrlLists = async (words: Word[]) => {
         'x-rapidapi-host': process.env.REACT_APP_RAPIDAPI_HOST!,
       },
     })
-    const data = (await res.json()) as { value: { url: string }[] }
+    const data = (await res.json()) as {
+      value: { url: string; title: string }[]
+    }
 
     const acceptedFormats = ['.png', '.jpg', '.jpeg', '.jfif', '.pjpeg', '.pjp']
+
     //Filter out urls either not hosted on https or not
     //containing an image of a valid format for Rekognition
-    const urls = data.value.flatMap(({ url }) => {
+    const goodResults = data.value.flatMap(result => {
       const isCorrectFormat = acceptedFormats.some(format =>
-        url.includes(format)
+        result.url.includes(format)
       )
 
-      return url.startsWith('https') && isCorrectFormat ? [url] : []
+      return url.startsWith('https') && isCorrectFormat
+        ? [{ url: result.url, title: result.title }]
+        : []
     })
 
     const wordImages = {
       word: word,
-      images: urls.map(url => ({ url: url })),
+      images: goodResults.map(result => ({
+        url: result.url,
+        title: result.title,
+      })),
     } as WordImages
 
     return wordImages
@@ -77,7 +85,7 @@ export const imagesToBytes = async (wordImagesList: WordImages[]) => {
         const controller = new AbortController()
         const signal = controller.signal
 
-        const res = await fetch(image.url!, { signal })
+        const res = await fetch(image.url, { signal })
         setTimeout(() => controller.abort(), 100)
 
         const bytes = await res.arrayBuffer()
@@ -93,9 +101,7 @@ export const imagesToBytes = async (wordImagesList: WordImages[]) => {
 
     //If bytes exist for an image, append it
     resolvedImageBytes.forEach((bytes, index) => {
-      if (bytes) {
-        wordImages.images[index].bytes = bytes
-      }
+      if (bytes) wordImages.images[index].bytes = bytes
     })
 
     //Remove all image objects not containing bytes
@@ -117,6 +123,8 @@ export const imagesToBytes = async (wordImagesList: WordImages[]) => {
  */
 export const analyzeImages = async (wordImagesList: WordImages[]) => {
   const updatedWordImagesList = wordImagesList.map(async wordImages => {
+  //Process each wordImages
+
     const WordImagesLabels = wordImages.images.map(async image => {
       try {
         //call Rekognition for labels
@@ -136,19 +144,29 @@ export const analyzeImages = async (wordImagesList: WordImages[]) => {
     })
     const resolvedImagesLabelList = await Promise.all(WordImagesLabels)
 
-    //modify wordImages in place to append labels to each image if they exist
+    //modify wordImages in place to append labels to each image if they exist,
+    //and append an objectUrl to be displayed later since this was a successfully
+    //analyzed image
     resolvedImagesLabelList.forEach((labelList, index) => {
-      if (labelList) wordImages.images[index].labels = labelList
+      const currentImage = wordImages.images[index]
+
+      if (labelList) {
+        currentImage.labels = labelList
+        currentImage.bytesUrl = URL.createObjectURL(
+          new Blob([currentImage.bytes!.buffer])
+        )
+      }
     })
+
+    //Filter out all images without bytesUrls
+    wordImages.images = wordImages.images.filter(image => image.bytesUrl)
 
     //make a set for each word of all its labels and add it to wordImages's allLabels property
     const wordLabelsSet = new Set<string>()
 
-    wordImages.images.forEach(image => {
-      image.labels?.forEach(label => {
-        wordLabelsSet.add(label)
-      })
-    })
+    wordImages.images.forEach(image =>
+      image.labels!.forEach(label => wordLabelsSet.add(label))
+    )
     wordImages.allLabels = [...wordLabelsSet]
 
     return wordImages
@@ -199,7 +217,7 @@ export const sortLabels = (
 }
 
 /**
- * Shuffles an array in place.
+ * Shuffles an array in place and returns it.
  * Taken from Richard Durstenfield's implementation of the Fisher-Yates shuffle:
  * https://www.w3docs.com/snippets/javascript/how-to-randomize-shuffle-a-javascript-array.html
  *

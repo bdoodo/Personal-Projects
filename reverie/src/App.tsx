@@ -1,8 +1,7 @@
 /* src/App.js */
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { ImageGrid, WordList, Associations } from './components'
 import { Grid, Divider, makeStyles } from '@material-ui/core'
-import { sortLabels } from './utils'
 
 export const App = () => {
   const [wordImages, setWordImages] = useState(new Array<WordImages>())
@@ -12,11 +11,6 @@ export const App = () => {
     words: new Array<string>(),
     labels: new Array<string>(),
   })
-
-  //Update associations whenever wordImages changes
-  useEffect(() => {
-    setAssociations(sortLabels(wordImages))
-  }, [wordImages])
 
   const styles = setStyles()
 
