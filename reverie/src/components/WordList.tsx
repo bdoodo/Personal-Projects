@@ -83,20 +83,18 @@ export const WordList = ({
     }
   }
 
-  //TODO: fix this
+  //TODO: If an active label filter is not present in the newly filtered word, remove the label filter first
   const filterByWord = (word: string) => {
     //If the clicked word is already in 'filters,' remove it from filters; otherwise, add it.
-    if (filters.words.includes(word)) {
-      const tempWords = filters.words
-      tempWords.splice(tempWords.indexOf(word), 1)
-      setFilters({ ...filters, words: tempWords })
-    } else {
-      setFilters({ ...filters, words: [...filters.words, word] })
-    }
+    filters.words.includes(word)
+      ? setFilters({
+          ...filters,
+          words: filters.words.filter(wordFilter => wordFilter !== word),
+        })
+      : setFilters({ ...filters, words: [...filters.words, word] })
   }
 
   //TODO: Include a unit test of removeWord. Sometimes it doesn't disappear correctly
-
   const removeWord = async (word: string) => {
     //Find whether the word to be removed is in activeWords or inactiveWords
     const partOfActiveWords = activeWords.find(({ name }) => name === word)
@@ -140,7 +138,7 @@ export const WordList = ({
 
   return (
     <Card className={styles.paper}>
-      <CardHeader title='Word list'/>
+      <CardHeader title="Word list" />
       <CardContent>
         <List>
           {activeWords.map(word => (
@@ -182,14 +180,14 @@ export const WordList = ({
       </CardContent>
       <CardActions className={styles.centerFlex}>
         {inactiveWords[0] && (
-            <Button
-              onClick={getAssociations}
-              variant="contained"
-              color="primary"
-              disabled={processing}
-            >
-              {!activeWords.length ? 'Create word list' : 'Update word list'}
-            </Button>
+          <Button
+            onClick={getAssociations}
+            variant="contained"
+            color="primary"
+            disabled={processing}
+          >
+            {!activeWords.length ? 'Create word list' : 'Update word list'}
+          </Button>
         )}
       </CardActions>
     </Card>
@@ -202,6 +200,6 @@ const setStyles = makeStyles({
   },
   centerFlex: {
     display: 'flex',
-    justifyContent: 'center'
-  }
+    justifyContent: 'center',
+  },
 })

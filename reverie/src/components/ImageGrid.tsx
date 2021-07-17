@@ -21,12 +21,9 @@ export const ImageGrid = ({
   const [allImageBytes, setAllImageBytes] = useState(new Array<Uint8Array>())
   //Extract all image bytes from each WordImages object
   useEffect(() => {
-    const tempImageBytes = new Array<Uint8Array>()
-    for (const { images } of wordImagesList) {
-      images.forEach(image => {
-        image.bytes && tempImageBytes.push(image.bytes)
-      })
-    }
+    const tempImageBytes = wordImagesList.flatMap(wordImages =>
+      wordImages.images.map(image => image.bytes!)
+    )
     shuffle(tempImageBytes)
     setAllImageBytes(tempImageBytes)
   }, [wordImagesList])
@@ -34,79 +31,35 @@ export const ImageGrid = ({
   const [filteredImageBytes, setFilteredImageBytes] = useState(allImageBytes)
   //Filter images by word and label filters
   useEffect(() => {
-    //Arrays of stringified bytes (stringified so we can compare them later)
-    let wordsFilteredImages = new Array<string>()
-    let labelsFilteredImages = new Array<string>()
-
     if (filters.labels[0] || filters.words[0]) {
-      if (filters.words[0]) {
-        filters.words.forEach(word => {
-          //Find the wordImages whose name matches the word filter
-          const matchingWordImages = wordImagesList.find(
-            wordImages => wordImages.word.name === word
-          )
+      const wordsFilteredImages = wordImagesList.flatMap(wordImages =>
+        filters.words.every(word => word === wordImages.word.name)
+          ? wordImages.images
+          : []
+      )
 
-          //Push bytes from the matching wordImages to wordsFilteredImages
-          matchingWordImages!.images.forEach(image => {
-            image.bytes && wordsFilteredImages.push(JSON.stringify(image.bytes))
-          })
-        })
-      }
-
-      if (filters.labels[0]) {
-        let matchingImages = new Array<{
-          bytes?: Uint8Array
-          labels?: string[]
-        }>()
-
-        filters.labels.forEach((label, index) => {
-          //On first label, add all images containing it
-          if (index === 0) {
-            //Find WordImages with the label to narrow search
-            const matchingWordImages = wordImagesList.filter(wordImages =>
-              wordImages.allLabels?.includes(label)
-            )
-
-            //Within those wordImages, push each image containing the
-            //matching label to matchingImages
-            matchingImages = matchingWordImages.flatMap(wordImages =>
-              //An array of matching images from a wordImage
-              wordImages.images.flatMap(image =>
-                image.labels?.includes(label) ? [image] : []
-              )
-            )
-          } //On all subsequent labels, filter out any images not containing them
-          else {
-            matchingImages = matchingImages.filter(image =>
-              image.labels?.includes(label)
-            )
-          }
-        })
-
-        //Fill labelsFilteredImages with stringified bytes from matching images
-        labelsFilteredImages = matchingImages.map(image =>
-          JSON.stringify(image.bytes!)
+      const labelsFilteredImages = wordImagesList.flatMap(wordImages =>
+        wordImages.images.filter(image =>
+          filters.labels.every(label => image.labels?.includes(label))
         )
-      }
+      )
 
-      //If there were both label and word filters, return their union; otherwise, return the result for the existing filter
-      const newFilteredImagesStringified =
-        wordsFilteredImages[0] && labelsFilteredImages[0]
-          ? wordsFilteredImages.filter(image =>
-              labelsFilteredImages.includes(image)
+      //If there were both label and word filters, return the union of their
+      //results; otherwise, return the result for the existing filter
+      const newFilteredImages =
+        filters.words[0] && filters.labels[0]
+          ? wordsFilteredImages.filter(({ url: url1 }) =>
+              labelsFilteredImages.some(({ url: url2 }) => url1! === url2!)
             )
-          : wordsFilteredImages[0]
+          : filters.words[0]
           ? wordsFilteredImages
           : labelsFilteredImages
 
-      const newFilteredImages = newFilteredImagesStringified.map(bytes => {
-        //JSON looks something like: {1: 100, 2: 424, 3: 300 ...}
-        const jsonParsed = JSON.parse(bytes)
-        //Take the values of the JSON, which originally made up the Uint8Array, and construct a new one from them
-        return Uint8Array.from(Object.values(jsonParsed))
-      })
-      setFilteredImageBytes(newFilteredImages)
-    } else {
+      const newFilteredImageBytes = newFilteredImages.map(image => image.bytes!)
+
+      setFilteredImageBytes(newFilteredImageBytes)
+    } //If there are no filters, update filteredImageBytes with allImageBytes
+    else {
       setFilteredImageBytes(allImageBytes)
     }
   }, [filters, allImageBytes])
@@ -119,7 +72,6 @@ export const ImageGrid = ({
 
   const styles = setStyles()
 
-  //TODO: place images in an image grid
   return (
     <Container className={styles.root}>
       {processing && !wordImagesList[0] ? (
@@ -130,8 +82,8 @@ export const ImageGrid = ({
       ) : (
         <ImageList cols={4}>
           {filteredImageBytes.map((bytes, index) => (
-            <Grow in={!processing} timeout={index * 200}>
-              <ImageListItem key={bytes.toString()}>
+            <Grow in={!processing} timeout={index * 200} key={bytes.toString()}>
+              <ImageListItem>
                 <img src={bytesToURL(bytes)} />
               </ImageListItem>
             </Grow>

@@ -31,28 +31,20 @@ export const Associations = ({
 
   //Update labels by word filters
   useEffect(() => {
-    //If there are word filters
     if (filters.words[0]) {
-      const newFilteredLabels = new Array<Association>()
+      const matchingWordImages = wordImagesList.filter(({ word }) =>
+        filters.words.some(wordFilter => wordFilter === word.name)
+      )
 
-      //For each word to filter by, find the corresponding WordImages object
-      filters.words.forEach(word => {
-        const matchingWordImages = wordImagesList.find(
-          wordImages => wordImages.word.name === word
+      const newFilteredLabels = associations.filter(association =>
+        matchingWordImages.every(wordImages =>
+          wordImages.allLabels?.includes(association.name)
         )
-
-        //Within the matching object, iterate through its labels to find matching associations to push
-        matchingWordImages!.allLabels?.forEach(label => {
-          const matchingAssociation = associations.find(
-            association => association.name === label
-          )
-
-          newFilteredLabels.push(matchingAssociation!)
-        })
-      })
+      )
 
       setFilteredLabels(newFilteredLabels)
-    } else {
+    } //If there are no filters, update filteredLabels with associations
+    else {
       setFilteredLabels(associations)
     }
   }, [filters.words, associations])
@@ -94,9 +86,8 @@ export const Associations = ({
         <Container className={styles.labels}>
           <ThemeProvider theme={theme}>
             {filteredLabels.map((label, index) => (
-              <Grow in={!processing} timeout={index * 100}>
+              <Grow in={!processing} timeout={index * 100} key={label.name}>
                 <Chip
-                  key={label.name}
                   label={label.name}
                   color={color(label.occurrences)}
                   avatar={<Avatar>{label.occurrences}</Avatar>}

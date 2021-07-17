@@ -19,8 +19,8 @@ const client = new RekognitionClient({
  */
 export const fetchUrlLists = async (words: Word[]) => {
   //for each word, fetch a list of image urls and store it in an array (urlLists)
-  const urlLists: Promise<WordImages>[] = words.map(async word => {
-    let url =
+  const urlLists = words.map(async word => {
+    const url =
       `https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/Search/ImageSearchAPI?` +
       new URLSearchParams([
         ['q', word.name],
@@ -39,9 +39,9 @@ export const fetchUrlLists = async (words: Word[]) => {
     })
     const data = (await res.json()) as { value: { url: string }[] }
 
-    const acceptedFormats = ['png', 'jpg', 'jpeg', 'jfif', 'pjpeg', 'pjp']
-    //Filter out urls not hosted on https or not containing an image of a valid
-    //format for Rekognition
+    const acceptedFormats = ['.png', '.jpg', '.jpeg', '.jfif', '.pjpeg', '.pjp']
+    //Filter out urls either not hosted on https or not
+    //containing an image of a valid format for Rekognition
     const urls = data.value.flatMap(({ url }) => {
       const isCorrectFormat = acceptedFormats.some(format =>
         url.includes(format)
@@ -68,14 +68,18 @@ export const fetchUrlLists = async (words: Word[]) => {
  * @param urlLists The result from fetchUrlLists(): a promise for an array of url arrays
  * @returns A promise of bytes in the same shape as the input.
  */
-export const imagesToBytes = async (
-  wordImagesList: WordImages[]
-): Promise<WordImages[]> => {
-  //fetch image urls and convert each to an Uint8Array for Rekognition to use
+export const imagesToBytes = async (wordImagesList: WordImages[]) => {
   const updatedWordImages = wordImagesList.map(async wordImages => {
     const imageBytes = wordImages.images.map(async image => {
       try {
-        const res = await fetch(image.url!)
+        //Originally, requests on some images were taking too long.
+        //This abort controller is to set a timeout on fetching.
+        const controller = new AbortController()
+        const signal = controller.signal
+
+        const res = await fetch(image.url!, { signal })
+        setTimeout(() => controller.abort(), 100)
+
         const bytes = await res.arrayBuffer()
         const ua = new Uint8Array(bytes)
 
@@ -114,7 +118,6 @@ export const imagesToBytes = async (
 export const analyzeImages = async (wordImagesList: WordImages[]) => {
   const updatedWordImagesList = wordImagesList.map(async wordImages => {
     const WordImagesLabels = wordImages.images.map(async image => {
-      if (!image.bytes) return
       try {
         //call Rekognition for labels
         const rekognitionCommand = new DetectLabelsCommand({
