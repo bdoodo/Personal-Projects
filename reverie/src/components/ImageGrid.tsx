@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Paper, Grid, makeStyles } from '@material-ui/core'
+import {
+  Grow,
+  makeStyles,
+  ImageList,
+  ImageListItem,
+  CircularProgress,
+  Container,
+} from '@material-ui/core'
 import { shuffle } from '../utils'
 
 export const ImageGrid = ({
@@ -114,21 +121,24 @@ export const ImageGrid = ({
 
   //TODO: place images in an image grid
   return (
-    <>
+    <Container className={styles.root}>
       {processing && !wordImagesList[0] ? (
-        'Loading images ...'
+        <>
+          <div>Loading images ...</div>
+          <CircularProgress />
+        </>
       ) : (
-        <Grid container spacing={3}>
+        <ImageList cols={4}>
           {filteredImageBytes.map((bytes, index) => (
-            <Grid key={bytes.toString()} item xs={4}>
-              <Paper className={styles.paper}>
-                <img src={bytesToURL(bytes)} className={styles.img} />
-              </Paper>
-            </Grid>
+            <Grow in={!processing} timeout={index * 200}>
+              <ImageListItem key={bytes.toString()}>
+                <img src={bytesToURL(bytes)} />
+              </ImageListItem>
+            </Grow>
           ))}
-        </Grid>
+        </ImageList>
       )}
-    </>
+    </Container>
   )
 }
 
@@ -143,5 +153,8 @@ const setStyles = makeStyles({
     padding: '2%',
     display: 'flex',
     justifyContent: 'center',
+  },
+  root: {
+    marginTop: '1rem',
   },
 })

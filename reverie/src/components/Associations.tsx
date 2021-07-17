@@ -5,6 +5,12 @@ import {
   Avatar,
   createTheme,
   ThemeProvider,
+  CircularProgress,
+  Theme,
+  makeStyles,
+  createStyles,
+  Typography,
+  Grow,
 } from '@material-ui/core'
 import { orange, yellow } from '@material-ui/core/colors'
 import { Check } from '@material-ui/icons'
@@ -23,7 +29,7 @@ export const Associations = ({
   const [filteredLabels, setFilteredLabels] = useState(associations)
   //Filters by words passed through filters
 
-  //TODO: update based on removal of words from wordlist
+  //Update labels by word filters
   useEffect(() => {
     //If there are word filters
     if (filters.words[0]) {
@@ -49,7 +55,7 @@ export const Associations = ({
     } else {
       setFilteredLabels(associations)
     }
-  }, [filters.words, associations, wordImagesList])
+  }, [filters.words, associations])
 
   const [selected, setSelected] = useState(new Array<string>())
 
@@ -60,42 +66,50 @@ export const Associations = ({
     } else {
       const tempLabelFilters = filters.labels
       tempLabelFilters.splice(tempLabelFilters.indexOf(label), 1)
-      setFilters({...filters, labels: tempLabelFilters})
+      setFilters({ ...filters, labels: tempLabelFilters })
 
       const tempSelected = selected
       tempSelected.splice(tempSelected.indexOf(label), 1)
       setSelected(tempSelected)
     }
-    
   }
 
   /**Determines color for labels depending on their occurrence */
   const color = (occurrence: number) =>
     occurrence === 3 ? 'primary' : occurrence === 2 ? 'secondary' : 'default'
 
+  const styles = useStyles()
+
   return (
     <>
-      <h2>Associations between words</h2>
+      <Typography variant="h4" className={styles.header}>
+        Associations between words
+      </Typography>
       {processing && !filteredLabels[0] ? (
-        'Loading associations ...'
+        <>
+          <div>Loading associations ...</div>
+          <CircularProgress />
+        </>
       ) : (
-        <Container>
+        <Container className={styles.labels}>
           <ThemeProvider theme={theme}>
-            {filteredLabels.map(label => (
-              <Chip
-                key={label.name}
-                label={label.name}
-                color={color(label.occurrences)}
-                avatar={<Avatar>{label.occurrences}</Avatar>}
-                clickable
-                onClick={() => {
-                  filterByLabel(label.name)
-                }}
-                deleteIcon={
-                  selected.includes(label.name) ? <Check /> : <></>
-                }
-                onDelete={() => {}}
-              />
+            {filteredLabels.map((label, index) => (
+              <Grow in={!processing} timeout={index * 100}>
+                <Chip
+                  key={label.name}
+                  label={label.name}
+                  color={color(label.occurrences)}
+                  avatar={<Avatar>{label.occurrences}</Avatar>}
+                  clickable
+                  onClick={() => {
+                    filterByLabel(label.name)
+                  }}
+                  deleteIcon={selected.includes(label.name) ? <Check /> : <></>}
+                  onDelete={() => {
+                    filterByLabel(label.name)
+                  }}
+                />
+              </Grow>
             ))}
           </ThemeProvider>
         </Container>
@@ -110,3 +124,19 @@ const theme = createTheme({
     secondary: yellow,
   },
 })
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    labels: {
+      display: 'flex',
+      justifyContent: 'center',
+      flexWrap: 'wrap',
+      '& > *': {
+        margin: theme.spacing(0.5),
+      },
+    },
+    header: {
+      padding: '5rem 0 1rem',
+    },
+  })
+)

@@ -25,7 +25,7 @@ export const fetchUrlLists = async (words: Word[]) => {
       new URLSearchParams([
         ['q', word.name],
         ['pageNumber', 1],
-        ['pageSize', 5],
+        ['pageSize', 20],
         ['autoCorrect', false],
         ['safeSearch', true],
       ] as string[][]).toString()
@@ -38,11 +38,17 @@ export const fetchUrlLists = async (words: Word[]) => {
       },
     })
     const data = (await res.json()) as { value: { url: string }[] }
-    const urls = data.value.flatMap(
-      (
-        img //take just the urls hosted on https
-      ) => (img.url.startsWith('https') ? [img.url] : [])
-    )
+
+    const acceptedFormats = ['png', 'jpg', 'jpeg', 'jfif', 'pjpeg', 'pjp']
+    //Filter out urls not hosted on https or not containing an image of a valid
+    //format for Rekognition
+    const urls = data.value.flatMap(({ url }) => {
+      const isCorrectFormat = acceptedFormats.some(format =>
+        url.includes(format)
+      )
+
+      return url.startsWith('https') && isCorrectFormat ? [url] : []
+    })
 
     const wordImages = {
       word: word,
@@ -129,9 +135,7 @@ export const analyzeImages = async (wordImagesList: WordImages[]) => {
 
     //modify wordImages in place to append labels to each image if they exist
     resolvedImagesLabelList.forEach((labelList, index) => {
-      if (labelList) {
-        wordImages.images[index].labels = labelList
-      }
+      if (labelList) wordImages.images[index].labels = labelList
     })
 
     //make a set for each word of all its labels and add it to wordImages's allLabels property
@@ -158,9 +162,10 @@ export const analyzeImages = async (wordImagesList: WordImages[]) => {
  * @param labelsToReturn The number of common labels (labels shared between words) to return
  * @returns An array of Association objects (containing labels and their occurrences between words)
  */
+
 export const sortLabels = (
   wordImagesList: WordImages[],
-  labelsToReturn: number
+  labelsToReturn: number = 50
 ) => {
   //count how many words a label appears across
   const countedLabels = new Map<string, number>()

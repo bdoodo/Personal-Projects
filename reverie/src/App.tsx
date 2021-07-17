@@ -1,7 +1,8 @@
 /* src/App.js */
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ImageGrid, WordList, Associations } from './components'
-import { Grid } from '@material-ui/core'
+import { Grid, Divider, makeStyles } from '@material-ui/core'
+import { sortLabels } from './utils'
 
 export const App = () => {
   const [wordImages, setWordImages] = useState(new Array<WordImages>())
@@ -12,16 +13,24 @@ export const App = () => {
     labels: new Array<string>(),
   })
 
+  //Update associations whenever wordImages changes
+  useEffect(() => {
+    setAssociations(sortLabels(wordImages))
+  }, [wordImages])
+
+  const styles = setStyles()
+
   return (
-    <Grid container spacing = {3}>
-      <Grid item xs={6}>
+    <Grid container spacing={5} className={styles.root}>
+      <Grid item xs={5}>
         <WordList
-          wordImages={{wordImages, setWordImages}}
+          wordImages={{ wordImages, setWordImages }}
           filters={{ filters, setFilters }}
-          setProcessing={setProcessing}
+          processing={{processing, setProcessing}}
           setAssociations={setAssociations}
         />
       </Grid>
+      <Divider orientation='vertical' className={styles.divider} />
       <Grid item xs={6}>
         <Associations
           associations={associations}
@@ -38,3 +47,13 @@ export const App = () => {
     </Grid>
   )
 }
+
+const setStyles = makeStyles({
+  root: {
+    height: '100vh'
+  },
+  divider: {
+    height: '60%',
+    alignSelf: 'center'
+  }
+})
