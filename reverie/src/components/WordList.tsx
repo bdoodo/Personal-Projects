@@ -29,7 +29,7 @@ export const WordList = ({
   filters: { filters, setFilters },
   wordImages: { wordImages, setWordImages },
   setAssociations,
-  processing: { processing, setProcessing },
+  status: { status, setStatus },
 }: {
   filters: FiltersState
   wordImages: {
@@ -38,9 +38,9 @@ export const WordList = ({
   }
 
   setAssociations: React.Dispatch<React.SetStateAction<Association[]>>
-  processing: {
-    processing: boolean
-    setProcessing: React.Dispatch<React.SetStateAction<boolean>>
+  status: {
+    status: string
+    setStatus: React.Dispatch<React.SetStateAction<string>>
   }
 }) => {
   const [formState, setFormState] = useState({ name: '' })
@@ -119,21 +119,26 @@ export const WordList = ({
 
   /**Initiate all processing for input words */
   const getAssociations = async () => {
-    setProcessing(true)
+    setStatus('Getting URL lists ...')
 
     //wordImages ...
     const afterUrls = await fetchUrlLists(inactiveWords)
+    
+    setStatus('Fetching images and converting them to bytes ...')
     const afterBytes = await imagesToBytes(afterUrls)
+
+    setStatus('Analyzing images ...')
     const afterLabels = await analyzeImages(afterBytes)
     setWordImages([...wordImages, ...afterLabels])
 
     setActiveWords([...activeWords, ...inactiveWords])
     setInactiveWords([])
 
+    setStatus('Finding associations ...')
     const sortedLabels = sortLabels([...wordImages, ...afterLabels])
 
     setAssociations(sortedLabels)
-    setProcessing(false)
+    setStatus('')
   }
 
   //When a word list is completely filled out, focus on the submit button
@@ -193,7 +198,7 @@ export const WordList = ({
             onClick={getAssociations}
             variant="contained"
             color="primary"
-            disabled={processing}
+            disabled={status ? true : false}
             ref={createWordsButton}
           >
             {!activeWords.length ? 'Create word list' : 'Update word list'}
@@ -204,9 +209,13 @@ export const WordList = ({
   )
 }
 
-const setStyles = makeStyles({
+const setStyles = makeStyles(theme => ({
   paper: {
-    margin: '5em 3em',
+    margin: '5rem 3rem 0',
+    [theme.breakpoints.up('lg')]: {
+      position: 'fixed',
+      minWidth: '325px'
+    }
   },
   centerFlex: {
     display: 'flex',
@@ -215,4 +224,4 @@ const setStyles = makeStyles({
   wordInput: {
     marginTop: '1rem',
   },
-})
+}))

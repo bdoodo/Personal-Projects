@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Grow,
   makeStyles,
@@ -12,11 +12,11 @@ import { shuffle } from '../utils'
 
 export const ImageGrid = ({
   wordImagesList,
-  processing,
+  status,
   filters,
 }: {
   wordImagesList: WordImages[]
-  processing: boolean
+  status: string
   filters: { words: string[]; labels: string[] }
 }) => {
   const [allImages, setAllImages] = useState(
@@ -63,7 +63,7 @@ export const ImageGrid = ({
           ? wordsFilteredImages
           : labelsFilteredImages
 
-      setFilteredImages(shuffle(newFilteredImages))
+      setFilteredImages(newFilteredImages) 
     } //If there are no filters, update filteredImages with allImageBytes
     else {
       setFilteredImages(shuffle(allImages))
@@ -74,9 +74,10 @@ export const ImageGrid = ({
 
   return (
     <Container className={styles.root}>
-      {processing ? (
+      {status ? ( 
         <Container className={styles.loading}>
           <CircularProgress />
+          <Typography variant='h6' color='primary'>{status}</Typography>
         </Container>
       ) : !allImages[0] ? (
         <Container className={styles.loading}>
@@ -85,7 +86,7 @@ export const ImageGrid = ({
       ) : (
         <ImageList cols={4}>
           {filteredImages.map((image, index) => (
-            <Grow in={!processing} timeout={index * 200} key={image.url!}>
+            <Grow in={!status} timeout={index * 200} key={image.url!}>
               <ImageListItem>
                 <img src={image.bytesUrl!} alt={image.title} />
               </ImageListItem>
@@ -97,7 +98,7 @@ export const ImageGrid = ({
   )
 }
 
-const setStyles = makeStyles({
+const setStyles = makeStyles(theme => ({
   img: {
     maxWidth: '100%',
     borderRaius: '4px',
@@ -116,7 +117,11 @@ const setStyles = makeStyles({
   loading: {
     justifyContent: 'center',
     display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
     height: '100%',
+    '& > *': {
+      margin: '1rem 0' 
+    }
   },
-})
+}))

@@ -18,12 +18,12 @@ import { Check, ExpandMore, ExpandLess } from '@material-ui/icons'
 
 export const Associations = ({
   associations,
-  processing,
+  status,
   filters: { filters, setFilters },
   wordImagesList,
 }: {
   associations: Association[]
-  processing: boolean
+  status: string
   filters: FiltersState
   wordImagesList: WordImages[]
 }) => {
@@ -92,7 +92,7 @@ export const Associations = ({
           <Container className={styles.labels}>
             <ThemeProvider theme={theme}>
               {filteredLabels.map((label, index) => (
-                <Grow in={!processing} timeout={index * 100} key={label.name}>
+                <Grow in={!status} timeout={index * 100} key={label.name}>
                   <Chip
                     label={label.name}
                     color={color(label.occurrences)}
@@ -113,7 +113,7 @@ export const Associations = ({
             </ThemeProvider>
           </Container>
         </Collapse>
-        {filteredLabels.length > 10 && !processing && (
+        {filteredLabels.length > 10 && !status && (
           <Container className={styles.labels}>
             <IconButton
               onClick={() => {
