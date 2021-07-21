@@ -34,10 +34,12 @@ export const Associations = ({
   //Update labels by word filters
   useEffect(() => {
     if (filters.words[0]) {
+      //Find wordImages passing word filters
       const matchingWordImages = wordImagesList.filter(({ word }) =>
         filters.words.some(wordFilter => wordFilter === word.name)
       )
 
+      //Filter associations to those found in every matchingWordImages
       const newFilteredLabels = associations.filter(association =>
         matchingWordImages.every(wordImages =>
           wordImages.allLabels?.includes(association.name)
@@ -48,7 +50,7 @@ export const Associations = ({
       //selected by passing them to filterByLabel
       selected.forEach(
         label =>
-          !newFilteredLabels.some(newLabel => newLabel.name === label) &&
+          newFilteredLabels.some(newLabel => newLabel.name === label) ||
           filterByLabel(label)
       )
 

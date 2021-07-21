@@ -15,7 +15,7 @@
       "function": {
         "getImageBytes": {
           "deploymentBucketName": "amplify-reverie-dev-185016-deployment",
-          "s3Key": "amplify-builds/getImageBytes-4b434a33522b544d6849-build.zip"
+          "s3Key": "amplify-builds/getImageBytes-44735368676352664d2b-build.zip"
         }
       }
     }

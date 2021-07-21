@@ -1,6 +1,87 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const createWordList = /* GraphQL */ `
+  mutation CreateWordList(
+    $input: CreateWordListInput!
+    $condition: ModelWordListConditionInput
+  ) {
+    createWordList(input: $input, condition: $condition) {
+      id
+      words {
+        items {
+          id
+          name
+          wordListID
+          labels
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
+      associations {
+        label
+        occurrences
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateWordList = /* GraphQL */ `
+  mutation UpdateWordList(
+    $input: UpdateWordListInput!
+    $condition: ModelWordListConditionInput
+  ) {
+    updateWordList(input: $input, condition: $condition) {
+      id
+      words {
+        items {
+          id
+          name
+          wordListID
+          labels
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
+      associations {
+        label
+        occurrences
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteWordList = /* GraphQL */ `
+  mutation DeleteWordList(
+    $input: DeleteWordListInput!
+    $condition: ModelWordListConditionInput
+  ) {
+    deleteWordList(input: $input, condition: $condition) {
+      id
+      words {
+        items {
+          id
+          name
+          wordListID
+          labels
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
+      associations {
+        label
+        occurrences
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const createWord = /* GraphQL */ `
   mutation CreateWord(
     $input: CreateWordInput!
@@ -9,6 +90,20 @@ export const createWord = /* GraphQL */ `
     createWord(input: $input, condition: $condition) {
       id
       name
+      wordListID
+      labels
+      wordList {
+        id
+        words {
+          nextToken
+        }
+        associations {
+          label
+          occurrences
+        }
+        createdAt
+        updatedAt
+      }
       createdAt
       updatedAt
     }
@@ -22,6 +117,20 @@ export const updateWord = /* GraphQL */ `
     updateWord(input: $input, condition: $condition) {
       id
       name
+      wordListID
+      labels
+      wordList {
+        id
+        words {
+          nextToken
+        }
+        associations {
+          label
+          occurrences
+        }
+        createdAt
+        updatedAt
+      }
       createdAt
       updatedAt
     }
@@ -35,60 +144,17 @@ export const deleteWord = /* GraphQL */ `
     deleteWord(input: $input, condition: $condition) {
       id
       name
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const createAssociations = /* GraphQL */ `
-  mutation CreateAssociations(
-    $input: CreateAssociationsInput!
-    $condition: ModelAssociationsConditionInput
-  ) {
-    createAssociations(input: $input, condition: $condition) {
-      id
-      list
-      word {
+      wordListID
+      labels
+      wordList {
         id
-        name
-        createdAt
-        updatedAt
-      }
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const updateAssociations = /* GraphQL */ `
-  mutation UpdateAssociations(
-    $input: UpdateAssociationsInput!
-    $condition: ModelAssociationsConditionInput
-  ) {
-    updateAssociations(input: $input, condition: $condition) {
-      id
-      list
-      word {
-        id
-        name
-        createdAt
-        updatedAt
-      }
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const deleteAssociations = /* GraphQL */ `
-  mutation DeleteAssociations(
-    $input: DeleteAssociationsInput!
-    $condition: ModelAssociationsConditionInput
-  ) {
-    deleteAssociations(input: $input, condition: $condition) {
-      id
-      list
-      word {
-        id
-        name
+        words {
+          nextToken
+        }
+        associations {
+          label
+          occurrences
+        }
         createdAt
         updatedAt
       }

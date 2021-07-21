@@ -1,5 +1,11 @@
+type WordList = {
+  id?: string,
+  name: string,
+  words?: Word[],
+}
+
 type Word = {
-  id?,
+  id?: string,
   name: string
 }
 
@@ -16,6 +22,11 @@ type WordImages = {
   allLabels?: string[]
 }
 
+interface Association {
+  name: string,
+  occurrences: number
+}
+
 interface FiltersState {
   filters: {
       words: string[];
@@ -25,9 +36,4 @@ interface FiltersState {
       words: string[];
       labels: string[];
   }>>;
-}
-
-interface Association {
-  name: string,
-  occurrences: number
 }

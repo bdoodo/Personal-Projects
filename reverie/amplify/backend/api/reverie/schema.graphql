@@ -1,10 +1,21 @@
-type Word @model {
+type WordList @model {
   id: ID!
   name: String!
+  words: [Word!]! @connection(keyName: "byWordList", fields: ["id"])
 }
 
-type Associations @model {
+type Word 
+  @model(queries: null) 
+  @key(name: "byWordList", fields: ["wordListID"])
+{
   id: ID!
-  list: [String!]!
-  word: Word!
+  name: String!
+  wordListID: ID!
+  labels: [String]
+  wordList: WordList @connection(fields: ["wordListID"])
+}
+
+type Association {
+  label: String!
+  occurrences: Int!
 }

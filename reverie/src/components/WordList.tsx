@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
-import { createWord, listWords, deleteWord } from '../graphql'
+import { createWord, deleteWord } from '../graphql'
 import Amplify, { API, graphqlOperation } from 'aws-amplify'
 import {
   List,
@@ -10,8 +10,9 @@ import {
   Button,
   Card,
   CardActions,
-  CardHeader,
   CardContent,
+  Input,
+  Typography,
 } from '@material-ui/core'
 import { Add } from '@material-ui/icons'
 import {
@@ -25,45 +26,63 @@ import { WordListItem } from './'
 import awsExports from '../aws-exports'
 Amplify.configure(awsExports)
 
+
 export const WordList = ({
   filters: { filters, setFilters },
   wordImages: { wordImages, setWordImages },
   setAssociations,
   status: { status, setStatus },
+  activeWordList: { activeWordList, setActiveWordList },
+  title
 }: {
   filters: FiltersState
   wordImages: {
     wordImages: WordImages[]
     setWordImages: React.Dispatch<React.SetStateAction<WordImages[]>>
   }
-
   setAssociations: React.Dispatch<React.SetStateAction<Association[]>>
   status: {
     status: string
     setStatus: React.Dispatch<React.SetStateAction<string>>
   }
+  activeWordList: {
+    activeWordList: WordList | undefined
+    setActiveWordList: React.Dispatch<
+      React.SetStateAction<WordList | undefined>
+    >
+  }
+  title: string
 }) => {
   const [formState, setFormState] = useState({ name: '' })
   const [selected, setSelected] = useState(new Array<string>())
   const [activeWords, setActiveWords] = useState(new Array<Word>())
   const [inactiveWords, setInactiveWords] = useState(new Array<Word>())
+  const [listTitle, setListTitle] = useState<string>(title)
+
+  //Update active word list properties whenever something from this word list changes
+  useEffect(() => {
+    setActiveWordList({
+      ...activeWordList,
+      name: listTitle,
+      words: activeWords,
+    })
+  }, [listTitle, activeWords])
 
   const maxWordsLength = 3
 
-  const fetchWords = async () => {
-    try {
-      const wordData = (await API.graphql(graphqlOperation(listWords))) as {
-        data: { listWords: { items: Word[] } }
+  /*useEffect(() => {
+    const fetchWords = (async () => {
+      try {
+        const wordData = (await API.graphql({query: listWords})) as {
+          data: { listWords: { items: Word[] } }
+        }
+        const activeWords = wordData.data.listWords.items
+        setActiveWords(activeWords)
+      } catch (err) {
+        console.log('error fetching words')
       }
-      const activeWords = wordData.data.listWords.items
-      setActiveWords(activeWords)
-    } catch (err) {
-      console.log('error fetching words')
-    }
-  }
-  useEffect(() => {
-    fetchWords()
-  }, [])
+    })()
+  }, [])*/
 
   const addWord = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -108,22 +127,21 @@ export const WordList = ({
   }
 
   const filterByWord = (word: string) => {
-    //If the clicked word is already in 'filters,' remove it from filters; otherwise, add it.
-    filters.words.includes(word)
-      ? setFilters({
-          ...filters,
-          words: filters.words.filter(wordFilter => wordFilter !== word),
-        })
-      : setFilters({ ...filters, words: [...filters.words, word] })
+    setFilters({
+      ...filters,
+      //If the clicked word is already in 'filters,' remove it from filters; otherwise, add it.
+      words: filters.words.includes(word)
+        ? filters.words.filter(wordFilter => wordFilter !== word)
+        : [...filters.words, word],
+    })
   }
 
   /**Initiate all processing for input words */
   const getAssociations = async () => {
     setStatus('Getting URL lists ...')
 
-    //wordImages ...
     const afterUrls = await fetchUrlLists(inactiveWords)
-    
+
     setStatus('Fetching images and converting them to bytes ...')
     const afterBytes = await imagesToBytes(afterUrls)
 
@@ -152,8 +170,20 @@ export const WordList = ({
 
   return (
     <Card className={styles.paper}>
-      <CardHeader title="Word list" />
       <CardContent>
+        <Typography variant="h5">
+          <Input
+            disableUnderline
+            margin="none"
+            value={listTitle}
+            inputProps={{ 'aria-label': 'Word List Title' }}
+            required
+            classes={{ root: styles.listTitle, input: styles.input }}
+            onChange={e => {
+              setListTitle(e.target.value)
+            }}
+          />
+        </Typography>
         <List>
           {activeWords.map(word => (
             <WordListItem
@@ -214,8 +244,8 @@ const setStyles = makeStyles(theme => ({
     margin: '5rem 3rem 0',
     [theme.breakpoints.up('lg')]: {
       position: 'fixed',
-      minWidth: '325px'
-    }
+      minWidth: '325px',
+    },
   },
   centerFlex: {
     display: 'flex',
@@ -223,5 +253,17 @@ const setStyles = makeStyles(theme => ({
   },
   wordInput: {
     marginTop: '1rem',
+  },
+  listTitle: {
+    fontSize: '1.5rem',
+    fontWeight: 400,
+    lineHeight: 1.334,
+    letterSpacing: '0em',
+  },
+  input: {
+    cursor: 'pointer',
+    '&:focus': {
+      cursor: 'text',
+    },
   },
 }))
