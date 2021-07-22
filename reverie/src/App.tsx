@@ -11,7 +11,6 @@ import {
   Container,
   Fab,
   Collapse,
-  Button,
 } from '@material-ui/core'
 import { Add } from '@material-ui/icons'
 import {
@@ -24,14 +23,7 @@ import { useEffect } from 'react'
 import Amplify, { API } from 'aws-amplify'
 
 export const App = () => {
-  //States for the active word list
-  const [wordImages, setWordImages] = useState(new Array<WordImages>())
-  const [associations, setAssociations] = useState(new Array<Association>())
   const [status, setStatus] = useState('')
-  const [filters, setFilters] = useState({
-    words: new Array<string>(),
-    labels: new Array<string>(),
-  })
 
   const [wordLists, setWordLists] = useState(new Array<WordList>())
   //Set wordLists to fetched word lists, or create a new one
@@ -57,7 +49,8 @@ export const App = () => {
       const newName = `Word List ${wordLists.length + 1}`
       const newWordList = {
         name: newName,
-        id: `id${Math.random() * Math.random()}`,
+        id: `id${Math.random()}`,
+        filters: { words: new Array<string>(), labels: new Array<string>() },
       }
 
       /*const newWordList = (await API.graphql({
@@ -69,6 +62,7 @@ export const App = () => {
 
       setWordLists([...wordLists, newWordList])
       setActiveWordList(newWordList)
+      console.log(activeWordList)
       console.log('active word list name:', activeWordList?.name)
     } catch (error) {
       console.log('Error creating new word list', error)
@@ -82,10 +76,13 @@ export const App = () => {
     activeWordList || setActiveWordList(wordLists[0])
   }, [wordLists])
 
+  //Expands a word list if it's inactive and sets it to active
   const expand = (list: WordList) => {
-    setActiveWordList(wordLists.find(wordList => wordList.id === list.id))
+    if (!status)
+      return isActive(list)
+        ? undefined
+        : setActiveWordList(wordLists.find(wordList => wordList.id === list.id))
   }
-
   const styles = setStyles()
 
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
@@ -107,53 +104,61 @@ export const App = () => {
     <ThemeProvider theme={theme}>
       <Container className={styles.root}>
         <Grid container spacing={5}>
-          <Grid item xs={5}>
+          <Grid
+            item
+            xs={5}
+            alignContent="center"
+            direction="column"
+            className={styles.wordListGrid}
+          >
             {wordLists.map(wordList => (
               <Collapse
                 key={wordList.id}
                 in={isActive(wordList)}
-                collapsedSize={150}
+                collapsedSize={80}
               >
                 <div
-                  onClick={
+                  onClick={() => expand(wordList)}
+                  className={
                     isActive(wordList)
-                      ? undefined
-                      : () => {
-                          expand(wordList)
-                        }
+                      ? styles.expandedList
+                      : styles.collapsedList
                   }
                 >
                   <WordList
-                    wordImages={{ wordImages, setWordImages }}
-                    filters={{ filters, setFilters }}
                     status={{ status, setStatus }}
-                    setAssociations={setAssociations}
+                    wordLists={{ wordLists, setWordLists }}
                     activeWordList={{ activeWordList, setActiveWordList }}
                     title={wordList.name}
+                    id={wordList.id}
                   />
                 </div>
               </Collapse>
             ))}
-            <Fab
-              color="primary"
-              aria-label="New word list"
-              onClick={makeWordList}
-            >
-              <Add />
-            </Fab>
+            {wordLists.length < 5 && (
+              <Fab
+                color="primary"
+                aria-label="New word list"
+                onClick={makeWordList}
+                className={styles.fab}
+              >
+                <Add />
+              </Fab>
+            )}
           </Grid>
           <Divider orientation="vertical" className={styles.divider} />
           <Grid item xs={6}>
             <Associations
-              associations={associations}
+              associations={activeWordList?.associations}
               status={status}
-              filters={{ filters, setFilters }}
-              wordImagesList={wordImages}
+              filters={activeWordList?.filters}
+              activeWordList={{ activeWordList, setActiveWordList }}
+              wordImagesList={activeWordList?.wordImages}
             />
             <ImageGrid
-              wordImagesList={wordImages}
+              wordImagesList={activeWordList?.wordImages}
               status={status}
-              filters={filters}
+              filters={activeWordList?.filters}
             />
           </Grid>
         </Grid>
@@ -169,5 +174,19 @@ const setStyles = makeStyles(theme => ({
   divider: {
     height: '60%',
     alignSelf: 'center',
+  },
+  fab: {
+    margin: '0 auto',
+  },
+  wordListGrid: {
+    display: 'flex',
+    height: '100vh',
+    marginTop: '2rem'
+  },
+  collapsedList: {
+    cursor: 'pointer',
+  },
+  expandedList: {
+    cursor: 'default',
   },
 }))

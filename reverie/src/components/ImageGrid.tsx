@@ -15,9 +15,9 @@ export const ImageGrid = ({
   status,
   filters,
 }: {
-  wordImagesList: WordImages[]
+  wordImagesList: WordImages[] | undefined
   status: string
-  filters: { words: string[]; labels: string[] }
+  filters: { words: string[]; labels: string[] } | undefined
 }) => {
   const [allImages, setAllImages] = useState(
     new Array<{
@@ -30,24 +30,25 @@ export const ImageGrid = ({
   )
   //Extract all image bytes from each WordImages object
   useEffect(() => {
-    setAllImages(
-      shuffle(wordImagesList.flatMap(wordImages => wordImages.images))
-    )
+    wordImagesList !== undefined &&
+      setAllImages(
+        shuffle(wordImagesList.flatMap(wordImages => wordImages.images))
+      )
   }, [wordImagesList])
 
   const [filteredImages, setFilteredImages] = useState(allImages)
   //Filter images by word and label filters
   useEffect(() => {
-    if (filters.labels[0] || filters.words[0]) {
-      const wordsFilteredImages = wordImagesList.flatMap(wordImages =>
-        filters.words.some(word => word === wordImages.word.name)
+    if (filters?.labels[0] || filters?.words[0]) {
+      const wordsFilteredImages = wordImagesList?.flatMap(wordImages =>
+        filters?.words.some(word => word === wordImages.word.name)
           ? wordImages.images
           : []
       )
 
-      const labelsFilteredImages = wordImagesList.flatMap(wordImages =>
+      const labelsFilteredImages = wordImagesList?.flatMap(wordImages =>
         wordImages.images.filter(image =>
-          filters.labels.some(label => image.labels?.includes(label))
+          filters?.labels.some(label => image.labels?.includes(label))
         )
       )
 
@@ -55,15 +56,15 @@ export const ImageGrid = ({
       //results; otherwise, return the result for the existing filter
 
       const newFilteredImages =
-        filters.words[0] && filters.labels[0]
-          ? wordsFilteredImages.filter(({ url: url1 }) =>
-              labelsFilteredImages.some(({ url: url2 }) => url1! === url2!)
+        filters?.words[0] && filters?.labels[0]
+          ? wordsFilteredImages?.filter(({ url: url1 }) =>
+              labelsFilteredImages?.some(({ url: url2 }) => url1! === url2!)
             )
-          : filters.words[0]
+          : filters?.words[0]
           ? wordsFilteredImages
           : labelsFilteredImages
 
-      setFilteredImages(newFilteredImages) 
+      newFilteredImages && setFilteredImages(newFilteredImages)
     } //If there are no filters, update filteredImages with allImageBytes
     else {
       setFilteredImages(shuffle(allImages))
@@ -74,10 +75,12 @@ export const ImageGrid = ({
 
   return (
     <Container className={styles.root}>
-      {status ? ( 
+      {status ? (
         <Container className={styles.loading}>
           <CircularProgress />
-          <Typography variant='h6' color='primary'>{status}</Typography>
+          <Typography variant="h6" color="primary">
+            {status}
+          </Typography>
         </Container>
       ) : !allImages[0] ? (
         <Container className={styles.loading}>
@@ -121,7 +124,7 @@ const setStyles = makeStyles(theme => ({
     alignItems: 'center',
     height: '100%',
     '& > *': {
-      margin: '1rem 0' 
-    }
+      margin: '1rem 0',
+    },
   },
 }))

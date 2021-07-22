@@ -2,6 +2,12 @@ type WordList = {
   id?: string,
   name: string,
   words?: Word[],
+  associations?: Association[],
+  wordImages?: WordImages[],
+  filters: {
+    words: string[],
+    labels: string[]
+  }
 }
 
 type Word = {
@@ -25,15 +31,4 @@ type WordImages = {
 interface Association {
   name: string,
   occurrences: number
-}
-
-interface FiltersState {
-  filters: {
-      words: string[];
-      labels: string[];
-  };
-  setFilters: React.Dispatch<React.SetStateAction<{
-      words: string[];
-      labels: string[];
-  }>>;
 }

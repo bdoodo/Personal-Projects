@@ -13,8 +13,10 @@ import {
   CardContent,
   Input,
   Typography,
+  Menu,
+  MenuItem,
 } from '@material-ui/core'
-import { Add } from '@material-ui/icons'
+import { Add, MoreVert } from '@material-ui/icons'
 import {
   analyzeImages,
   fetchUrlLists,
@@ -26,24 +28,20 @@ import { WordListItem } from './'
 import awsExports from '../aws-exports'
 Amplify.configure(awsExports)
 
-
 export const WordList = ({
-  filters: { filters, setFilters },
-  wordImages: { wordImages, setWordImages },
-  setAssociations,
   status: { status, setStatus },
+  wordLists: { wordLists, setWordLists },
   activeWordList: { activeWordList, setActiveWordList },
-  title
+  title,
+  id,
 }: {
-  filters: FiltersState
-  wordImages: {
-    wordImages: WordImages[]
-    setWordImages: React.Dispatch<React.SetStateAction<WordImages[]>>
-  }
-  setAssociations: React.Dispatch<React.SetStateAction<Association[]>>
   status: {
     status: string
     setStatus: React.Dispatch<React.SetStateAction<string>>
+  }
+  wordLists: {
+    wordLists: WordList[]
+    setWordLists: React.Dispatch<React.SetStateAction<WordList[]>>
   }
   activeWordList: {
     activeWordList: WordList | undefined
@@ -52,21 +50,42 @@ export const WordList = ({
     >
   }
   title: string
+  id: string | undefined
 }) => {
   const [formState, setFormState] = useState({ name: '' })
+  const [wordImages, setWordImages] = useState(new Array<WordImages>())
+  const [associations, setAssociations] = useState(new Array<Association>())
   const [selected, setSelected] = useState(new Array<string>())
   const [activeWords, setActiveWords] = useState(new Array<Word>())
   const [inactiveWords, setInactiveWords] = useState(new Array<Word>())
   const [listTitle, setListTitle] = useState<string>(title)
+  const [filters, setFilters] = useState({
+    words: new Array<string>(),
+    labels: new Array<string>(),
+  })
 
   //Update active word list properties whenever something from this word list changes
   useEffect(() => {
-    setActiveWordList({
-      ...activeWordList,
+    const current = {
       name: listTitle,
       words: activeWords,
+      wordImages: wordImages,
+      associations: associations,
+      filters: filters,
+    }
+
+    setActiveWordList({
+      ...activeWordList,
+      ...current,
     })
-  }, [listTitle, activeWords])
+
+    //Update this list in wordLists
+    const newWordLists = wordLists
+    const thisListIndex = newWordLists.findIndex(list => list.id === id)
+    newWordLists[thisListIndex] = { ...newWordLists[thisListIndex], ...current }
+
+    setWordLists(newWordLists)
+  }, [listTitle, activeWords, wordImages, associations, filters])
 
   const maxWordsLength = 3
 
@@ -166,7 +185,50 @@ export const WordList = ({
       createWordsButton.current?.focus()
   }, [inactiveWords])
 
-  const styles = setStyles()
+  const deleteWordList = () => {
+    const listIndex = wordLists.findIndex(list => list.id === id)
+    setActiveWordList(wordLists[listIndex + 1] || wordLists[listIndex - 1])
+
+    setWordLists(wordLists.filter(list => list.id !== id))
+  }
+
+  /**Checks whether this word list is active */
+  const isActive = () => activeWordList?.id === id
+
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuButtonRef = useRef(null)
+
+  const styles = makeStyles(theme => ({
+    paper: {
+      margin: isActive() ? '3rem auto' : '0.1rem auto', 
+      maxWidth: '400px'
+    },
+    centerFlex: {
+      display: 'flex',
+      justifyContent: 'center',
+    },
+    wordInput: {
+      marginTop: '1rem',
+    },
+    listTitle: {
+      fontSize: '1.5rem',
+      fontWeight: 400,
+      lineHeight: 1.334,
+      letterSpacing: '0em',
+    },
+    input: {
+      cursor: isActive() ? 'pointer' : 'default',
+      textOverflow: 'ellipsis',
+      maxWidth: 200,
+      '&:focus': {
+        cursor: 'text',
+      },
+    },
+    menuButton: {
+      float: 'right'
+    }
+  }))()
+  
 
   return (
     <Card className={styles.paper}>
@@ -179,10 +241,24 @@ export const WordList = ({
             inputProps={{ 'aria-label': 'Word List Title' }}
             required
             classes={{ root: styles.listTitle, input: styles.input }}
-            onChange={e => {
-              setListTitle(e.target.value)
-            }}
+            onChange={e => setListTitle(e.target.value)}
+            disabled={!isActive()}
           />
+          <IconButton
+            ref={menuButtonRef}
+            onClick={() => setMenuOpen(!menuOpen)}
+            disabled={!isActive()}
+            className={styles.menuButton}
+          >
+            <MoreVert />
+          </IconButton>
+          <Menu
+            anchorEl={menuButtonRef.current}
+            open={menuOpen}
+            onClose={() => setMenuOpen(false)}
+          >
+            <MenuItem onClick={deleteWordList}>Delete list</MenuItem>
+          </Menu>
         </Typography>
         <List>
           {activeWords.map(word => (
@@ -192,6 +268,7 @@ export const WordList = ({
               word={word}
               removeWord={removeWord}
               filterByWord={filterByWord}
+              disabled={!isActive()}
             />
           ))}
           {inactiveWords.map(word => (
@@ -238,32 +315,3 @@ export const WordList = ({
     </Card>
   )
 }
-
-const setStyles = makeStyles(theme => ({
-  paper: {
-    margin: '5rem 3rem 0',
-    [theme.breakpoints.up('lg')]: {
-      position: 'fixed',
-      minWidth: '325px',
-    },
-  },
-  centerFlex: {
-    display: 'flex',
-    justifyContent: 'center',
-  },
-  wordInput: {
-    marginTop: '1rem',
-  },
-  listTitle: {
-    fontSize: '1.5rem',
-    fontWeight: 400,
-    lineHeight: 1.334,
-    letterSpacing: '0em',
-  },
-  input: {
-    cursor: 'pointer',
-    '&:focus': {
-      cursor: 'text',
-    },
-  },
-}))
