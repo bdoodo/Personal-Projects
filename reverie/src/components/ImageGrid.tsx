@@ -54,7 +54,6 @@ export const ImageGrid = ({
 
       //If there were both label and word filters, return the union of their
       //results; otherwise, return the result for the existing filter
-
       const newFilteredImages =
         filters?.words[0] && filters?.labels[0]
           ? wordsFilteredImages?.filter(({ url: url1 }) =>
@@ -77,14 +76,14 @@ export const ImageGrid = ({
     <Container className={styles.root}>
       {status ? (
         <Container className={styles.loading}>
-          <CircularProgress />
-          <Typography variant="h6" color="primary">
+          <CircularProgress className={styles.dark} />
+          <Typography variant="h6" className={styles.dark}>
             {status}
           </Typography>
         </Container>
       ) : !allImages[0] ? (
         <Container className={styles.loading}>
-          <Typography variant="h5">Try adding some words!</Typography>
+          <Typography color='secondary' variant="h5">Try adding some words!</Typography>
         </Container>
       ) : (
         <ImageList cols={4}>
@@ -127,4 +126,7 @@ const setStyles = makeStyles(theme => ({
       margin: '1rem 0',
     },
   },
+  dark: {
+    color: theme.palette.primary.dark
+  }
 }))

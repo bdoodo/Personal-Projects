@@ -11,7 +11,7 @@ export const WordListItem = ({
   word,
   removeWord,
   filterByWord,
-  disabled = false
+  disabled = false,
 }: {
   selected: {
     selected: string[]
@@ -25,11 +25,11 @@ export const WordListItem = ({
   /**On click, update word filters and toggle selected */
   const handleItemClick = (word: string) => {
     filterByWord(word)
-    if (selected.includes(word)) {
-      const tempSelected = selected
-      tempSelected.splice(selected.indexOf(word), 1)
-      setSelected(tempSelected)
-    } else setSelected([...selected, word])
+    setSelected(
+      selected.includes(word)
+        ? selected.filter(selectedWord => selectedWord !== word)
+        : [...selected, word]
+    )
   }
 
   return (
@@ -37,20 +37,14 @@ export const WordListItem = ({
       key={word.id}
       role="list"
       button
-      onClick={() => {
-        handleItemClick(word.name)
-      }}
+      onClick={() => handleItemClick(word.name)}
       selected={selected.includes(word.name)}
       disabled={disabled}
     >
       <ListItemText>{word.name}</ListItemText>
       <ListItemSecondaryAction>
         <IconButton>
-          <DeleteOutlined
-            onClick={() => {
-              removeWord(word.name)
-            }}
-          />
+          <DeleteOutlined onClick={() => removeWord(word.name)} />
         </IconButton>
       </ListItemSecondaryAction>
     </ListItem>

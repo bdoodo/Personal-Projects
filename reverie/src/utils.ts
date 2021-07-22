@@ -84,9 +84,10 @@ export const imagesToBytes = async (wordImagesList: WordImages[]) => {
         //This abort controller is to set a timeout on fetching.
         const controller = new AbortController()
         const signal = controller.signal
-
+        
+        setTimeout(() => controller.abort(), 2000)
         const res = await fetch(image.url, { signal })
-        setTimeout(() => controller.abort(), 100)
+        
 
         const bytes = await res.arrayBuffer()
         const ua = new Uint8Array(bytes)

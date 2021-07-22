@@ -11,8 +11,22 @@ import {
   Container,
   Fab,
   Collapse,
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
 } from '@material-ui/core'
 import { Add } from '@material-ui/icons'
+import {
+  orange,
+  red,
+  blueGrey,
+  amber,
+  common,
+  lightBlue,
+  teal,
+  grey,
+} from '@material-ui/core/colors'
 import {
   listWordLists,
   createWordList,
@@ -37,7 +51,7 @@ export const App = () => {
 
         fetchedWordLists.length
           ? setWordLists(fetchedWordLists)
-          :*/ makeWordList()
+          :*/ !wordLists.length && makeWordList()
       } catch {
         console.log('error fetching word lists')
       }
@@ -62,8 +76,6 @@ export const App = () => {
 
       setWordLists([...wordLists, newWordList])
       setActiveWordList(newWordList)
-      console.log(activeWordList)
-      console.log('active word list name:', activeWordList?.name)
     } catch (error) {
       console.log('Error creating new word list', error)
     }
@@ -91,6 +103,16 @@ export const App = () => {
     () =>
       createTheme({
         palette: {
+          primary: {
+            ...teal,
+            main: teal[100],
+            dark: teal[500],
+          },
+          secondary: {
+            ...grey,
+            main: grey[500],
+            dark: grey[600],
+          },
           type: prefersDarkMode ? 'dark' : 'light',
         },
       }),
@@ -103,6 +125,15 @@ export const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <Container className={styles.root}>
+        <AppBar>
+          <Toolbar>
+            <Typography className={styles.title} variant="h6">
+              Reverie
+            </Typography>
+            <Button className={styles.signIn}>Log in</Button>
+          </Toolbar>
+        </AppBar>
+        <Toolbar />
         <Grid container spacing={5}>
           <Grid
             item
@@ -169,7 +200,7 @@ export const App = () => {
 
 const setStyles = makeStyles(theme => ({
   root: {
-    height: '100vh',
+    height: '100%',
   },
   divider: {
     height: '60%',
@@ -180,13 +211,20 @@ const setStyles = makeStyles(theme => ({
   },
   wordListGrid: {
     display: 'flex',
-    height: '100vh',
-    marginTop: '2rem'
+    height: '100%',
+    marginTop: '2rem',
   },
   collapsedList: {
     cursor: 'pointer',
   },
   expandedList: {
     cursor: 'default',
+  },
+  signIn: {
+    marginRight: theme.spacing(2),
+  },
+  title: {
+    flexGrow: 1,
+    userSelect: 'none',
   },
 }))

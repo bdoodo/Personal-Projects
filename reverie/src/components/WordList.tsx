@@ -71,7 +71,12 @@ export const WordList = ({
       words: activeWords,
       wordImages: wordImages,
       associations: associations,
-      filters: filters,
+      filters: activeWordList
+        ? {
+            ...activeWordList.filters,
+            words: filters.words,
+          }
+        : filters,
     }
 
     setActiveWordList({
@@ -200,8 +205,8 @@ export const WordList = ({
 
   const styles = makeStyles(theme => ({
     paper: {
-      margin: isActive() ? '3rem auto' : '0.1rem auto', 
-      maxWidth: '400px'
+      margin: isActive() ? '3rem auto' : '0.1rem auto',
+      maxWidth: '400px',
     },
     centerFlex: {
       display: 'flex',
@@ -225,10 +230,9 @@ export const WordList = ({
       },
     },
     menuButton: {
-      float: 'right'
-    }
+      float: 'right',
+    },
   }))()
-  
 
   return (
     <Card className={styles.paper}>
