@@ -7,6 +7,8 @@ import {
   CircularProgress,
   Container,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@material-ui/core'
 import { shuffle } from '../utils'
 
@@ -30,7 +32,7 @@ export const ImageGrid = ({
   )
   //Extract all image bytes from each WordImages object
   useEffect(() => {
-    wordImagesList !== undefined &&
+    wordImagesList &&
       setAllImages(
         shuffle(wordImagesList.flatMap(wordImages => wordImages.images))
       )
@@ -70,6 +72,18 @@ export const ImageGrid = ({
     }
   }, [filters, allImages])
 
+  const theme = useTheme()
+
+  const imageColumns = window.matchMedia(
+    `(max-width: ${theme.breakpoints.values.sm}px)`
+  ).matches
+    ? 2
+    : window.matchMedia(`(max-width: ${theme.breakpoints.values.md}px)`).matches
+    ? 3
+    : window.matchMedia(`(max-width: ${theme.breakpoints.values.xl}px)`).matches
+    ? 4
+    : 5
+
   const styles = setStyles()
 
   return (
@@ -83,10 +97,12 @@ export const ImageGrid = ({
         </Container>
       ) : !allImages[0] ? (
         <Container className={styles.loading}>
-          <Typography color='secondary' variant="h5">Try adding some words!</Typography>
+          <Typography color="secondary" variant="h5">
+            Try adding some words!
+          </Typography>
         </Container>
       ) : (
-        <ImageList cols={4}>
+        <ImageList cols={imageColumns}>
           {filteredImages.map((image, index) => (
             <Grow in={!status} timeout={index * 200} key={image.url!}>
               <ImageListItem>
@@ -127,6 +143,6 @@ const setStyles = makeStyles(theme => ({
     },
   },
   dark: {
-    color: theme.palette.primary.dark
-  }
+    color: theme.palette.primary.dark,
+  },
 }))

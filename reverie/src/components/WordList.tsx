@@ -32,8 +32,7 @@ export const WordList = ({
   status: { status, setStatus },
   wordLists: { wordLists, setWordLists },
   activeWordList: { activeWordList, setActiveWordList },
-  title,
-  id,
+  meta,
 }: {
   status: {
     status: string
@@ -49,8 +48,7 @@ export const WordList = ({
       React.SetStateAction<WordList | undefined>
     >
   }
-  title: string
-  id: string | undefined
+  meta: WordList
 }) => {
   const [formState, setFormState] = useState({ name: '' })
   const [wordImages, setWordImages] = useState(new Array<WordImages>())
@@ -58,25 +56,38 @@ export const WordList = ({
   const [selected, setSelected] = useState(new Array<string>())
   const [activeWords, setActiveWords] = useState(new Array<Word>())
   const [inactiveWords, setInactiveWords] = useState(new Array<Word>())
-  const [listTitle, setListTitle] = useState<string>(title)
+  const [listTitle, setListTitle] = useState<string>(meta.name)
   const [filters, setFilters] = useState({
     words: new Array<string>(),
     labels: new Array<string>(),
   })
 
+  const id = meta.id
+
+  //On render, update list properties with list state properties from app
+  useEffect(() => {
+    setListTitle(meta.name)
+    meta.words?.active && setActiveWords(meta.words.active)
+    meta.words?.inactive && setInactiveWords(meta.words.inactive)
+    meta.wordImages && setWordImages(meta.wordImages)
+    meta.associations && setAssociations(meta.associations)
+    setFilters(meta.filters)
+  }, [])
+
   //Update active word list properties whenever something from this word list changes
   useEffect(() => {
     const current = {
       name: listTitle,
-      words: activeWords,
+      words: {
+        active: activeWords,
+        inactive: inactiveWords,
+      },
       wordImages: wordImages,
       associations: associations,
-      filters: activeWordList
-        ? {
-            ...activeWordList.filters,
-            words: filters.words,
-          }
-        : filters,
+      filters: {
+        labels: activeWordList?.filters.labels || [],
+        words: filters.words,
+      },
     }
 
     setActiveWordList({
@@ -90,7 +101,7 @@ export const WordList = ({
     newWordLists[thisListIndex] = { ...newWordLists[thisListIndex], ...current }
 
     setWordLists(newWordLists)
-  }, [listTitle, activeWords, wordImages, associations, filters])
+  }, [listTitle, activeWords, inactiveWords, wordImages, associations, filters])
 
   const maxWordsLength = 3
 
@@ -162,24 +173,56 @@ export const WordList = ({
 
   /**Initiate all processing for input words */
   const getAssociations = async () => {
+    //Exit if there are no words to process
+    if (!activeWordList?.words?.inactive) return
+
     setStatus('Getting URL lists ...')
 
-    const afterUrls = await fetchUrlLists(inactiveWords)
+    const afterUrls = await fetchUrlLists(activeWordList.words.inactive)
 
     setStatus('Fetching images and converting them to bytes ...')
     const afterBytes = await imagesToBytes(afterUrls)
 
     setStatus('Analyzing images ...')
     const afterLabels = await analyzeImages(afterBytes)
-    setWordImages([...wordImages, ...afterLabels])
-
-    setActiveWords([...activeWords, ...inactiveWords])
-    setInactiveWords([])
 
     setStatus('Finding associations ...')
-    const sortedLabels = sortLabels([...wordImages, ...afterLabels])
+    const sortedLabels = sortLabels([
+      ...(activeWordList?.wordImages || []),
+      ...afterLabels,
+    ])
 
-    setAssociations(sortedLabels)
+    const newProperties = {
+      wordImages: [...wordImages, ...afterLabels],
+      words: {
+        active: [...activeWords, ...inactiveWords],
+        inactive: [],
+      },
+      associations: sortedLabels,
+    }
+
+    setWordImages(newProperties.wordImages)
+    setActiveWords(newProperties.words.active)
+    setInactiveWords(newProperties.words.inactive)
+    setAssociations(newProperties.associations)
+
+    setActiveWordList({
+      ...activeWordList,
+      ...newProperties,
+    })
+
+    //Update this list in wordLists
+    const newWordLists = wordLists
+    const activeIndex = newWordLists.findIndex(
+      list => list.id === activeWordList.id
+    )
+    newWordLists[activeIndex] = {
+      ...newWordLists[activeIndex],
+      ...newProperties,
+    }
+
+    setWordLists(newWordLists)
+
     setStatus('')
   }
 
@@ -189,6 +232,9 @@ export const WordList = ({
     activeWords.length + inactiveWords.length === maxWordsLength &&
       createWordsButton.current?.focus()
   }, [inactiveWords])
+
+  const titleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
+    event.target.select()
 
   const deleteWordList = () => {
     const listIndex = wordLists.findIndex(list => list.id === id)
@@ -247,6 +293,7 @@ export const WordList = ({
             classes={{ root: styles.listTitle, input: styles.input }}
             onChange={e => setListTitle(e.target.value)}
             disabled={!isActive()}
+            onClick={titleClick}
           />
           <IconButton
             ref={menuButtonRef}

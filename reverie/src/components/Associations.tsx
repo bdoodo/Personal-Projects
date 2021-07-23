@@ -12,6 +12,8 @@ import {
   Grow,
   IconButton,
   Collapse,
+  useMediaQuery,
+  useTheme
 } from '@material-ui/core'
 import { orange, yellow } from '@material-ui/core/colors'
 import { Check, ExpandMore, ExpandLess } from '@material-ui/icons'
@@ -22,6 +24,7 @@ export const Associations = ({
   filters,
   activeWordList: { activeWordList, setActiveWordList },
   wordImagesList,
+  mobile,
 }: {
   associations: Association[] | undefined
   status: string
@@ -33,6 +36,7 @@ export const Associations = ({
     >
   }
   wordImagesList: WordImages[] | undefined
+  mobile?: boolean
 }) => {
   const [filteredLabels, setFilteredLabels] = useState(associations)
   const [collapsed, setCollapsed] = useState(true)
@@ -70,7 +74,7 @@ export const Associations = ({
 
   const filterByLabel = (label: string) => {
     const alreadyExists = filters?.labels.includes(label)
-    
+
     activeWordList &&
       setActiveWordList({
         ...activeWordList,
@@ -93,15 +97,18 @@ export const Associations = ({
   const color = (occurrence: number) =>
     occurrence === 3 ? 'primary' : occurrence === 2 ? 'secondary' : 'default'
 
+  const theme = useTheme()
+  const smallMobile = useMediaQuery('(max-width: 400px)')
+
   const styles = useStyles()
 
   return (
     <>
       <Typography variant="h4" className={styles.header}>
-        Associations between words
+        {mobile ?? 'Associations between words'}
       </Typography>
       <Container>
-        <Collapse in={!collapsed} collapsedSize="78px">
+        <Collapse in={!collapsed} collapsedSize={smallMobile ? '92px' : "78px"}>
           <Container className={styles.labels}>
             <ThemeProvider theme={theme}>
               {filteredLabels?.map((label, index) => (
@@ -110,12 +117,13 @@ export const Associations = ({
                     label={label.name}
                     color={color(label.occurrences)}
                     avatar={<Avatar>{label.occurrences}</Avatar>}
+                    size={smallMobile ? 'small' : 'medium'}
                     clickable
                     onClick={() => filterByLabel(label.name)}
+                    onDelete={() => filterByLabel(label.name)}
                     deleteIcon={
                       selected.includes(label.name) ? <Check /> : <></>
                     }
-                    onDelete={() => filterByLabel(label.name)}
                   />
                 </Grow>
               ))}

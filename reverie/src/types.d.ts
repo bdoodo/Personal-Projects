@@ -1,7 +1,10 @@
 type WordList = {
   id?: string,
   name: string,
-  words?: Word[],
+  words?: {
+    active?: Word[],
+    inactive?: Word[]
+  },
   associations?: Association[],
   wordImages?: WordImages[],
   filters: {
