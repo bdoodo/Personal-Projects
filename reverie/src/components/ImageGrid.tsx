@@ -7,7 +7,6 @@ import {
   CircularProgress,
   Container,
   Typography,
-  useMediaQuery,
   useTheme,
 } from '@material-ui/core'
 import { shuffle } from '../utils'
@@ -21,6 +20,8 @@ export const ImageGrid = ({
   status: string
   filters: { words: string[]; labels: string[] } | undefined
 }) => {
+  console.log('filters:',filters)
+
   const [allImages, setAllImages] = useState(
     new Array<{
       title: string

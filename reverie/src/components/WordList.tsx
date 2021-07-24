@@ -33,6 +33,7 @@ export const WordList = ({
   wordLists: { wordLists, setWordLists },
   activeWordList: { activeWordList, setActiveWordList },
   meta,
+  mobile
 }: {
   status: {
     status: string
@@ -49,11 +50,11 @@ export const WordList = ({
     >
   }
   meta: WordList
+  mobile?: boolean
 }) => {
   const [formState, setFormState] = useState({ name: '' })
   const [wordImages, setWordImages] = useState(new Array<WordImages>())
   const [associations, setAssociations] = useState(new Array<Association>())
-  const [selected, setSelected] = useState(new Array<string>())
   const [activeWords, setActiveWords] = useState(new Array<Word>())
   const [inactiveWords, setInactiveWords] = useState(new Array<Word>())
   const [listTitle, setListTitle] = useState<string>(meta.name)
@@ -63,6 +64,7 @@ export const WordList = ({
   })
 
   const id = meta.id
+  const activeIndex = wordLists.findIndex(list => list.id === id)
 
   //On render, update list properties with list state properties from app
   useEffect(() => {
@@ -85,7 +87,7 @@ export const WordList = ({
       wordImages: wordImages,
       associations: associations,
       filters: {
-        labels: activeWordList?.filters.labels || [],
+        labels: wordLists[activeIndex].filters.labels!,
         words: filters.words,
       },
     }
@@ -97,11 +99,10 @@ export const WordList = ({
 
     //Update this list in wordLists
     const newWordLists = wordLists
-    const thisListIndex = newWordLists.findIndex(list => list.id === id)
-    newWordLists[thisListIndex] = { ...newWordLists[thisListIndex], ...current }
+    newWordLists[activeIndex] = { ...newWordLists[activeIndex], ...current }
 
     setWordLists(newWordLists)
-  }, [listTitle, activeWords, inactiveWords, wordImages, associations, filters])
+  }, [listTitle, activeWords, inactiveWords, wordImages, associations, filters.words])
 
   const maxWordsLength = 3
 
@@ -133,16 +134,12 @@ export const WordList = ({
     }
   }
 
-  //TODO: Include a unit test of removeWord. Sometimes it doesn't disappear correctly
   const removeWord = async (word: string) => {
     //Find whether the word to be removed is in activeWords or inactiveWords
     const partOfActiveWords = activeWords.find(({ name }) => name === word)
     try {
       //If the deleted word was in filters, pass it to filterByWord to remove it
       filters.words.includes(word) && filterByWord(word)
-
-      //Remove from 'selected' if it was in there
-      selected.includes(word) && setSelected(selected.filter(e => e !== word))
 
       //Remove from the appropriate list
       partOfActiveWords
@@ -213,14 +210,10 @@ export const WordList = ({
 
     //Update this list in wordLists
     const newWordLists = wordLists
-    const activeIndex = newWordLists.findIndex(
-      list => list.id === activeWordList.id
-    )
     newWordLists[activeIndex] = {
       ...newWordLists[activeIndex],
       ...newProperties,
     }
-
     setWordLists(newWordLists)
 
     setStatus('')
@@ -315,17 +308,18 @@ export const WordList = ({
           {activeWords.map(word => (
             <WordListItem
               key={word.name}
-              selected={{ selected, setSelected }}
+              filters={{ filters, setFilters }}
               word={word}
               removeWord={removeWord}
               filterByWord={filterByWord}
               disabled={!isActive()}
+              mobile={mobile}
             />
           ))}
           {inactiveWords.map(word => (
             <WordListItem
               key={word.name}
-              selected={{ selected, setSelected }}
+              filters={{ filters, setFilters }}
               word={word}
               removeWord={removeWord}
               filterByWord={filterByWord}

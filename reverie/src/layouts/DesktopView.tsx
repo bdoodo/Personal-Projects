@@ -100,6 +100,7 @@ export const DesktopView = ({
               filters={activeWordList?.filters}
               activeWordList={{ activeWordList, setActiveWordList }}
               wordImagesList={activeWordList?.wordImages}
+              wordLists={{wordLists, setWordLists}}
             />
             <ImageGrid
               wordImagesList={activeWordList?.wordImages}

@@ -7,38 +7,54 @@ import {
 import { DeleteOutlined } from '@material-ui/icons'
 
 export const WordListItem = ({
-  selected: { selected, setSelected },
+  filters: { filters, setFilters },
   word,
   removeWord,
   filterByWord,
   disabled = false,
+  mobile,
 }: {
-  selected: {
-    selected: string[]
-    setSelected: React.Dispatch<React.SetStateAction<string[]>>
+  filters: {
+    filters: {
+      words: string[]
+      labels: string[]
+    }
+    setFilters: React.Dispatch<
+      React.SetStateAction<{
+        words: string[]
+        labels: string[]
+      }>
+    >
   }
   word: Word
   removeWord: (word: string) => Promise<void>
   filterByWord: (word: string) => void
   disabled?: boolean
+  mobile?: boolean
 }) => {
   /**On click, update word filters and toggle selected */
   const handleItemClick = (word: string) => {
     filterByWord(word)
-    setSelected(
-      selected.includes(word)
-        ? selected.filter(selectedWord => selectedWord !== word)
-        : [...selected, word]
-    )
+    setFilters({
+      ...filters,
+      words: filters.words.includes(word)
+        ? filters.words.filter(selectedWord => selectedWord !== word)
+        : [...filters.words, word],
+    })
   }
+
+  const desktopProps = !mobile &&
+     {
+        button: true as true,
+        onClick: () => handleItemClick(word.name),
+      }
 
   return (
     <ListItem
       key={word.id}
       role="list"
-      button
-      onClick={() => handleItemClick(word.name)}
-      selected={selected.includes(word.name)}
+      {...desktopProps}
+      selected={filters.words.includes(word.name)}
       disabled={disabled}
     >
       <ListItemText>{word.name}</ListItemText>

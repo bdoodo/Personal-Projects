@@ -15,7 +15,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@material-ui/core'
-import { orange, yellow } from '@material-ui/core/colors'
+import { orange, yellow, amber, blueGrey } from '@material-ui/core/colors'
 import { Check, ExpandMore, ExpandLess } from '@material-ui/icons'
 
 export const Associations = ({
@@ -23,6 +23,7 @@ export const Associations = ({
   status,
   filters,
   activeWordList: { activeWordList, setActiveWordList },
+  wordLists: {wordLists, setWordLists},
   wordImagesList,
   mobile,
 }: {
@@ -35,12 +36,18 @@ export const Associations = ({
       React.SetStateAction<WordList | undefined>
     >
   }
+  wordLists: {
+    wordLists: WordList[]
+    setWordLists: React.Dispatch<React.SetStateAction<WordList[]>>
+  }
   wordImagesList: WordImages[] | undefined
   mobile?: boolean
 }) => {
   const [filteredLabels, setFilteredLabels] = useState(associations)
   const [collapsed, setCollapsed] = useState(true)
   const [selected, setSelected] = useState(new Array<string>())
+
+  console.log('activeWordList:', activeWordList)
 
   //Update labels by word filters
   useEffect(() => {
@@ -75,16 +82,24 @@ export const Associations = ({
   const filterByLabel = (label: string) => {
     const alreadyExists = filters?.labels.includes(label)
 
+    const newLabels = !alreadyExists
+    ? [...filters!.labels, label]
+    : filters!.labels.filter(labelFilter => labelFilter !== label)
+
     activeWordList &&
       setActiveWordList({
         ...activeWordList,
         filters: {
           ...activeWordList.filters,
-          labels: !alreadyExists
-            ? [...filters!.labels, label]
-            : filters!.labels.filter(labelFilter => labelFilter !== label),
+          labels: newLabels,
         },
       })
+    
+    const newWordLists = wordLists
+    const activeIndex = wordLists.findIndex(list => list.id === activeWordList?.id) 
+    newWordLists[activeIndex].filters.labels = newLabels
+
+    setWordLists(newWordLists)
 
     setSelected(
       !alreadyExists
@@ -97,7 +112,6 @@ export const Associations = ({
   const color = (occurrence: number) =>
     occurrence === 3 ? 'primary' : occurrence === 2 ? 'secondary' : 'default'
 
-  const theme = useTheme()
   const smallMobile = useMediaQuery('(max-width: 400px)')
 
   const styles = useStyles()
@@ -144,7 +158,7 @@ export const Associations = ({
 
 const theme = createTheme({
   palette: {
-    primary: orange,
+    primary: amber,
     secondary: yellow,
   },
 })

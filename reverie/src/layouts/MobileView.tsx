@@ -95,6 +95,7 @@ export const MobileView = ({
                       wordLists={{ wordLists, setWordLists }}
                       activeWordList={{ activeWordList, setActiveWordList }}
                       meta={wordList}
+                      mobile
                     />
                   </div>
                 </Collapse>
@@ -127,6 +128,7 @@ export const MobileView = ({
                 activeWordList={{ activeWordList, setActiveWordList }}
                 wordImagesList={activeWordList?.wordImages}
                 mobile
+                wordLists={{wordLists, setWordLists}}
               />
               <ImageGrid
                 wordImagesList={activeWordList?.wordImages}
