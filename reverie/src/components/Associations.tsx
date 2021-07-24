@@ -51,6 +51,8 @@ export const Associations = ({
 
   //Update labels by word filters
   useEffect(() => {
+    setSelected(filters?.labels || [])
+
     if (filters?.words[0]) {
       //Find wordImages passing word filters
       const matchingWordImages = wordImagesList?.filter(({ word }) =>
@@ -77,7 +79,7 @@ export const Associations = ({
     else {
       setFilteredLabels(associations)
     }
-  }, [filters?.words, associations])
+  }, [filters, associations])
 
   const filterByLabel = (label: string) => {
     const alreadyExists = filters?.labels.includes(label)
