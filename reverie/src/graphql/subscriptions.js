@@ -5,7 +5,6 @@ export const onCreateWordList = /* GraphQL */ `
   subscription OnCreateWordList {
     onCreateWordList {
       id
-      name
       words {
         items {
           id
@@ -16,6 +15,10 @@ export const onCreateWordList = /* GraphQL */ `
           updatedAt
         }
         nextToken
+      }
+      associations {
+        label
+        occurrences
       }
       createdAt
       updatedAt
@@ -26,7 +29,6 @@ export const onUpdateWordList = /* GraphQL */ `
   subscription OnUpdateWordList {
     onUpdateWordList {
       id
-      name
       words {
         items {
           id
@@ -38,6 +40,10 @@ export const onUpdateWordList = /* GraphQL */ `
         }
         nextToken
       }
+      associations {
+        label
+        occurrences
+      }
       createdAt
       updatedAt
     }
@@ -47,7 +53,6 @@ export const onDeleteWordList = /* GraphQL */ `
   subscription OnDeleteWordList {
     onDeleteWordList {
       id
-      name
       words {
         items {
           id
@@ -58,6 +63,10 @@ export const onDeleteWordList = /* GraphQL */ `
           updatedAt
         }
         nextToken
+      }
+      associations {
+        label
+        occurrences
       }
       createdAt
       updatedAt
@@ -73,9 +82,12 @@ export const onCreateWord = /* GraphQL */ `
       labels
       wordList {
         id
-        name
         words {
           nextToken
+        }
+        associations {
+          label
+          occurrences
         }
         createdAt
         updatedAt
@@ -94,9 +106,12 @@ export const onUpdateWord = /* GraphQL */ `
       labels
       wordList {
         id
-        name
         words {
           nextToken
+        }
+        associations {
+          label
+          occurrences
         }
         createdAt
         updatedAt
@@ -115,9 +130,12 @@ export const onDeleteWord = /* GraphQL */ `
       labels
       wordList {
         id
-        name
         words {
           nextToken
+        }
+        associations {
+          label
+          occurrences
         }
         createdAt
         updatedAt

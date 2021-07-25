@@ -22,8 +22,7 @@ export const DesktopView = ({
   activeWordList,
   setActiveWordList,
   expand,
-  isActive,
-  auth: {signIn, signOut}
+  isActive
 }: {
   status: string
   setStatus: React.Dispatch<React.SetStateAction<string>>
@@ -34,10 +33,6 @@ export const DesktopView = ({
   setActiveWordList: React.Dispatch<React.SetStateAction<WordList | undefined>>,
   expand: (list: WordList) => void,
   isActive: (list: WordList) => boolean
-  auth: {
-    signIn: () => Promise<ICredentials>
-    signOut: () => Promise<any>
-  }
 }) => {
 
   const styles = setStyles()
@@ -49,7 +44,7 @@ export const DesktopView = ({
             <Typography className={styles.title} variant="h6">
               Reverie
             </Typography>
-            <Button className={styles.signIn} onClick={signIn}>Log in</Button>
+            <Button className={styles.signIn}>Log in</Button>
           </Toolbar>
         </AppBar>
         <Toolbar />
