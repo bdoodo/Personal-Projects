@@ -25,8 +25,6 @@ import {
 } from '../utils'
 import { WordListItem } from './'
 
-import awsExports from '../aws-exports'
-Amplify.configure(awsExports)
 
 export const WordList = ({
   status: { status, setStatus },

@@ -9,11 +9,69 @@ import {
   updateWordList,
 } from './graphql'
 import { useEffect } from 'react'
-import Amplify, { API } from 'aws-amplify'
+import Amplify, { API, Auth, Hub } from 'aws-amplify'
 import { MobileView, DesktopView } from './layouts'
+
+import awsConfig from './aws-exports'
+const configureAws = (() => {
+  const isLocalhost = Boolean(
+    window.location.hostname === 'localhost' ||
+      // [::1] is the IPv6 localhost address.
+      window.location.hostname === '[::1]' ||
+      // 127.0.0.1/8 is considered localhost for IPv4.
+      window.location.hostname.match(
+        /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
+      )
+  )
+
+  const [localRedirectSignIn, productionRedirectSignIn] =
+    awsConfig.oauth.redirectSignIn.split(',')
+    console.log('localRedirectSignIn:', localRedirectSignIn)
+
+  const [localRedirectSignOut, productionRedirectSignOut] =
+    awsConfig.oauth.redirectSignOut.split(',')
+
+  const updatedAwsConfig = {
+    ...awsConfig,
+    oauth: {
+      ...awsConfig.oauth,
+      redirectSignIn: isLocalhost
+        ? localRedirectSignIn
+        : productionRedirectSignIn,
+      redirectSignOut: isLocalhost
+        ? localRedirectSignOut
+        : productionRedirectSignOut,
+    },
+  }
+  Amplify.configure(updatedAwsConfig)
+})()
+
 
 export const App = () => {
   const [status, setStatus] = useState('')
+
+  const [user, setUser] = useState<any>(null)
+
+  useEffect(() => {
+    Hub.listen('auth', ({ payload: { event, data } }) => {
+      event === 'signIn'
+        ? setUser({ user: data })
+        : //event === signOut
+          setUser({ user: null })
+    })
+    ;(async () => {
+      try {
+        const user = await Auth.currentAuthenticatedUser()
+        setUser({ user })
+      } catch {
+        console.log('Not signed in')
+      }
+    })()
+  }, [])
+
+  const signIn = () => Auth.federatedSignIn({ provider: 'Google' })
+
+  const signOut = () => Auth.signOut()
 
   const [wordLists, setWordLists] = useState(new Array<WordList>())
   //Set wordLists to fetched word lists, or create a new one
@@ -106,6 +164,7 @@ export const App = () => {
     setActiveWordList: setActiveWordList,
     expand: expand,
     isActive: isActive,
+    auth: { signIn, signOut },
   }
 
   return (

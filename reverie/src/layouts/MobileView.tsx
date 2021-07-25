@@ -26,6 +26,7 @@ export const MobileView = ({
   setActiveWordList,
   expand,
   isActive,
+  auth: {signIn, signOut}
 }: {
   status: string
   setStatus: React.Dispatch<React.SetStateAction<string>>
@@ -36,6 +37,10 @@ export const MobileView = ({
   setActiveWordList: React.Dispatch<React.SetStateAction<WordList | undefined>>
   expand: (list: WordList) => void
   isActive: (list: WordList) => boolean
+  auth: {
+    signIn: () => Promise<ICredentials>
+    signOut: () => Promise<any>
+  }
 }) => {
   const [tab, setTab] = useState<'wordList' | 'associations'>('wordList')
 

@@ -17,6 +17,11 @@
           "deploymentBucketName": "amplify-reverie-dev-185016-deployment",
           "s3Key": "amplify-builds/getImageBytes-44735368676352664d2b-build.zip"
         }
+      },
+      "auth": {
+        "reverie55b9046c": {
+          "googleClientId": "687373485651-82ifsnb2imfl7gcdspd44252glgmk38a.apps.googleusercontent.com"
+        }
       }
     }
   }
