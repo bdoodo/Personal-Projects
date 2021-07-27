@@ -14,11 +14,13 @@ export const getWordList = /* GraphQL */ `
           labels
           createdAt
           updatedAt
+          owner
         }
         nextToken
       }
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -37,6 +39,7 @@ export const listWordLists = /* GraphQL */ `
         }
         createdAt
         updatedAt
+        owner
       }
       nextToken
     }

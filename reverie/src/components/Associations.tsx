@@ -47,8 +47,6 @@ export const Associations = ({
   const [collapsed, setCollapsed] = useState(true)
   const [selected, setSelected] = useState(new Array<string>())
 
-  console.log('activeWordList:', activeWordList)
-
   //Update labels by word filters
   useEffect(() => {
     setSelected(filters?.labels || [])

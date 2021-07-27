@@ -1,8 +1,8 @@
 {
-    "identityPoolName": "reverie55b9046c_identitypool_55b9046c",
+    "identityPoolName": "ReverieIdentityPool",
     "allowUnauthenticatedIdentities": false,
-    "resourceNameTruncated": "reveri55b9046c",
-    "userPoolName": "reverie55b9046c_userpool_55b9046c",
+    "resourceNameTruncated": "reveri537430d7",
+    "userPoolName": "ReverieUserPool",
     "autoVerifiedAttributes": [
         "email"
     ],
@@ -23,17 +23,15 @@
     "userpoolClientGenerateSecret": false,
     "userpoolClientRefreshTokenValidity": 30,
     "userpoolClientWriteAttributes": [
-        "picture",
         "email"
     ],
     "userpoolClientReadAttributes": [
-        "email",
-        "picture"
+        "email"
     ],
-    "userpoolClientLambdaRole": "reveri55b9046c_userpoolclient_lambda_role",
-    "userpoolClientSetAttributes": true,
-    "sharedId": "55b9046c",
-    "resourceName": "reverie55b9046c",
+    "userpoolClientLambdaRole": "Reveri537430d7_userpoolclient_lambda_role",
+    "userpoolClientSetAttributes": false,
+    "sharedId": "537430d7",
+    "resourceName": "ReverieUsers",
     "authSelections": "identityPoolAndUserPool",
     "authRoleArn": {
         "Fn::GetAtt": [
@@ -48,32 +46,22 @@
         ]
     },
     "useDefault": "manual",
-    "hostedUI": true,
+    "thirdPartyAuth": false,
     "usernameAttributes": [
         "email"
     ],
-    "hostedUIDomainName": "sign-in",
-    "authProvidersUserPool": [
-        "Google"
-    ],
-    "hostedUIProviderMeta": "[{\"ProviderName\":\"Google\",\"authorize_scopes\":\"openid email profile\",\"AttributeMapping\":{\"email\":\"email\",\"username\":\"sub\"}}]",
-    "userPoolGroupList": [
-        "reverieCore"
-    ],
-    "serviceName": "Cognito",
-    "usernameCaseSensitive": false,
-    "dependsOn": [],
-    "thirdPartyAuth": true,
-    "authProviders": [
-        "accounts.google.com"
-    ],
-    "userPoolGroups": true,
+    "userPoolGroups": false,
     "adminQueries": true,
     "triggers": "{}",
+    "hostedUI": false,
+    "userPoolGroupList": [],
+    "serviceName": "Cognito",
+    "usernameCaseSensitive": false,
     "parentStack": {
         "Ref": "AWS::StackId"
     },
     "breakCircularDependency": true,
     "permissions": [],
-    "oAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"http://localhost:3000/\",\"https://main.d1u19tu6spl9ux.amplifyapp.com/\"],\"LogoutURLs\":[\"http://localhost:3000/\",\"https://main.d1u19tu6spl9ux.amplifyapp.com/\"]}"
+    "dependsOn": [],
+    "authProviders": []
 }

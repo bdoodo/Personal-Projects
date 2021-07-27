@@ -7,7 +7,7 @@ type WordList = {
   },
   associations?: Association[],
   wordImages?: WordImages[],
-  filters: {
+  filters?: {
     words: string[],
     labels: string[]
   }

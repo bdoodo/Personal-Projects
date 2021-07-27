@@ -85,7 +85,7 @@ export const WordList = ({
       wordImages: wordImages,
       associations: associations,
       filters: {
-        labels: wordLists[activeIndex].filters.labels!,
+        labels: wordLists[activeIndex].filters?.labels || [],
         words: filters.words,
       },
     }
@@ -123,7 +123,7 @@ export const WordList = ({
 
     try {
       if (!formState.name) return
-      const word = { ...formState }
+      const word = { ...formState, wordListID: activeWordList?.id }
       setInactiveWords([...inactiveWords, word])
       setFormState({ name: '' })
       await API.graphql(graphqlOperation(createWord, { input: word }))

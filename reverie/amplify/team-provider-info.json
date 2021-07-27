@@ -19,10 +19,7 @@
         }
       },
       "auth": {
-        "reverie55b9046c": {
-          "googleClientId": "687373485651-82ifsnb2imfl7gcdspd44252glgmk38a.apps.googleusercontent.com"
-        },
-        "userPoolGroups": {}
+        "ReverieUsers": {}
       }
     }
   }

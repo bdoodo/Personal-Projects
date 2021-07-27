@@ -15,6 +15,7 @@ import { TabList, TabContext, TabPanel } from '@material-ui/lab'
 import { useEffect } from 'react'
 import { useState } from 'react'
 import { WordList, Associations, ImageGrid } from '../components'
+import {CognitoUser} from 'amazon-cognito-identity-js'
 
 export const MobileView = ({
   status,
@@ -26,7 +27,9 @@ export const MobileView = ({
   setActiveWordList,
   expand,
   isActive,
-  auth: {signIn, signOut}
+  user: {user, setUser},
+  setSnackMessage,
+  snackMessage
 }: {
   status: string
   setStatus: React.Dispatch<React.SetStateAction<string>>
@@ -37,10 +40,23 @@ export const MobileView = ({
   setActiveWordList: React.Dispatch<React.SetStateAction<WordList | undefined>>
   expand: (list: WordList) => void
   isActive: (list: WordList) => boolean
-  auth: {
-    signIn: () => Promise<ICredentials>
-    signOut: () => Promise<any>
+  
+  user: {
+    user: {
+      email: string | undefined
+      password: string | undefined
+      isSignedIn: boolean
+    }
+    setUser: React.Dispatch<
+      React.SetStateAction<{
+        email: string | undefined
+        password: string | undefined
+        isSignedIn: boolean
+      }>
+    >
   }
+  setSnackMessage: React.Dispatch<React.SetStateAction<string>> 
+  snackMessage: string
 }) => {
   const [tab, setTab] = useState<'wordList' | 'associations'>('wordList')
 

@@ -1,13 +1,13 @@
-type WordList @model {
+type WordList @model @auth(rules: [{ allow: owner }]) {
   id: ID!
   name: String!
-  words: [Word!]! @connection(keyName: "byWordList", fields: ["id"])
+  words: [Word]! @connection(keyName: "byWordList", fields: ["id"])
 }
 
-type Word 
-  @model(queries: null) 
+type Word
+  @model(queries: null)
   @key(name: "byWordList", fields: ["wordListID"])
-{
+  @auth(rules: [{ allow: owner }]) {
   id: ID!
   name: String!
   wordListID: ID!

@@ -13,84 +13,78 @@ import Amplify, { API, Auth, Hub } from 'aws-amplify'
 import { MobileView, DesktopView } from './layouts'
 
 import awsConfig from './aws-exports'
-const configureAws = (() => {
-  const isLocalhost = Boolean(
-    window.location.hostname === 'localhost' ||
-      // [::1] is the IPv6 localhost address.
-      window.location.hostname === '[::1]' ||
-      // 127.0.0.1/8 is considered localhost for IPv4.
-      window.location.hostname.match(
-        /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
-      )
-  )
-
-  const [localRedirectSignIn, productionRedirectSignIn] =
-    awsConfig.oauth.redirectSignIn.split(',')
-    console.log('localRedirectSignIn:', localRedirectSignIn)
-
-  const [localRedirectSignOut, productionRedirectSignOut] =
-    awsConfig.oauth.redirectSignOut.split(',')
-
-  const updatedAwsConfig = {
-    ...awsConfig,
-    oauth: {
-      ...awsConfig.oauth,
-      redirectSignIn: isLocalhost
-        ? localRedirectSignIn
-        : productionRedirectSignIn,
-      redirectSignOut: isLocalhost
-        ? localRedirectSignOut
-        : productionRedirectSignOut,
-    },
-  }
-  Amplify.configure(updatedAwsConfig)
-})()
-
+Amplify.configure(awsConfig)
 
 export const App = () => {
   const [status, setStatus] = useState('')
 
-  const [user, setUser] = useState<any>(null)
+  const [snackMessage, setSnackMessage] = useState('')
 
-  useEffect(() => {
-    Hub.listen('auth', ({ payload: { event, data } }) => {
-      event === 'signIn'
-        ? setUser({ user: data })
-        : //event === signOut
-          setUser({ user: null })
-    })
-    ;(async () => {
-      try {
-        const user = await Auth.currentAuthenticatedUser()
-        setUser({ user })
-      } catch {
-        console.log('Not signed in')
-      }
-    })()
-  }, [])
+  const [user, setUser] = useState<{
+    email: string | undefined
+    password: string | undefined
+    isSignedIn: boolean
+  }>({
+    email: undefined,
+    password: undefined,
+    isSignedIn: Boolean(Auth.currentAuthenticatedUser),
+  })
 
-  const signIn = () => Auth.federatedSignIn({ provider: 'Google' })
+  const signIn = async (email: string, password: string) => {
+    try {
+      await Auth.signIn(email, password)
+    } catch (error) {
+      setSnackMessage('Error signing in: ' + error.code)
+      return error.code as string
+    }
+  }
 
-  const signOut = () => Auth.signOut()
+  const signOut = async () => {
+    try {
+      await Auth.signOut()
+    } catch (error) {
+      setSnackMessage('Error signing out: ' + error.code)
+      return error.code as string
+    }
+  }
+
+  const signUp = async (email: string, password: string) => {
+    try {
+      const { user: newUser } = await Auth.signUp({
+        username: email,
+        password: password,
+      })
+    } catch (error) {
+      setSnackMessage('Error signing up: ' + error.code)
+      console.log(error)
+      return error.code as string
+    }
+  }
 
   const [wordLists, setWordLists] = useState(new Array<WordList>())
   //Set wordLists to fetched word lists, or create a new one
   useEffect(() => {
-    ;(async () => {
-      try {
-        /*const wordListData = (await API.graphql({ query: listWordLists })) as {
-          data: { listWordLists: { items: WordList[] } }
-        }
-        const fetchedWordLists = wordListData.data.listWordLists.items
+    if (user.isSignedIn) {
+      ;(async () => {
+        try {
+          const wordListData = (await API.graphql({
+            query: listWordLists,
+          })) as {
+            data: { listWordLists: { items: WordList[] } }
+          }
+          const fetchedWordLists = wordListData.data.listWordLists.items
 
-        fetchedWordLists.length
-          ? setWordLists(fetchedWordLists)
-          :*/ !wordLists.length && makeWordList()
-      } catch {
-        console.log('error fetching word lists')
-      }
-    })()
-  }, [])
+          fetchedWordLists.length
+            ? setWordLists(fetchedWordLists)
+            : !wordLists.length && makeWordList()
+        } catch {
+          console.log('error fetching word lists')
+        }
+      })()
+    } else {
+      !wordLists.length && makeWordList()
+    }
+  }, [user.isSignedIn])
 
   const [activeWordList, setActiveWordList] = useState<WordList>()
   //Only used for first render, after wordlists have been fetched. Selects
@@ -102,21 +96,21 @@ export const App = () => {
   const makeWordList = async () => {
     try {
       const newName = `Word List ${wordLists.length + 1}`
-      const newWordList = {
-        name: newName,
-        id: `id${Math.random()}`,
-        filters: { words: new Array<string>(), labels: new Array<string>() },
-      }
 
-      /*const newWordList = (await API.graphql({
+      const createListData = (await API.graphql({
         query: createWordList,
         variables: { input: { name: newName } },
       })) as { data: { createWordList: { id: string } } }
 
-      const id = newWordList.data.createWordList.id*/
+      const newWordList = {
+        name: newName,
+        filters: { words: new Array<string>(), labels: new Array<string>() },
+        id: createListData.data.createWordList.id,
+      }
 
       setWordLists([...wordLists, newWordList])
       setActiveWordList(newWordList)
+      setSnackMessage('Successfully created list!!')
     } catch (error) {
       console.log('Error creating new word list', error)
     }
@@ -155,16 +149,18 @@ export const App = () => {
 
   //Passed down to layouts
   const resourcePack = {
-    status: status,
-    setStatus: setStatus,
-    wordLists: wordLists,
-    setWordLists: setWordLists,
-    makeWordList: makeWordList,
-    activeWordList: activeWordList,
-    setActiveWordList: setActiveWordList,
-    expand: expand,
-    isActive: isActive,
-    auth: { signIn, signOut },
+    status,
+    setStatus,
+    wordLists,
+    setWordLists,
+    makeWordList,
+    activeWordList,
+    setActiveWordList,
+    expand,
+    isActive,
+    user: { user, setUser },
+    snackMessage,
+    setSnackMessage,
   }
 
   return (
