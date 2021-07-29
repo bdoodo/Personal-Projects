@@ -64,7 +64,7 @@ export const ImageGrid = ({
           ? wordsFilteredImages
           : labelsFilteredImages
 
-      newFilteredImages && setFilteredImages(newFilteredImages)
+      newFilteredImages && setFilteredImages(shuffle(newFilteredImages))
     } //If there are no filters, update filteredImages with allImageBytes
     else {
       setFilteredImages(shuffle(allImages))
