@@ -168,6 +168,7 @@ export const MobileView = ({
                         meta: wordList,
                         mobile: true,
                         setSnackMessage,
+                        user
                       }}
                     />
                   </div>

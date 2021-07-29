@@ -158,6 +158,7 @@ export const DesktopView = ({
                     setActiveListId,
                     meta: wordList,
                     setSnackMessage,
+                    user
                   }}
                 />
               </div>

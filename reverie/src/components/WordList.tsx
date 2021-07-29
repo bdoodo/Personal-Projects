@@ -36,6 +36,7 @@ export const WordList = ({
   meta,
   mobile,
   setSnackMessage,
+  user,
 }: {
   status: string
   setStatus: React.Dispatch<React.SetStateAction<string>>
@@ -46,6 +47,11 @@ export const WordList = ({
   meta: WordList
   mobile?: boolean
   setSnackMessage: React.Dispatch<React.SetStateAction<string>>
+  user: {
+    email: string | undefined
+    password: string | undefined
+    isSignedIn: boolean
+  }
 }) => {
   const [formState, setFormState] = useState({ name: '' })
   const [wordImages, setWordImages] = useState(new Array<WordImages>())
@@ -143,10 +149,11 @@ export const WordList = ({
       )
 
       //Remove from database
-      await API.graphql({
-        query: deleteWord,
-        variables: { input: { id: word.id } },
-      })
+      user.isSignedIn &&
+        (await API.graphql({
+          query: deleteWord,
+          variables: { input: { id: word.id } },
+        }))
     } catch (err) {
       console.log('error deleting word:', err)
     }
@@ -186,17 +193,19 @@ export const WordList = ({
 
     //Create new active words from inactive words and store their ids
     const newActiveWords = inactiveWords.map(async word => {
-      const newActiveWord = (await API.graphql({
+      const newActiveWord = user.isSignedIn ?
+      (await API.graphql({
         query: createWord,
         variables: { input: word },
       })) as { data: { createWord: { id: string } } }
+      : undefined
 
-      return { ...word, id: newActiveWord.data.createWord.id } as Word
+      return { ...word, id: newActiveWord?.data.createWord.id || Math.random().toString() } as Word
     })
 
     const resolvedNewActiveWords = await Promise.all(newActiveWords)
 
-    const newProperties = { 
+    const newProperties = {
       wordImages: [...wordImages, ...afterLabels],
       words: {
         active: [...activeWords, ...resolvedNewActiveWords],
@@ -237,10 +246,11 @@ export const WordList = ({
       )
 
       //Remove from app state and database
-      await API.graphql({
-        query: deleteWordList,
-        variables: { input: { id } },
-      })
+      user.isSignedIn &&
+        (await API.graphql({
+          query: deleteWordList,
+          variables: { input: { id } },
+        }))
       setWordLists(wordLists.filter(list => list.id !== id))
       console.log('deleted list')
     } catch (error) {
@@ -251,6 +261,7 @@ export const WordList = ({
   }
 
   const updateTitle = async () => {
+    if (!user.isSignedIn) return
     try {
       await API.graphql({
         query: updateWordList,
