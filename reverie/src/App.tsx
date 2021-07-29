@@ -89,7 +89,7 @@ export const App = () => {
                 variables: { id: list.id  },
               })) as { data: { getWordList: { words: { items: Word[] } } } }
 
-              return { ...list, words: { active: items } }
+              return { ...list, words: { inactive: items } }
             })
 
             const resolvedWordLists = await Promise.all(convertedWordLists)
