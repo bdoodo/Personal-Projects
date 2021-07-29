@@ -1,5 +1,5 @@
 type WordList = {
-  id?: string,
+  id: string,
   name: string,
   words?: {
     active?: Word[],
@@ -7,15 +7,17 @@ type WordList = {
   },
   associations?: Association[],
   wordImages?: WordImages[],
-  filters: {
+  filters?: {
     words: string[],
     labels: string[]
   }
 }
 
 type Word = {
-  id?: string,
-  name: string
+  id: string,
+  name: string,
+  wordListID: string
+  createdAt?: any
 }
 
 type WordImages = {

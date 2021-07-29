@@ -145,20 +145,20 @@
     "events" "^3.1.0"
     "sinon" "^7.5.0"
 
-"@aws-amplify/ui-components@1.4.0":
-  "integrity" "sha512-73l8dY82bnFqyinchGC9Hk/36hJVGIvs5gwwqcJSH6LUPv6qADQ5hTRDJ0beOUaxORnOww7Mb2vnBaKa4Jf7Ig=="
-  "resolved" "https://registry.npmjs.org/@aws-amplify/ui-components/-/ui-components-1.4.0.tgz"
-  "version" "1.4.0"
+"@aws-amplify/ui-components@1.7.0":
+  "integrity" "sha512-LfHp9EpECEoX8jlR2R7JlO3zkmduNprqiKkNlakf0VKAdxYprajxkuTXIuCMyKeSdD07Ke49lXKdA5veu9+dSg=="
+  "resolved" "https://registry.npmjs.org/@aws-amplify/ui-components/-/ui-components-1.7.0.tgz"
+  "version" "1.7.0"
   dependencies:
     "qrcode" "^1.4.4"
     "uuid" "^8.2.0"
 
-"@aws-amplify/ui-react@^1.2.2":
-  "integrity" "sha512-DHIWypg+/0JXOmW7jhOzX0FGHhHW40EJRVWYC0JsoxSfcYtfK2dRntcKWxNxsjtsZEb2XJLpISPflP4oD1+ypQ=="
-  "resolved" "https://registry.npmjs.org/@aws-amplify/ui-react/-/ui-react-1.2.2.tgz"
-  "version" "1.2.2"
+"@aws-amplify/ui-react@^1.2.7":
+  "integrity" "sha512-7c4YIeBSqTzXBgXqLxFRjGbMmkpPvEBSSHO7v88bd0CJwcLSe/z+YOzkhgK+7KIF7ux4/P+7vfMqi7Ba/8MMTQ=="
+  "resolved" "https://registry.npmjs.org/@aws-amplify/ui-react/-/ui-react-1.2.7.tgz"
+  "version" "1.2.7"
   dependencies:
-    "@aws-amplify/ui-components" "1.4.0"
+    "@aws-amplify/ui-components" "1.7.0"
 
 "@aws-amplify/ui@2.0.3":
   "integrity" "sha512-LxbmPGD/S4bWzUh2PXMPSt/rXeUVJTsCbMpwH18XilTkXgOSmKH/eyVZNXUBY8C/xwqjzMTC68EtTlsM1DCq1A=="
@@ -4581,7 +4581,7 @@
     "postcss" "^7.0.32"
     "postcss-value-parser" "^4.1.0"
 
-"aws-amplify@^4.1.0", "aws-amplify@3.x.x":
+"aws-amplify@^4.1.0", "aws-amplify@3.x.x || 4.x.x":
   "integrity" "sha512-3gIMFr2+jAzAXYJ/xe5p7xX+wLf7ywCO/yLLZ63Ea4ai3wBBjgdrytdEikfCwZbOhOiw+rjtWiPURcNU8Y57PA=="
   "resolved" "https://registry.npmjs.org/aws-amplify/-/aws-amplify-4.1.0.tgz"
   "version" "4.1.0"

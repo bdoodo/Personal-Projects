@@ -2,63 +2,148 @@
 import { useState, useMemo } from 'react'
 import { createTheme, ThemeProvider, useMediaQuery } from '@material-ui/core'
 import { teal, grey } from '@material-ui/core/colors'
-import {
-  listWordLists,
-  createWordList,
-  deleteWordList,
-  updateWordList,
-} from './graphql'
+import { listWordLists, createWordList, getWordList } from './graphql'
 import { useEffect } from 'react'
 import Amplify, { API } from 'aws-amplify'
 import { MobileView, DesktopView } from './layouts'
 
+import awsConfig from './aws-exports'
+Amplify.configure(awsConfig)
+
 export const App = () => {
   const [status, setStatus] = useState('')
 
-  const [wordLists, setWordLists] = useState(new Array<WordList>())
-  //Set wordLists to fetched word lists, or create a new one
-  useEffect(() => {
-    ;(async () => {
-      try {
-        /*const wordListData = (await API.graphql({ query: listWordLists })) as {
-          data: { listWordLists: { items: WordList[] } }
-        }
-        const fetchedWordLists = wordListData.data.listWordLists.items
+  const [snackMessage, setSnackMessage] = useState('')
 
-        fetchedWordLists.length
-          ? setWordLists(fetchedWordLists)
-          :*/ !wordLists.length && makeWordList()
-      } catch {
-        console.log('error fetching word lists')
-      }
-    })()
+  const [user, setUser] = useState<{
+    email: string | undefined
+    password: string | undefined
+    isSignedIn: boolean
+  }>({
+    email: undefined,
+    password: undefined,
+    isSignedIn: false,
+  })
+
+  const isSignedIn = async () => {
+    try {
+      await Auth.currentAuthenticatedUser()
+      return true
+    } catch {
+      return false
+    }
+  }
+  useEffect(() => {
+    ;(async () => setUser({ ...user, isSignedIn: await isSignedIn() }))()
   }, [])
 
-  const [activeWordList, setActiveWordList] = useState<WordList>()
-  //Only used for first render, after wordlists have been fetched. Selects
-  //an activeWordList if none exists
+  const signIn = async (email: string, password: string) => {
+    try {
+      await Auth.signIn(email, password)
+    } catch (error) {
+      setSnackMessage('Error signing in: ' + error.code)
+      return error.code as string
+    }
+  }
+
+  const signOut = async () => {
+    try {
+      await Auth.signOut()
+    } catch (error) {
+      setSnackMessage('Error signing out: ' + error.code)
+      return error.code as string
+    }
+  }
+
+  const signUp = async (email: string, password: string) => {
+    try {
+      const { user: newUser } = await Auth.signUp({
+        username: email,
+        password: password,
+      })
+    } catch (error) {
+      setSnackMessage('Error signing up: ' + error.code)
+      console.log(error)
+      return error.code as string
+    }
+  }
+  
+  const [wordLists, setWordLists] = useState(new Array<WordList>())
+  const [activeListId, setActiveListId] = useState<string>()
+  //Set wordLists to fetched word lists, or create a new one
   useEffect(() => {
-    !activeWordList && setActiveWordList(wordLists[0])
-  }, [wordLists])
+    if (user.isSignedIn) {
+      ;(async () => {
+        try {
+          const wordListData = (await API.graphql({
+            query: listWordLists,
+          })) as {
+            data: {
+              listWordLists: {
+                items: { id: string; name: string }[]
+              }
+            }
+          }
+          const fetchedWordLists = wordListData.data.listWordLists.items
+
+          if (fetchedWordLists.length) {
+            //Word lists stored in graphQL resemble a slightly different shape
+            //than lists in app. Convert them to resemble app shape here
+            const convertedWordLists = fetchedWordLists.map(async list => {
+              const {
+                data: {
+                  getWordList: {
+                    words: { items },
+                  },
+                },
+              } = (await API.graphql({
+                query: getWordList,
+                variables: { id: list.id },
+              })) as { data: { getWordList: { words: { items: Word[] } } } }
+
+              return { ...list, words: { inactive: items } }
+            })
+
+            const resolvedWordLists = await Promise.all(convertedWordLists)
+
+            setWordLists(resolvedWordLists)
+            setActiveListId(resolvedWordLists[0].id)
+          } else {
+            setWordLists([])
+            makeWordList()
+          }
+        } catch (error) {
+          console.log('error fetching word lists', error)
+        }
+      })()
+    } else {
+      !wordLists.length && makeWordList()
+    }
+  }, [user.isSignedIn])
 
   const makeWordList = async () => {
     try {
       const newName = `Word List ${wordLists.length + 1}`
-      const newWordList = {
+
+      let newWordList = {
         name: newName,
-        id: `id${Math.random()}`,
         filters: { words: new Array<string>(), labels: new Array<string>() },
+        id: '',
       }
 
-      /*const newWordList = (await API.graphql({
-        query: createWordList,
-        variables: { input: { name: newName } },
-      })) as { data: { createWordList: { id: string } } }
+      if (user.isSignedIn) {
+        const createListData = (await API.graphql({
+          query: createWordList,
+          variables: { input: { name: newName } },
+        })) as { data: { createWordList: { id: string } } }
 
-      const id = newWordList.data.createWordList.id*/
+        newWordList.id = createListData.data.createWordList.id
+      } else {
+        newWordList.id = Math.random().toString()
+      }
 
       setWordLists([...wordLists, newWordList])
-      setActiveWordList(newWordList)
+      setActiveListId(newWordList.id)
     } catch (error) {
       console.log('Error creating new word list', error)
     }
@@ -66,9 +151,7 @@ export const App = () => {
 
   //Expands a word list if it's inactive and sets it to active
   const expand = (list: WordList) =>
-    !status && !isActive(list)
-      ? setActiveWordList(wordLists.find(wordList => wordList.id === list.id))
-      : undefined
+    !status && !isActive(list) ? setActiveListId(list.id) : undefined
 
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
 
@@ -93,19 +176,23 @@ export const App = () => {
   )
 
   /**Compares a word list to the active word list */
-  const isActive = (list: WordList) => activeWordList?.id === list.id
+  const isActive = (list: WordList) => activeListId === list.id
 
   //Passed down to layouts
   const resourcePack = {
-    status: status,
-    setStatus: setStatus,
-    wordLists: wordLists,
-    setWordLists: setWordLists,
-    makeWordList: makeWordList,
-    activeWordList: activeWordList,
-    setActiveWordList: setActiveWordList,
-    expand: expand,
-    isActive: isActive,
+    status,
+    setStatus,
+    wordLists,
+    setWordLists,
+    makeWordList,
+    activeListId,
+    setActiveListId,
+    expand,
+    isActive,
+    user,
+    setUser,
+    snackMessage,
+    setSnackMessage,
   }
 
   return (

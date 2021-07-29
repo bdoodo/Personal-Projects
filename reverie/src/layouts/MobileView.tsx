@@ -14,7 +14,15 @@ import { Add } from '@material-ui/icons'
 import { TabList, TabContext, TabPanel } from '@material-ui/lab'
 import { useEffect } from 'react'
 import { useState } from 'react'
-import { WordList, Associations, ImageGrid } from '../components'
+import {
+  WordList,
+  Associations,
+  ImageGrid,
+  SignupForm,
+  VerificationForm,
+} from '../components'
+import { Auth } from 'aws-amplify'
+
 
 export const MobileView = ({
   status,
@@ -22,20 +30,38 @@ export const MobileView = ({
   wordLists,
   setWordLists,
   makeWordList,
-  activeWordList,
-  setActiveWordList,
+  activeListId,
+  setActiveListId,
   expand,
   isActive,
+  user,
+  setUser,
+  setSnackMessage,
+  snackMessage,
 }: {
   status: string
   setStatus: React.Dispatch<React.SetStateAction<string>>
   wordLists: WordList[]
   setWordLists: React.Dispatch<React.SetStateAction<WordList[]>>
   makeWordList: () => Promise<void>
-  activeWordList: WordList | undefined
-  setActiveWordList: React.Dispatch<React.SetStateAction<WordList | undefined>>
+  activeListId: string | undefined
+  setActiveListId: React.Dispatch<React.SetStateAction<string | undefined>>
   expand: (list: WordList) => void
   isActive: (list: WordList) => boolean
+  user: {
+    email: string | undefined
+    password: string | undefined
+    isSignedIn: boolean
+  }
+  setUser: React.Dispatch<
+    React.SetStateAction<{
+      email: string | undefined
+      password: string | undefined
+      isSignedIn: boolean
+    }>
+  >
+  setSnackMessage: React.Dispatch<React.SetStateAction<string>>
+  snackMessage: string
 }) => {
   const [tab, setTab] = useState<'wordList' | 'associations'>('wordList')
 
@@ -47,9 +73,25 @@ export const MobileView = ({
     status && setTab('associations')
   }, [status])
 
-  //TODO: Lift state from wordList to here
+  const signOut = () => {
+    Auth.signOut()
+    setUser({ ...user, isSignedIn: false })
+  }
+
+  const [signInPopup, setSignInPopup] = useState(false)
+  const [verificationPopup, setVerificationPopup] = useState<{
+    open: boolean
+    email: string | undefined
+  }>({ open: false, email: undefined })
+
+  const handleClose = () => {
+    setSignInPopup(false)
+    setVerificationPopup({ ...verificationPopup, open: false })
+  }
 
   const styles = setStyles()
+
+  const activeWordList = wordLists.find(list => list.id === activeListId)
 
   return (
     <Container className={styles.root}>
@@ -59,7 +101,9 @@ export const MobileView = ({
             <Typography className={styles.title} variant="h6">
               Reverie
             </Typography>
-            <Button>Log in</Button>
+            <Button onClick={() =>
+              !user.isSignedIn ? setSignInPopup(true) : signOut()
+            }>Sign in</Button>
           </Toolbar>
           <TabList onChange={switchTabs} variant="fullWidth">
             <Tab label="Word lists" value="wordList" />
@@ -68,6 +112,29 @@ export const MobileView = ({
         </AppBar>
         <Toolbar />
         <Toolbar />
+        <SignupForm
+          {...{
+            user,
+            setUser,
+            handleClose,
+            setSnackMessage,
+            setVerificationPopup,
+            verificationPopup,
+            mobile: true
+          }}
+          open={signInPopup}
+        />
+        <VerificationForm
+          {...{
+            email: verificationPopup.email!,
+            open: verificationPopup.open,
+            handleClose,
+            setSnackMessage,
+            user,
+            setUser,
+            mobile: true
+          }}
+        />
         <TabPanel value="wordList" className={styles.wordPanel}>
           <Slide
             in={tab === 'wordList'}
@@ -91,11 +158,18 @@ export const MobileView = ({
                     }
                   >
                     <WordList
-                      status={{ status, setStatus }}
-                      wordLists={{ wordLists, setWordLists }}
-                      activeWordList={{ activeWordList, setActiveWordList }}
-                      meta={wordList}
-                      mobile
+                      {...{
+                        status,
+                        setStatus,
+                        wordLists,
+                        setWordLists,
+                        activeListId,
+                        setActiveListId,
+                        meta: wordList,
+                        mobile: true,
+                        setSnackMessage,
+                        user
+                      }}
                     />
                   </div>
                 </Collapse>
@@ -122,13 +196,17 @@ export const MobileView = ({
           >
             <div>
               <Associations
-                associations={activeWordList?.associations}
-                status={status}
-                filters={activeWordList?.filters}
-                activeWordList={{ activeWordList, setActiveWordList }}
-                wordImagesList={activeWordList?.wordImages}
-                mobile
-                wordLists={{wordLists, setWordLists}}
+                {...{
+                  associations: activeWordList?.associations,
+                  status,
+                  filters: activeWordList?.filters,
+                  activeListId,
+                  setActiveListId,
+                  wordImagesList: activeWordList?.wordImages,
+                  wordLists,
+                  setWordLists,
+                  mobile: true,
+                }}
               />
               <ImageGrid
                 wordImagesList={activeWordList?.wordImages}

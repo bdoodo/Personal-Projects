@@ -6,7 +6,10 @@
       "output": {
         "authConfig": {
           "defaultAuthentication": {
-            "authenticationType": "AWS_IAM"
+            "authenticationType": "AMAZON_COGNITO_USER_POOLS",
+            "userPoolConfig": {
+              "userPoolId": "authReverieUsers"
+            }
           },
           "additionalAuthenticationProviders": []
         }
@@ -34,5 +37,12 @@
       "service": "Lambda"
     }
   },
-  "auth": {}
+  "auth": {
+    "ReverieUsers": {
+      "service": "Cognito",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false
+    }
+  }
 }

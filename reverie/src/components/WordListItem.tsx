@@ -27,7 +27,7 @@ export const WordListItem = ({
     >
   }
   word: Word
-  removeWord: (word: string) => Promise<void>
+  removeWord: (word: Word) => Promise<void>
   filterByWord: (word: string) => void
   disabled?: boolean
   mobile?: boolean
@@ -60,7 +60,7 @@ export const WordListItem = ({
       <ListItemText>{word.name}</ListItemText>
       <ListItemSecondaryAction>
         <IconButton>
-          <DeleteOutlined onClick={() => removeWord(word.name)} />
+          <DeleteOutlined onClick={() => removeWord(word)} />
         </IconButton>
       </ListItemSecondaryAction>
     </ListItem>

@@ -2,17 +2,17 @@
 // this is an auto generated file. This will be overwritten
 
 export const onCreateWordList = /* GraphQL */ `
-  subscription OnCreateWordList {
-    onCreateWordList {
+  subscription OnCreateWordList($owner: String!) {
+    onCreateWordList(owner: $owner) {
       id
       words {
         items {
           id
           name
           wordListID
-          labels
           createdAt
           updatedAt
+          owner
         }
         nextToken
       }
@@ -22,21 +22,22 @@ export const onCreateWordList = /* GraphQL */ `
       }
       createdAt
       updatedAt
+      owner
     }
   }
 `;
 export const onUpdateWordList = /* GraphQL */ `
-  subscription OnUpdateWordList {
-    onUpdateWordList {
+  subscription OnUpdateWordList($owner: String!) {
+    onUpdateWordList(owner: $owner) {
       id
       words {
         items {
           id
           name
           wordListID
-          labels
           createdAt
           updatedAt
+          owner
         }
         nextToken
       }
@@ -46,21 +47,22 @@ export const onUpdateWordList = /* GraphQL */ `
       }
       createdAt
       updatedAt
+      owner
     }
   }
 `;
 export const onDeleteWordList = /* GraphQL */ `
-  subscription OnDeleteWordList {
-    onDeleteWordList {
+  subscription OnDeleteWordList($owner: String!) {
+    onDeleteWordList(owner: $owner) {
       id
       words {
         items {
           id
           name
           wordListID
-          labels
           createdAt
           updatedAt
+          owner
         }
         nextToken
       }
@@ -70,78 +72,43 @@ export const onDeleteWordList = /* GraphQL */ `
       }
       createdAt
       updatedAt
+      owner
     }
   }
 `;
 export const onCreateWord = /* GraphQL */ `
-  subscription OnCreateWord {
-    onCreateWord {
+  subscription OnCreateWord($owner: String!) {
+    onCreateWord(owner: $owner) {
       id
       name
       wordListID
-      labels
-      wordList {
-        id
-        words {
-          nextToken
-        }
-        associations {
-          label
-          occurrences
-        }
-        createdAt
-        updatedAt
-      }
       createdAt
       updatedAt
+      owner
     }
   }
 `;
 export const onUpdateWord = /* GraphQL */ `
-  subscription OnUpdateWord {
-    onUpdateWord {
+  subscription OnUpdateWord($owner: String!) {
+    onUpdateWord(owner: $owner) {
       id
       name
       wordListID
-      labels
-      wordList {
-        id
-        words {
-          nextToken
-        }
-        associations {
-          label
-          occurrences
-        }
-        createdAt
-        updatedAt
-      }
       createdAt
       updatedAt
+      owner
     }
   }
 `;
 export const onDeleteWord = /* GraphQL */ `
-  subscription OnDeleteWord {
-    onDeleteWord {
+  subscription OnDeleteWord($owner: String!) {
+    onDeleteWord(owner: $owner) {
       id
       name
       wordListID
-      labels
-      wordList {
-        id
-        words {
-          nextToken
-        }
-        associations {
-          label
-          occurrences
-        }
-        createdAt
-        updatedAt
-      }
       createdAt
       updatedAt
+      owner
     }
   }
 `;

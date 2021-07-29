@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import { createWord, deleteWord } from '../graphql'
-import Amplify, { API, graphqlOperation } from 'aws-amplify'
+import { API, graphqlOperation } from 'aws-amplify'
 import {
   List,
   IconButton,
@@ -24,33 +24,34 @@ import {
   sortLabels,
 } from '../utils'
 import { WordListItem } from './'
-
-import awsExports from '../aws-exports'
-Amplify.configure(awsExports)
+import { deleteWordList, updateWordList } from '../graphql'
 
 export const WordList = ({
-  status: { status, setStatus },
-  wordLists: { wordLists, setWordLists },
-  activeWordList: { activeWordList, setActiveWordList },
+  status,
+  setStatus,
+  wordLists,
+  setWordLists,
+  activeListId,
+  setActiveListId,
   meta,
-  mobile
+  mobile,
+  setSnackMessage,
+  user,
 }: {
-  status: {
-    status: string
-    setStatus: React.Dispatch<React.SetStateAction<string>>
-  }
-  wordLists: {
-    wordLists: WordList[]
-    setWordLists: React.Dispatch<React.SetStateAction<WordList[]>>
-  }
-  activeWordList: {
-    activeWordList: WordList | undefined
-    setActiveWordList: React.Dispatch<
-      React.SetStateAction<WordList | undefined>
-    >
-  }
+  status: string
+  setStatus: React.Dispatch<React.SetStateAction<string>>
+  wordLists: WordList[]
+  setWordLists: React.Dispatch<React.SetStateAction<WordList[]>>
+  activeListId: string | undefined
+  setActiveListId: React.Dispatch<React.SetStateAction<string | undefined>>
   meta: WordList
   mobile?: boolean
+  setSnackMessage: React.Dispatch<React.SetStateAction<string>>
+  user: {
+    email: string | undefined
+    password: string | undefined
+    isSignedIn: boolean
+  }
 }) => {
   const [formState, setFormState] = useState({ name: '' })
   const [wordImages, setWordImages] = useState(new Array<WordImages>())
@@ -73,7 +74,7 @@ export const WordList = ({
     meta.words?.inactive && setInactiveWords(meta.words.inactive)
     meta.wordImages && setWordImages(meta.wordImages)
     meta.associations && setAssociations(meta.associations)
-    setFilters(meta.filters)
+    meta.filters && setFilters(meta.filters)
   }, [])
 
   //Update active word list properties whenever something from this word list changes
@@ -87,77 +88,77 @@ export const WordList = ({
       wordImages: wordImages,
       associations: associations,
       filters: {
-        labels: wordLists[activeIndex].filters.labels!,
+        labels: wordLists[activeIndex].filters?.labels || [],
         words: filters.words,
       },
     }
-
-    setActiveWordList({
-      ...activeWordList,
-      ...current,
-    })
 
     //Update this list in wordLists
     const newWordLists = wordLists
     newWordLists[activeIndex] = { ...newWordLists[activeIndex], ...current }
 
-    setWordLists(newWordLists)
-  }, [listTitle, activeWords, inactiveWords, wordImages, associations, filters.words])
+    setWordLists([...newWordLists])
+  }, [
+    listTitle,
+    activeWords,
+    inactiveWords,
+    wordImages,
+    associations,
+    filters.words,
+  ])
 
   const maxWordsLength = 3
-
-  /*useEffect(() => {
-    const fetchWords = (async () => {
-      try {
-        const wordData = (await API.graphql({query: listWords})) as {
-          data: { listWords: { items: Word[] } }
-        }
-        const activeWords = wordData.data.listWords.items
-        setActiveWords(activeWords)
-      } catch (err) {
-        console.log('error fetching words')
-      }
-    })()
-  }, [])*/
 
   const addWord = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     try {
       if (!formState.name) return
-      const word = { ...formState }
+      const word = { name: formState.name, wordListID: activeListId! } as Word
+
       setInactiveWords([...inactiveWords, word])
       setFormState({ name: '' })
-      await API.graphql(graphqlOperation(createWord, { input: word }))
     } catch (err) {
       console.log('error creating word:', err)
     }
   }
 
-  const removeWord = async (word: string) => {
+  const removeWord = async (word: Word) => {
     //Find whether the word to be removed is in activeWords or inactiveWords
-    const partOfActiveWords = activeWords.find(({ name }) => name === word)
+    const partOfActiveWords = activeWords.find(({ name }) => name === word.name)
     try {
       //If the deleted word was in filters, pass it to filterByWord to remove it
-      filters.words.includes(word) && filterByWord(word)
+      filters.words.includes(word.name) && filterByWord(word.name)
 
       //Remove from the appropriate list
       partOfActiveWords
-        ? setActiveWords(activeWords.filter(({ name }) => name !== word))
-        : setInactiveWords(inactiveWords.filter(({ name }) => name !== word))
+        ? setActiveWords(activeWords.filter(({ name }) => name !== word.name))
+        : setInactiveWords(
+            inactiveWords.filter(({ name }) => name !== word.name)
+          )
 
       //Update wordImages and associations
-      setWordImages(wordImages.filter(({ word: { name } }) => name !== word))
+      setWordImages(
+        wordImages.filter(({ word: { name } }) => name !== word.name)
+      )
       setAssociations(
-        sortLabels(wordImages.filter(({ word: { name } }) => name !== word))
+        sortLabels(
+          wordImages.filter(({ word: { name } }) => name !== word.name)
+        )
       )
 
-      await API.graphql(graphqlOperation(deleteWord, { input: { name: word } }))
+      //Remove from database
+      user.isSignedIn &&
+        (await API.graphql({
+          query: deleteWord,
+          variables: { input: { id: word.id } },
+        }))
     } catch (err) {
       console.log('error deleting word:', err)
     }
   }
 
+  //Add a word filter if it's selected
   const filterByWord = (word: string) => {
     setFilters({
       ...filters,
@@ -171,11 +172,11 @@ export const WordList = ({
   /**Initiate all processing for input words */
   const getAssociations = async () => {
     //Exit if there are no words to process
-    if (!activeWordList?.words?.inactive) return
+    if (!inactiveWords) return
 
     setStatus('Getting URL lists ...')
 
-    const afterUrls = await fetchUrlLists(activeWordList.words.inactive)
+    const afterUrls = await fetchUrlLists(inactiveWords)
 
     setStatus('Fetching images and converting them to bytes ...')
     const afterBytes = await imagesToBytes(afterUrls)
@@ -185,14 +186,31 @@ export const WordList = ({
 
     setStatus('Finding associations ...')
     const sortedLabels = sortLabels([
-      ...(activeWordList?.wordImages || []),
+      ...(meta.wordImages || []),
       ...afterLabels,
     ])
+
+    //Create new active words from inactive words and store their ids
+    const newActiveWords = inactiveWords.map(async word => {
+      //If user is signed in and this word was already created in the database, don't make it again
+      if (word.createdAt) return word
+
+      const newActiveWord = user.isSignedIn ?
+      (await API.graphql({
+        query: createWord,
+        variables: { input: word },
+      })) as { data: { createWord: { id: string } } }
+      : undefined
+
+      return { ...word, id: newActiveWord?.data.createWord.id || Math.random().toString() } as Word
+    })
+
+    const resolvedNewActiveWords = await Promise.all(newActiveWords)
 
     const newProperties = {
       wordImages: [...wordImages, ...afterLabels],
       words: {
-        active: [...activeWords, ...inactiveWords],
+        active: [...activeWords, ...resolvedNewActiveWords],
         inactive: [],
       },
       associations: sortedLabels,
@@ -203,42 +221,61 @@ export const WordList = ({
     setInactiveWords(newProperties.words.inactive)
     setAssociations(newProperties.associations)
 
-    setActiveWordList({
-      ...activeWordList,
-      ...newProperties,
-    })
-
     //Update this list in wordLists
     const newWordLists = wordLists
     newWordLists[activeIndex] = {
       ...newWordLists[activeIndex],
       ...newProperties,
     }
-    setWordLists(newWordLists)
+    setWordLists([...newWordLists])
 
     setStatus('')
   }
 
-  //When a word list is completely filled out, focus on the submit button
+  //When this list is completely filled out, focus on the submit button
   const createWordsButton = useRef<HTMLButtonElement>(null)
   useLayoutEffect(() => {
     activeWords.length + inactiveWords.length === maxWordsLength &&
       createWordsButton.current?.focus()
   }, [inactiveWords])
 
-  const titleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
-    event.target.select()
+  const removeWordList = async () => {
+    try {
+      //Change the active list to the one before or after this (undefined if no other lists)
+      const listIndex = wordLists.findIndex(list => list.id === id)
+      setActiveListId(
+        wordLists[listIndex + 1].id || wordLists[listIndex - 1].id
+      )
 
-  const deleteWordList = () => {
-    const listIndex = wordLists.findIndex(list => list.id === id)
-    setActiveWordList(wordLists[listIndex + 1] || wordLists[listIndex - 1])
+      //Remove from app state and database
+      user.isSignedIn &&
+        (await API.graphql({
+          query: deleteWordList,
+          variables: { input: { id } },
+        }))
+      setWordLists(wordLists.filter(list => list.id !== id))
+    } catch (error) {
+      setSnackMessage('Error deleting list: ' + error)
+      console.error(error)
+    }
+  }
 
-    setWordLists(wordLists.filter(list => list.id !== id))
+  const updateTitle = async () => {
+    if (!user.isSignedIn) return
+    try {
+      await API.graphql({
+        query: updateWordList,
+        variables: { input: { id: activeListId, name: listTitle } },
+      })
+    } catch (error) {
+      setSnackMessage('error updating list title: ' + error.code)
+    }
   }
 
   /**Checks whether this word list is active */
-  const isActive = () => activeWordList?.id === id
+  const isActive = () => activeListId === id
 
+  //Used for the menu button on this list
   const [menuOpen, setMenuOpen] = useState(false)
   const menuButtonRef = useRef(null)
 
@@ -286,7 +323,8 @@ export const WordList = ({
             classes={{ root: styles.listTitle, input: styles.input }}
             onChange={e => setListTitle(e.target.value)}
             disabled={!isActive()}
-            onClick={titleClick}
+            onClick={e => e.target.select()}
+            onBlur={updateTitle}
           />
           <IconButton
             ref={menuButtonRef}
@@ -301,7 +339,7 @@ export const WordList = ({
             open={menuOpen}
             onClose={() => setMenuOpen(false)}
           >
-            <MenuItem onClick={deleteWordList}>Delete list</MenuItem>
+            <MenuItem onClick={removeWordList}>Delete list</MenuItem>
           </Menu>
         </Typography>
         <List>

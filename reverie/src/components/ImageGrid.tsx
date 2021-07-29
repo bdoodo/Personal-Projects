@@ -20,8 +20,6 @@ export const ImageGrid = ({
   status: string
   filters: { words: string[]; labels: string[] } | undefined
 }) => {
-  console.log('filters:',filters)
-
   const [allImages, setAllImages] = useState(
     new Array<{
       title: string
@@ -66,7 +64,7 @@ export const ImageGrid = ({
           ? wordsFilteredImages
           : labelsFilteredImages
 
-      newFilteredImages && setFilteredImages(newFilteredImages)
+      newFilteredImages && setFilteredImages(shuffle(newFilteredImages))
     } //If there are no filters, update filteredImages with allImageBytes
     else {
       setFilteredImages(shuffle(allImages))

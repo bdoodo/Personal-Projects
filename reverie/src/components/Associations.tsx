@@ -13,41 +13,32 @@ import {
   IconButton,
   Collapse,
   useMediaQuery,
-  useTheme
 } from '@material-ui/core'
-import { orange, yellow, amber, blueGrey } from '@material-ui/core/colors'
+import { yellow, amber } from '@material-ui/core/colors'
 import { Check, ExpandMore, ExpandLess } from '@material-ui/icons'
 
 export const Associations = ({
   associations,
   status,
   filters,
-  activeWordList: { activeWordList, setActiveWordList },
-  wordLists: {wordLists, setWordLists},
+  activeListId,
+  wordLists,
+  setWordLists,
   wordImagesList,
   mobile,
 }: {
   associations: Association[] | undefined
   status: string
   filters: { words: string[]; labels: string[] } | undefined
-  activeWordList: {
-    activeWordList: WordList | undefined
-    setActiveWordList: React.Dispatch<
-      React.SetStateAction<WordList | undefined>
-    >
-  }
-  wordLists: {
-    wordLists: WordList[]
-    setWordLists: React.Dispatch<React.SetStateAction<WordList[]>>
-  }
+  activeListId: string | undefined
+  wordLists: WordList[]
+  setWordLists: React.Dispatch<React.SetStateAction<WordList[]>>
   wordImagesList: WordImages[] | undefined
   mobile?: boolean
 }) => {
   const [filteredLabels, setFilteredLabels] = useState(associations)
   const [collapsed, setCollapsed] = useState(true)
   const [selected, setSelected] = useState(new Array<string>())
-
-  console.log('activeWordList:', activeWordList)
 
   //Update labels by word filters
   useEffect(() => {
@@ -85,23 +76,20 @@ export const Associations = ({
     const alreadyExists = filters?.labels.includes(label)
 
     const newLabels = !alreadyExists
-    ? [...filters!.labels, label]
-    : filters!.labels.filter(labelFilter => labelFilter !== label)
+      ? [...filters!.labels, label]
+      : filters!.labels.filter(labelFilter => labelFilter !== label)
 
-    activeWordList &&
-      setActiveWordList({
-        ...activeWordList,
-        filters: {
-          ...activeWordList.filters,
-          labels: newLabels,
-        },
-      })
-    
     const newWordLists = wordLists
-    const activeIndex = wordLists.findIndex(list => list.id === activeWordList?.id) 
-    newWordLists[activeIndex].filters.labels = newLabels
+    const activeIndex = wordLists.findIndex(list => list.id === activeListId)
+    newWordLists[activeIndex] = {
+      ...newWordLists[activeIndex],
+      filters: {
+        words: newWordLists[activeIndex].filters?.words || [],
+        labels: newLabels,
+      },
+    }
 
-    setWordLists(newWordLists)
+    setWordLists([...newWordLists])
 
     setSelected(
       !alreadyExists
@@ -124,7 +112,7 @@ export const Associations = ({
         {mobile ?? 'Associations between words'}
       </Typography>
       <Container>
-        <Collapse in={!collapsed} collapsedSize={smallMobile ? '92px' : "78px"}>
+        <Collapse in={!collapsed} collapsedSize={smallMobile ? '92px' : '78px'}>
           <Container className={styles.labels}>
             <ThemeProvider theme={theme}>
               {filteredLabels?.map((label, index) => (

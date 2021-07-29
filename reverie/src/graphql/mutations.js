@@ -13,9 +13,9 @@ export const createWordList = /* GraphQL */ `
           id
           name
           wordListID
-          labels
           createdAt
           updatedAt
+          owner
         }
         nextToken
       }
@@ -25,6 +25,7 @@ export const createWordList = /* GraphQL */ `
       }
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -40,9 +41,9 @@ export const updateWordList = /* GraphQL */ `
           id
           name
           wordListID
-          labels
           createdAt
           updatedAt
+          owner
         }
         nextToken
       }
@@ -52,6 +53,7 @@ export const updateWordList = /* GraphQL */ `
       }
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -67,9 +69,9 @@ export const deleteWordList = /* GraphQL */ `
           id
           name
           wordListID
-          labels
           createdAt
           updatedAt
+          owner
         }
         nextToken
       }
@@ -79,6 +81,7 @@ export const deleteWordList = /* GraphQL */ `
       }
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -91,21 +94,9 @@ export const createWord = /* GraphQL */ `
       id
       name
       wordListID
-      labels
-      wordList {
-        id
-        words {
-          nextToken
-        }
-        associations {
-          label
-          occurrences
-        }
-        createdAt
-        updatedAt
-      }
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -118,21 +109,9 @@ export const updateWord = /* GraphQL */ `
       id
       name
       wordListID
-      labels
-      wordList {
-        id
-        words {
-          nextToken
-        }
-        associations {
-          label
-          occurrences
-        }
-        createdAt
-        updatedAt
-      }
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -145,21 +124,9 @@ export const deleteWord = /* GraphQL */ `
       id
       name
       wordListID
-      labels
-      wordList {
-        id
-        words {
-          nextToken
-        }
-        associations {
-          label
-          occurrences
-        }
-        createdAt
-        updatedAt
-      }
       createdAt
       updatedAt
+      owner
     }
   }
 `;
