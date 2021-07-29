@@ -17,6 +17,7 @@ type Word = {
   id: string,
   name: string,
   wordListID: string
+  createdAt?: any
 }
 
 type WordImages = {

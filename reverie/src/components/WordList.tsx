@@ -69,7 +69,6 @@ export const WordList = ({
 
   //On render, update list properties with list state properties from app
   useEffect(() => {
-    console.log(meta)
     setListTitle(meta.name)
     meta.words?.active && setActiveWords(meta.words.active)
     meta.words?.inactive && setInactiveWords(meta.words.inactive)
@@ -193,6 +192,9 @@ export const WordList = ({
 
     //Create new active words from inactive words and store their ids
     const newActiveWords = inactiveWords.map(async word => {
+      //If user is signed in and this word was already created in the database, don't make it again
+      if (word.createdAt) return word
+
       const newActiveWord = user.isSignedIn ?
       (await API.graphql({
         query: createWord,
@@ -252,11 +254,9 @@ export const WordList = ({
           variables: { input: { id } },
         }))
       setWordLists(wordLists.filter(list => list.id !== id))
-      console.log('deleted list')
     } catch (error) {
       setSnackMessage('Error deleting list: ' + error)
       console.error(error)
-      console.log('id:', id)
     }
   }
 

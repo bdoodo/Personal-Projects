@@ -6,8 +6,8 @@ import {
 const client = new RekognitionClient({
   region: 'us-west-2',
   credentials: {
-    accessKeyId: 'AKIA25VFNGRYORTEVYCL',
-    secretAccessKey: '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',
+    accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY!,
+    secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY!,
   },
 })
 
@@ -33,8 +33,8 @@ export const fetchUrlLists = async (words: Word[]) => {
     const res = await fetch(url, {
       method: 'GET',
       headers: {
-        'x-rapidapi-key': 'e9d24164f4msh7c129df4ebbe15dp141c4cjsn05d5e1ca14eb',
-        'x-rapidapi-host': 'contextualwebsearch-websearch-v1.p.rapidapi.com',
+        'x-rapidapi-key': process.env.REACT_APP_RAPIDAPI_KEY!,
+        'x-rapidapi-host': process.env.REACT_APP_RAPIDAPI_HOST!,
       },
     })
     const data = (await res.json()) as {
