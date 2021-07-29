@@ -8,7 +8,6 @@ export const createWordList = /* GraphQL */ `
   ) {
     createWordList(input: $input, condition: $condition) {
       id
-      name
       words {
         items {
           id
@@ -19,6 +18,10 @@ export const createWordList = /* GraphQL */ `
           owner
         }
         nextToken
+      }
+      associations {
+        label
+        occurrences
       }
       createdAt
       updatedAt
@@ -33,7 +36,6 @@ export const updateWordList = /* GraphQL */ `
   ) {
     updateWordList(input: $input, condition: $condition) {
       id
-      name
       words {
         items {
           id
@@ -44,6 +46,10 @@ export const updateWordList = /* GraphQL */ `
           owner
         }
         nextToken
+      }
+      associations {
+        label
+        occurrences
       }
       createdAt
       updatedAt
@@ -58,7 +64,6 @@ export const deleteWordList = /* GraphQL */ `
   ) {
     deleteWordList(input: $input, condition: $condition) {
       id
-      name
       words {
         items {
           id
@@ -69,6 +74,10 @@ export const deleteWordList = /* GraphQL */ `
           owner
         }
         nextToken
+      }
+      associations {
+        label
+        occurrences
       }
       createdAt
       updatedAt

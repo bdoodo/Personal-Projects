@@ -4,7 +4,7 @@ import { createTheme, ThemeProvider, useMediaQuery } from '@material-ui/core'
 import { teal, grey } from '@material-ui/core/colors'
 import { listWordLists, createWordList, getWordList } from './graphql'
 import { useEffect } from 'react'
-import Amplify, { API, Auth, Hub } from 'aws-amplify'
+import Amplify, { API } from 'aws-amplify'
 import { MobileView, DesktopView } from './layouts'
 
 import awsConfig from './aws-exports'
@@ -67,7 +67,7 @@ export const App = () => {
       return error.code as string
     }
   }
-
+  
   const [wordLists, setWordLists] = useState(new Array<WordList>())
   const [activeListId, setActiveListId] = useState<string>()
   //Set wordLists to fetched word lists, or create a new one
