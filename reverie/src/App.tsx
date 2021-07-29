@@ -2,12 +2,7 @@
 import { useState, useMemo } from 'react'
 import { createTheme, ThemeProvider, useMediaQuery } from '@material-ui/core'
 import { teal, grey } from '@material-ui/core/colors'
-import {
-  listWordLists,
-  createWordList,
-  deleteWordList,
-  updateWordList,
-} from './graphql'
+import { listWordLists, createWordList, getWordList } from './graphql'
 import { useEffect } from 'react'
 import Amplify, { API, Auth, Hub } from 'aws-amplify'
 import { MobileView, DesktopView } from './layouts'
@@ -62,6 +57,7 @@ export const App = () => {
   }
 
   const [wordLists, setWordLists] = useState(new Array<WordList>())
+  const [activeListId, setActiveListId] = useState<string>()
   //Set wordLists to fetched word lists, or create a new one
   useEffect(() => {
     if (user.isSignedIn) {
@@ -70,28 +66,47 @@ export const App = () => {
           const wordListData = (await API.graphql({
             query: listWordLists,
           })) as {
-            data: { listWordLists: { items: WordList[] } }
+            data: {
+              listWordLists: {
+                items: { id: string; name: string }[]
+              }
+            }
           }
           const fetchedWordLists = wordListData.data.listWordLists.items
 
-          fetchedWordLists.length
-            ? setWordLists(fetchedWordLists)
-            : !wordLists.length && makeWordList()
-        } catch {
-          console.log('error fetching word lists')
+          if (fetchedWordLists.length) {
+            //Word lists stored in graphQL resemble a slightly different shape
+            //than lists in app. Convert them to resemble app shape here
+            const convertedWordLists = fetchedWordLists.map(async list => {
+              const {
+                data: {
+                  getWordList: {
+                    words: { items },
+                  },
+                },
+              } = (await API.graphql({
+                query: getWordList,
+                variables: { id: list.id  },
+              })) as { data: { getWordList: { words: { items: Word[] } } } }
+
+              return { ...list, words: { active: items } }
+            })
+
+            const resolvedWordLists = await Promise.all(convertedWordLists)
+
+            setWordLists(resolvedWordLists)
+            setActiveListId(resolvedWordLists[0].id)
+          } else {
+            !wordLists.length && makeWordList()
+          }
+        } catch (error) {
+          console.log('error fetching word lists', error)
         }
       })()
     } else {
       !wordLists.length && makeWordList()
     }
   }, [user.isSignedIn])
-
-  const [activeWordList, setActiveWordList] = useState<WordList>()
-  //Only used for first render, after wordlists have been fetched. Selects
-  //an activeWordList if none exists
-  useEffect(() => {
-    !activeWordList && setActiveWordList(wordLists[0])
-  }, [wordLists])
 
   const makeWordList = async () => {
     try {
@@ -109,7 +124,7 @@ export const App = () => {
       }
 
       setWordLists([...wordLists, newWordList])
-      setActiveWordList(newWordList)
+      setActiveListId(newWordList.id)
       setSnackMessage('Successfully created list!!')
     } catch (error) {
       console.log('Error creating new word list', error)
@@ -118,9 +133,7 @@ export const App = () => {
 
   //Expands a word list if it's inactive and sets it to active
   const expand = (list: WordList) =>
-    !status && !isActive(list)
-      ? setActiveWordList(wordLists.find(wordList => wordList.id === list.id))
-      : undefined
+    !status && !isActive(list) ? setActiveListId(list.id) : undefined
 
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
 
@@ -145,7 +158,7 @@ export const App = () => {
   )
 
   /**Compares a word list to the active word list */
-  const isActive = (list: WordList) => activeWordList?.id === list.id
+  const isActive = (list: WordList) => activeListId === list.id
 
   //Passed down to layouts
   const resourcePack = {
@@ -154,11 +167,12 @@ export const App = () => {
     wordLists,
     setWordLists,
     makeWordList,
-    activeWordList,
-    setActiveWordList,
+    activeListId,
+    setActiveListId,
     expand,
     isActive,
-    user: { user, setUser },
+    user,
+    setUser,
     snackMessage,
     setSnackMessage,
   }

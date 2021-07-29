@@ -1,5 +1,4 @@
 import {
-  Paper,
   TextField,
   Button,
   makeStyles,
@@ -13,7 +12,6 @@ import {
 } from '@material-ui/core'
 import { TabContext, TabPanel, TabList } from '@material-ui/lab'
 import { useState } from 'react'
-import { CognitoUser } from 'amazon-cognito-identity-js'
 import { Auth } from 'aws-amplify'
 
 export const SignupForm = ({

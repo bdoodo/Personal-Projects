@@ -11,7 +11,6 @@ export const getWordList = /* GraphQL */ `
           id
           name
           wordListID
-          labels
           createdAt
           updatedAt
           owner

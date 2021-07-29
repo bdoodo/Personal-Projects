@@ -15,7 +15,6 @@ import React, { useState } from 'react'
 import { Add } from '@material-ui/icons'
 import { WordList, Associations, ImageGrid, SignupForm } from '../components'
 import { useEffect } from 'react'
-import { CognitoUser } from 'amazon-cognito-identity-js'
 import { Auth } from 'aws-amplify'
 
 export const DesktopView = ({
@@ -24,11 +23,12 @@ export const DesktopView = ({
   wordLists,
   setWordLists,
   makeWordList,
-  activeWordList,
-  setActiveWordList,
+  activeListId,
+  setActiveListId,
   expand,
   isActive,
-  user: { user, setUser },
+  user,
+  setUser,
   snackMessage,
   setSnackMessage,
 }: {
@@ -37,24 +37,22 @@ export const DesktopView = ({
   wordLists: WordList[]
   setWordLists: React.Dispatch<React.SetStateAction<WordList[]>>
   makeWordList: () => Promise<void>
-  activeWordList: WordList | undefined
-  setActiveWordList: React.Dispatch<React.SetStateAction<WordList | undefined>>
+  activeListId: string | undefined
+  setActiveListId: React.Dispatch<React.SetStateAction<string | undefined>>
   expand: (list: WordList) => void
   isActive: (list: WordList) => boolean
   user: {
-    user: {
+    email: string | undefined
+    password: string | undefined
+    isSignedIn: boolean
+  }
+  setUser: React.Dispatch<
+    React.SetStateAction<{
       email: string | undefined
       password: string | undefined
       isSignedIn: boolean
-    }
-    setUser: React.Dispatch<
-      React.SetStateAction<{
-        email: string | undefined
-        password: string | undefined
-        isSignedIn: boolean
-      }>
-    >
-  }
+    }>
+  >
   snackMessage: string
   setSnackMessage: React.Dispatch<React.SetStateAction<string>>
 }) => {
@@ -71,8 +69,10 @@ export const DesktopView = ({
 
   const signOut = () => {
     Auth.signOut()
-    setUser({...user, isSignedIn: false})
+    setUser({ ...user, isSignedIn: false })
   }
+
+  const activeWordList = wordLists.find(list => list.id === activeListId)
 
   return (
     <Container className={styles.root}>
@@ -119,10 +119,16 @@ export const DesktopView = ({
                 }
               >
                 <WordList
-                  status={{ status, setStatus }}
-                  wordLists={{ wordLists, setWordLists }}
-                  activeWordList={{ activeWordList, setActiveWordList }}
-                  meta={wordList}
+                  {...{
+                    status,
+                    setStatus,
+                    wordLists,
+                    setWordLists,
+                    activeListId,
+                    setActiveListId,
+                    meta: wordList,
+                    setSnackMessage
+                  }}
                 />
               </div>
             </Collapse>
@@ -143,12 +149,15 @@ export const DesktopView = ({
         </Grid>
         <Grid item xs={7}>
           <Associations
-            associations={activeWordList?.associations}
-            status={status}
-            filters={activeWordList?.filters}
-            activeWordList={{ activeWordList, setActiveWordList }}
-            wordImagesList={activeWordList?.wordImages}
-            wordLists={{ wordLists, setWordLists }}
+            {...{
+              associations: activeWordList?.associations,
+              status,
+              filters: activeWordList?.filters,
+              activeListId,
+              wordImagesList: activeWordList?.wordImages,
+              wordLists,
+              setWordLists,
+            }}
           />
           <ImageGrid
             wordImagesList={activeWordList?.wordImages}

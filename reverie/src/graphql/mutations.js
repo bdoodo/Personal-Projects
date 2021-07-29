@@ -14,7 +14,6 @@ export const createWordList = /* GraphQL */ `
           id
           name
           wordListID
-          labels
           createdAt
           updatedAt
           owner
@@ -40,7 +39,6 @@ export const updateWordList = /* GraphQL */ `
           id
           name
           wordListID
-          labels
           createdAt
           updatedAt
           owner
@@ -66,7 +64,6 @@ export const deleteWordList = /* GraphQL */ `
           id
           name
           wordListID
-          labels
           createdAt
           updatedAt
           owner
@@ -88,17 +85,6 @@ export const createWord = /* GraphQL */ `
       id
       name
       wordListID
-      labels
-      wordList {
-        id
-        name
-        words {
-          nextToken
-        }
-        createdAt
-        updatedAt
-        owner
-      }
       createdAt
       updatedAt
       owner
@@ -114,17 +100,6 @@ export const updateWord = /* GraphQL */ `
       id
       name
       wordListID
-      labels
-      wordList {
-        id
-        name
-        words {
-          nextToken
-        }
-        createdAt
-        updatedAt
-        owner
-      }
       createdAt
       updatedAt
       owner
@@ -140,17 +115,6 @@ export const deleteWord = /* GraphQL */ `
       id
       name
       wordListID
-      labels
-      wordList {
-        id
-        name
-        words {
-          nextToken
-        }
-        createdAt
-        updatedAt
-        owner
-      }
       createdAt
       updatedAt
       owner
