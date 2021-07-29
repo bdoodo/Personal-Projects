@@ -22,8 +22,20 @@ export const App = () => {
   }>({
     email: undefined,
     password: undefined,
-    isSignedIn: Boolean(Auth.currentAuthenticatedUser),
+    isSignedIn: false,
   })
+
+  const isSignedIn = async () => {
+    try {
+      await Auth.currentAuthenticatedUser()
+      return true
+    } catch {
+      return false
+    }
+  }
+  useEffect(() => {
+    ;(async () => setUser({ ...user, isSignedIn: await isSignedIn() }))()
+  }, [])
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -86,7 +98,7 @@ export const App = () => {
                 },
               } = (await API.graphql({
                 query: getWordList,
-                variables: { id: list.id  },
+                variables: { id: list.id },
               })) as { data: { getWordList: { words: { items: Word[] } } } }
 
               return { ...list, words: { inactive: items } }
@@ -97,7 +109,8 @@ export const App = () => {
             setWordLists(resolvedWordLists)
             setActiveListId(resolvedWordLists[0].id)
           } else {
-            !wordLists.length && makeWordList()
+            setWordLists([])
+            makeWordList()
           }
         } catch (error) {
           console.log('error fetching word lists', error)
@@ -112,20 +125,25 @@ export const App = () => {
     try {
       const newName = `Word List ${wordLists.length + 1}`
 
-      const createListData = (await API.graphql({
-        query: createWordList,
-        variables: { input: { name: newName } },
-      })) as { data: { createWordList: { id: string } } }
-
-      const newWordList = {
+      let newWordList = {
         name: newName,
         filters: { words: new Array<string>(), labels: new Array<string>() },
-        id: createListData.data.createWordList.id,
+        id: '',
+      }
+
+      if (user.isSignedIn) {
+        const createListData = (await API.graphql({
+          query: createWordList,
+          variables: { input: { name: newName } },
+        })) as { data: { createWordList: { id: string } } }
+
+        newWordList.id = createListData.data.createWordList.id
+      } else {
+        newWordList.id = Math.random().toString()
       }
 
       setWordLists([...wordLists, newWordList])
       setActiveListId(newWordList.id)
-      setSnackMessage('Successfully created list!!')
     } catch (error) {
       console.log('Error creating new word list', error)
     }

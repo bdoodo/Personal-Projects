@@ -13,7 +13,13 @@ import {
 } from '@material-ui/core'
 import React, { useState } from 'react'
 import { Add } from '@material-ui/icons'
-import { WordList, Associations, ImageGrid, SignupForm } from '../components'
+import {
+  WordList,
+  Associations,
+  ImageGrid,
+  SignupForm,
+  VerificationForm,
+} from '../components'
 import { useEffect } from 'react'
 import { Auth } from 'aws-amplify'
 
@@ -64,8 +70,15 @@ export const DesktopView = ({
   }, [snackMessage])
 
   const [signInPopup, setSignInPopup] = useState(false)
+  const [verificationPopup, setVerificationPopup] = useState<{
+    open: boolean
+    email: string | undefined
+  }>({ open: false, email: undefined })
 
-  const handleClose = () => setSignInPopup(false)
+  const handleClose = () => {
+    setSignInPopup(false)
+    setVerificationPopup({ ...verificationPopup, open: false })
+  }
 
   const signOut = () => {
     Auth.signOut()
@@ -93,8 +106,25 @@ export const DesktopView = ({
       </AppBar>
       <Toolbar />
       <SignupForm
-        {...{ user, setUser, handleClose, setSnackMessage }}
+        {...{
+          user,
+          setUser,
+          handleClose,
+          setSnackMessage,
+          setVerificationPopup,
+          verificationPopup,
+        }}
         open={signInPopup}
+      />
+      <VerificationForm
+        {...{
+          email: verificationPopup.email!,
+          open: verificationPopup.open,
+          handleClose,
+          setSnackMessage,
+          user,
+          setUser,
+        }}
       />
       <Grid container spacing={5}>
         <Grid
@@ -127,7 +157,7 @@ export const DesktopView = ({
                     activeListId,
                     setActiveListId,
                     meta: wordList,
-                    setSnackMessage
+                    setSnackMessage,
                   }}
                 />
               </div>

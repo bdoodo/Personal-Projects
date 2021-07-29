@@ -109,7 +109,7 @@ export const WordList = ({
 
     try {
       if (!formState.name) return
-      const word = { name: formState.name, wordListID: activeListId! }
+      const word = { name: formState.name, wordListID: activeListId! } as Word
 
       setInactiveWords([...inactiveWords, word])
       setFormState({ name: '' })

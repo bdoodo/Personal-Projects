@@ -8,8 +8,12 @@ import {
   DialogTitle,
   Tab,
   Slide,
+  IconButton,
+  AppBar,
+  Toolbar,
   Typography,
 } from '@material-ui/core'
+import { Close } from '@material-ui/icons'
 import { TabContext, TabPanel, TabList } from '@material-ui/lab'
 import { useState } from 'react'
 import { Auth } from 'aws-amplify'
@@ -21,6 +25,7 @@ export const SignupForm = ({
   open,
   handleClose,
   setSnackMessage,
+  setVerificationPopup,
 }: {
   user: {
     email: string | undefined
@@ -34,11 +39,16 @@ export const SignupForm = ({
       isSignedIn: boolean
     }>
   >
-
   mobile?: boolean
   open?: boolean
   handleClose: () => void
   setSnackMessage: React.Dispatch<React.SetStateAction<string>>
+  setVerificationPopup: React.Dispatch<
+    React.SetStateAction<{
+      open: boolean
+      email: string | undefined
+    }>
+  >
 }) => {
   const styles = makeStyles({
     dialogContent: {
@@ -55,7 +65,6 @@ export const SignupForm = ({
     verification: '',
   })
   const [tab, setTab] = useState<'signUp' | 'signIn'>('signIn')
-  const [needsVerification, setNeedsVerification] = useState(false)
 
   const switchTabs = (_event: any, newValue: 'signIn' | 'signUp') => {
     setTab(newValue)
@@ -69,34 +78,24 @@ export const SignupForm = ({
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => setFormState({ ...formState, password: e.target.value })
 
-  const setVerification = (
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-  ) => setFormState({ ...formState, verification: e.target.value })
-
   const submit = async (
     type: 'sign up' | 'sign in',
     event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault()
 
-    if (needsVerification) {
-      try {
-        await Auth.confirmSignUp(formState.email, formState.verification)
-        setNeedsVerification(false)
-        setUser({...user, isSignedIn: true})
-        handleClose()
-      } catch (error) {
-        setSnackMessage('Error validating your email: ' + error.code)
-      }
-    } else if (type === 'sign in') {
+    if (type === 'sign in') {
       try {
         await Auth.signIn(formState.email, formState.password)
-        setUser({...user, isSignedIn: true})
+        setUser({ ...user, isSignedIn: true })
         handleClose()
       } catch (error) {
-        if (error.code.toLowerCase().includes('usernotconfirmed'))
-          setNeedsVerification(true)
-        else setSnackMessage('Error signing in: ' + error.code)
+        if (error.code.toLowerCase().includes('usernotconfirmed')) {
+          handleClose()
+          setVerificationPopup({ email: formState.email, open: true })
+        } else {
+          setSnackMessage('Error signing in: ' + error.code)
+        }
       }
     } else if (type === 'sign up') {
       try {
@@ -104,33 +103,49 @@ export const SignupForm = ({
           username: formState.email,
           password: formState.password,
         })
-        setNeedsVerification(true)
+        handleClose()
+        setVerificationPopup({ email: formState.email, open: true })
       } catch (error) {
         setSnackMessage('Error signing up: ' + error.code)
       }
     }
   }
 
-  const resendVerificationCode = async () => {
-    try {
-      await Auth.resendSignUp(formState.email)
-      setSnackMessage('Code resent successfully')
-    } catch (err) {
-      setSnackMessage('Error resending code: ' + err.code)
-    }
-  }
-
   return (
-    <Dialog open={Boolean(open)} onClose={handleClose}>
-      <DialogTitle>Sign in</DialogTitle>
+    <Dialog open={Boolean(open)} onClose={handleClose} fullScreen={mobile}>
       <TabContext value={tab}>
-        <TabList
-          onChange={switchTabs}
-          {...(mobile && { variant: 'fullWidth' })}
-        >
-          <Tab label="Sign in" value="signIn" />
-          <Tab label="Sign up" value="signUp" />
-        </TabList>
+        {mobile && (
+          <>
+            <AppBar>
+              <Toolbar>
+                <IconButton onClick={handleClose}>
+                  <Close />
+                </IconButton>
+              </Toolbar>
+              <TabList
+                onChange={switchTabs}
+                {...(mobile && { variant: 'fullWidth' })}
+              >
+                <Tab label="Sign in" value="signIn" />
+                <Tab label="Sign up" value="signUp" />
+              </TabList>
+            </AppBar>
+            <Toolbar />
+            <Toolbar />
+          </>
+        )}
+        {!mobile && (
+          <>
+            <DialogTitle>Sign in</DialogTitle>
+            <TabList
+              onChange={switchTabs}
+              {...(mobile && { variant: 'fullWidth' })}
+            >
+              <Tab label="Sign in" value="signIn" />
+              <Tab label="Sign up" value="signUp" />
+            </TabList>
+          </>
+        )}
         <TabPanel value="signIn">
           <Slide
             in={tab === 'signIn'}
@@ -146,19 +161,6 @@ export const SignupForm = ({
                   label="Password"
                   onChange={setPassword}
                 />
-                {needsVerification && (
-                  <>
-                    <Typography>Type your verification code here:</Typography>
-                    <TextField
-                      variant="filled"
-                      label="Verification code"
-                      onChange={setVerification}
-                    />
-                    <Button onClick={resendVerificationCode}>
-                      Resend verification code
-                    </Button>
-                  </>
-                )}
               </DialogContent>
               <DialogActions>
                 <Button type="submit">Log in</Button>
@@ -182,19 +184,6 @@ export const SignupForm = ({
                   label="Password"
                   onChange={setPassword}
                 />
-                {needsVerification && (
-                  <>
-                    <Typography>
-                      We sent you a verification code to your email. Please type
-                      it here:
-                    </Typography>
-                    <TextField
-                      variant="filled"
-                      label="verification code"
-                      onChange={setVerification}
-                    />
-                  </>
-                )}
               </DialogContent>
               <DialogActions>
                 <Button type="submit">Sign up</Button>

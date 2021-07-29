@@ -14,7 +14,15 @@ import { Add } from '@material-ui/icons'
 import { TabList, TabContext, TabPanel } from '@material-ui/lab'
 import { useEffect } from 'react'
 import { useState } from 'react'
-import { WordList, Associations, ImageGrid } from '../components'
+import {
+  WordList,
+  Associations,
+  ImageGrid,
+  SignupForm,
+  VerificationForm,
+} from '../components'
+import { Auth } from 'aws-amplify'
+
 
 export const MobileView = ({
   status,
@@ -65,6 +73,22 @@ export const MobileView = ({
     status && setTab('associations')
   }, [status])
 
+  const signOut = () => {
+    Auth.signOut()
+    setUser({ ...user, isSignedIn: false })
+  }
+
+  const [signInPopup, setSignInPopup] = useState(false)
+  const [verificationPopup, setVerificationPopup] = useState<{
+    open: boolean
+    email: string | undefined
+  }>({ open: false, email: undefined })
+
+  const handleClose = () => {
+    setSignInPopup(false)
+    setVerificationPopup({ ...verificationPopup, open: false })
+  }
+
   const styles = setStyles()
 
   const activeWordList = wordLists.find(list => list.id === activeListId)
@@ -77,7 +101,9 @@ export const MobileView = ({
             <Typography className={styles.title} variant="h6">
               Reverie
             </Typography>
-            <Button>Log in</Button>
+            <Button onClick={() =>
+              !user.isSignedIn ? setSignInPopup(true) : signOut()
+            }>Sign in</Button>
           </Toolbar>
           <TabList onChange={switchTabs} variant="fullWidth">
             <Tab label="Word lists" value="wordList" />
@@ -86,6 +112,29 @@ export const MobileView = ({
         </AppBar>
         <Toolbar />
         <Toolbar />
+        <SignupForm
+          {...{
+            user,
+            setUser,
+            handleClose,
+            setSnackMessage,
+            setVerificationPopup,
+            verificationPopup,
+            mobile: true
+          }}
+          open={signInPopup}
+        />
+        <VerificationForm
+          {...{
+            email: verificationPopup.email!,
+            open: verificationPopup.open,
+            handleClose,
+            setSnackMessage,
+            user,
+            setUser,
+            mobile: true
+          }}
+        />
         <TabPanel value="wordList" className={styles.wordPanel}>
           <Slide
             in={tab === 'wordList'}
@@ -118,7 +167,7 @@ export const MobileView = ({
                         setActiveListId,
                         meta: wordList,
                         mobile: true,
-                        setSnackMessage
+                        setSnackMessage,
                       }}
                     />
                   </div>
