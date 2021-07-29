@@ -98,7 +98,7 @@ export const WordList = ({
     const newWordLists = wordLists
     newWordLists[activeIndex] = { ...newWordLists[activeIndex], ...current }
 
-    setWordLists(newWordLists)
+    setWordLists([...newWordLists])
   }, [
     listTitle,
     activeWords,
@@ -225,7 +225,7 @@ export const WordList = ({
       ...newWordLists[activeIndex],
       ...newProperties,
     }
-    setWordLists(newWordLists)
+    setWordLists([...newWordLists])
 
     setStatus('')
   }

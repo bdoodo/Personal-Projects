@@ -89,7 +89,7 @@ export const Associations = ({
       },
     }
 
-    setWordLists(newWordLists)
+    setWordLists([...newWordLists])
 
     setSelected(
       !alreadyExists

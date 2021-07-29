@@ -86,6 +86,7 @@ export const DesktopView = ({
   }
 
   const activeWordList = wordLists.find(list => list.id === activeListId)
+  console.log(activeWordList)
 
   return (
     <Container className={styles.root}>
