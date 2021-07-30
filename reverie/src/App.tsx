@@ -6,6 +6,7 @@ import { listWordLists, createWordList, getWordList } from './graphql'
 import { useEffect } from 'react'
 import Amplify, { API } from 'aws-amplify'
 import { MobileView, DesktopView } from './layouts'
+import { Auth } from 'aws-amplify'
 
 import awsConfig from './aws-exports'
 Amplify.configure(awsConfig)
@@ -67,7 +68,7 @@ export const App = () => {
       return error.code as string
     }
   }
-  
+
   const [wordLists, setWordLists] = useState(new Array<WordList>())
   const [activeListId, setActiveListId] = useState<string>()
   //Set wordLists to fetched word lists, or create a new one
