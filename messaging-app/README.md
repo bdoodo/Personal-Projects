@@ -8,4 +8,4 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ### Start a server to serve the production bundle
 
-Try Serve: run `npm install serve -g` if you don't have it installed. Once it's installed and the build bundle is ready, run 'serve -s build' in the root directory to start a server.
+Try Serve: Run `npm install serve -g` if you don't have it installed. Once it's installed and the build bundle is ready, run 'serve -s build' in the root directory to start a server.
