@@ -56,7 +56,7 @@ export const MobileView = (props: {
       <AppBar position="sticky">
         <Toolbar className={styles.prominent}>
           {view === 'details' ? (
-            <IconButton edge="start" onClick={() => setView('lists')}>
+            <IconButton edge="start" onClick={() => setView('lists')} color="inherit">
               <ArrowBack />
             </IconButton>
           ) : (

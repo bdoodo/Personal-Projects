@@ -84,7 +84,7 @@ export const Details = (props: {
   const styles = setStyles()
 
   return (
-    <Container>
+    <Container className={styles.root}>
       {!content ? (
         <Typography>No message selected</Typography>
       ) : content === 'compose' ? (
@@ -146,4 +146,7 @@ const setStyles = makeStyles({
     justifyContent: 'space-between',
     height: 180 
   },
+  root: {
+    marginTop: 20
+  }
 })
