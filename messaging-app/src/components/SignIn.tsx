@@ -101,6 +101,6 @@ export const SignIn = (props: {
 const setStyles = makeStyles({
   paper: {
     maxWidth: '20rem',
-    margin: '0 auto',
+    margin: '3rem auto',
   },
 })

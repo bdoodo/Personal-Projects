@@ -11,6 +11,7 @@ export const MessageListTabs = (props: {
   >
   detailsContent: number | 'compose' | undefined
   updateSentSwitch: boolean
+  setView?: React.Dispatch<React.SetStateAction<'lists' | 'details'>>
 }) => {
   const {
     authToken,
@@ -18,6 +19,7 @@ export const MessageListTabs = (props: {
     setDetailsContent,
     detailsContent,
     updateSentSwitch,
+    setView,
   } = props
 
   const [tab, setTab] = useState<'inbox' | 'sent'>('inbox')
@@ -38,7 +40,13 @@ export const MessageListTabs = (props: {
       <TabPanel value="inbox">
         <MessageList
           list="inbox"
-          {...{ authToken, setSnackMessage, setDetailsContent, detailsContent }}
+          {...{
+            authToken,
+            setSnackMessage,
+            setDetailsContent,
+            detailsContent,
+            setView,
+          }}
         />
       </TabPanel>
       <TabPanel value="sent">
@@ -50,6 +58,7 @@ export const MessageListTabs = (props: {
             setDetailsContent,
             detailsContent,
             updateSentSwitch,
+            setView,
           }}
         />
       </TabPanel>

@@ -9,6 +9,7 @@ import {
   CardActions,
   TextField,
   IconButton,
+  makeStyles
 } from '@material-ui/core'
 import { Send } from '@material-ui/icons'
 
@@ -80,6 +81,8 @@ export const Details = (props: {
     }
   }
 
+  const styles = setStyles()
+
   return (
     <Container>
       {!content ? (
@@ -87,7 +90,7 @@ export const Details = (props: {
       ) : content === 'compose' ? (
         <Card>
           <form onSubmit={sendMessage}>
-            <CardContent>
+            <CardContent className={styles.form}>
               <TextField
                 variant="outlined"
                 label="To:"
@@ -110,6 +113,7 @@ export const Details = (props: {
                 onChange={e => updateCompose(e, 'body')}
                 value={composeState.body}
                 required
+                size="medium"
               />
             </CardContent>
             <CardActions>
@@ -123,14 +127,23 @@ export const Details = (props: {
         //If a message Id was provided
         <Card>
           <CardHeader
-            title={messageContent!.title}
-            subheader={parseDate(messageContent!.sent)}
+            title={messageContent?.title}
+            subheader={messageContent && parseDate(messageContent.sent)}
           />
           <CardContent>
-            <Typography>{messageContent!.body}</Typography>
+            <Typography>{messageContent?.body}</Typography>
           </CardContent>
         </Card>
       )}
     </Container>
   )
 }
+
+const setStyles = makeStyles({
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    height: 180 
+  },
+})

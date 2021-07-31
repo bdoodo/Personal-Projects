@@ -17,8 +17,17 @@ export const MessageList = (props: {
     React.SetStateAction<number | 'compose' | undefined>
   >
   updateSentSwitch?: boolean
+  setView?: React.Dispatch<React.SetStateAction<'lists' | 'details'>>
 }) => {
-  const { authToken, setSnackMessage, list, setDetailsContent, detailsContent, updateSentSwitch } = props
+  const {
+    authToken,
+    setSnackMessage,
+    list,
+    setDetailsContent,
+    detailsContent,
+    updateSentSwitch,
+    setView,
+  } = props
 
   const [messages, setMessages] = useState(new Array<IndexedMessage>())
   useEffect(() => {
@@ -67,10 +76,18 @@ export const MessageList = (props: {
     }
   }
 
+  const selectItem = (message: IndexedMessage) => {
+    setDetailsContent(message.id)
+
+    //If this component was passed the setView prop (for mobile),
+    //set the view to details
+    setView && setView('details')
+  }
+
   return (
     <List>
       {messages.map(message => (
-        <ListItem button onClick={() => setDetailsContent(message.id)}>
+        <ListItem button onClick={() => selectItem(message)}>
           <ListItemText
             inset
             primary={list === 'sent' ? message.receiver : message.sender}

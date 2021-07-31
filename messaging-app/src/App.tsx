@@ -1,20 +1,7 @@
 import './App.css'
-import { SignIn, MessageListTabs, Details } from './components'
 import { useState, useEffect } from 'react'
-import {
-  Container,
-  Grid,
-  Snackbar,
-  Divider,
-  AppBar,
-  Toolbar,
-  Typography,
-  makeStyles,
-  Button,
-  IconButton,
-} from '@material-ui/core'
-import { Create } from '@material-ui/icons'
-import { Alert } from '@material-ui/lab'
+import { DesktopView, MobileView } from './layouts'
+import { useMediaQuery, useTheme } from '@material-ui/core'
 
 export default function App() {
   const [authToken, setAuthToken] = useState<string>()
@@ -42,85 +29,30 @@ export default function App() {
   //Only used for updating 'sent' list when a new message is sent
   const [updateSentSwitch, updateSentTab] = useState(false)
 
-  const styles = setStyles()
+  const theme = useTheme()
+  //'md' is 960px; anything narrower is considered mobile
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
+  const layoutResources = {
+    authToken,
+    setDetailsContent,
+    signOut,
+    setSnackMessage,
+    setAuthToken,
+    detailsContent,
+    updateSentSwitch,
+    updateSentTab,
+    snackMessage,
+    closeSnack,
+  }
 
   return (
-    <Container className={styles.root}>
-      <AppBar position="sticky">
-        <Toolbar>
-          <Typography variant="h6" className={styles.title}>
-            Brian's Messaging App
-          </Typography>
-          {authToken && (
-            <>
-              <IconButton
-                edge="end"
-                color="inherit"
-                onClick={() => setDetailsContent('compose')}
-              >
-                <Create />
-              </IconButton>
-              <Divider flexItem orientation="vertical" variant="middle" />
-              <Button onClick={signOut} color="inherit">
-                Sign out
-              </Button>
-            </>
-          )}
-        </Toolbar>
-      </AppBar>
-      <SignIn open={!authToken} {...{ setSnackMessage, setAuthToken }} />
-      {authToken && (
-        <Grid container className={styles.grid}>
-          <Grid item xs={3}>
-            <MessageListTabs
-              {...{
-                authToken,
-                setSnackMessage,
-                setDetailsContent,
-                detailsContent,
-                updateSentSwitch,
-              }}
-            />
-          </Grid>
-          <Divider orientation="vertical" flexItem />
-          <Grid item xs={8}>
-            <Details
-              content={detailsContent}
-              {...{
-                setSnackMessage,
-                authToken,
-                updateSentTab,
-                updateSentSwitch,
-              }}
-            />
-          </Grid>
-        </Grid>
+    <>
+      {isMobile ? (
+        <MobileView {...layoutResources} />
+      ) : (
+        <DesktopView {...layoutResources} />
       )}
-      <Snackbar
-        autoHideDuration={5000}
-        open={Boolean(snackMessage)}
-        onClose={closeSnack}
-        anchorOrigin={{
-          horizontal: !authToken ? 'center' : 'right',
-          vertical: 'bottom',
-        }}
-      >
-        <Alert severity="error" onClose={closeSnack}>
-          {snackMessage}
-        </Alert>
-      </Snackbar>
-    </Container>
+    </>
   )
 }
-
-const setStyles = makeStyles({
-  root: {
-    height: '90vh',
-  },
-  grid: {
-    height: '100%',
-  },
-  title: {
-    flexGrow: 1,
-  },
-})
