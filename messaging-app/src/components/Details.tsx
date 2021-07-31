@@ -74,7 +74,7 @@ export const Details = (props: {
 
       setComposeState({ receiver: '', title: '', body: '' })
 
-      //Refresh the sent tab if it's active
+      //Refresh the sent tab in case it's active
       updateSentTab(!updateSentSwitch)
     } catch (error) {
       setSnackMessage('Error sending your message: ' + error)

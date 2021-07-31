@@ -55,18 +55,15 @@ export const MobileView = (props: {
     <Container className={styles.root}>
       <AppBar position="sticky">
         <Toolbar className={styles.prominent}>
-          {view === 'details' && (
+          {view === 'details' ? (
             <IconButton edge="start" onClick={() => setView('lists')}>
               <ArrowBack />
             </IconButton>
-          )}
-          {view === 'lists' && (
-            <Typography variant="h6" className={styles.title}>
-              Brian's Messaging App
-            </Typography>
-          )}
-          {view === 'lists' && (
+          ) : (
             <>
+              <Typography variant="h6" className={styles.title}>
+                Brian's Messaging App
+              </Typography>
               <Divider flexItem orientation="vertical" variant="middle" />
               <Button onClick={signOut} color="inherit">
                 Sign out
@@ -128,9 +125,6 @@ const setStyles = makeStyles(theme => ({
     height: '90vh',
     margin: 0,
     padding: 0,
-  },
-  grid: {
-    height: '100%',
   },
   title: {
     flexGrow: 1,
