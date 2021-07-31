@@ -38,37 +38,6 @@ export const App = () => {
     ;(async () => setUser({ ...user, isSignedIn: await isSignedIn() }))()
   }, [])
 
-  const signIn = async (email: string, password: string) => {
-    try {
-      await Auth.signIn(email, password)
-    } catch (error) {
-      setSnackMessage('Error signing in: ' + error.code)
-      return error.code as string
-    }
-  }
-
-  const signOut = async () => {
-    try {
-      await Auth.signOut()
-    } catch (error) {
-      setSnackMessage('Error signing out: ' + error.code)
-      return error.code as string
-    }
-  }
-
-  const signUp = async (email: string, password: string) => {
-    try {
-      const { user: newUser } = await Auth.signUp({
-        username: email,
-        password: password,
-      })
-    } catch (error) {
-      setSnackMessage('Error signing up: ' + error.code)
-      console.log(error)
-      return error.code as string
-    }
-  }
-
   const [wordLists, setWordLists] = useState(new Array<WordList>())
   const [activeListId, setActiveListId] = useState<string>()
   //Set wordLists to fetched word lists, or create a new one

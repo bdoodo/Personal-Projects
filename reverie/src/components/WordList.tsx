@@ -244,7 +244,7 @@ export const WordList = ({
       //Change the active list to the one before or after this (undefined if no other lists)
       const listIndex = wordLists.findIndex(list => list.id === id)
       setActiveListId(
-        wordLists[listIndex + 1].id || wordLists[listIndex - 1].id
+        wordLists[listIndex + 1]?.id || wordLists[listIndex - 1]?.id
       )
 
       //Remove from app state and database
@@ -253,6 +253,7 @@ export const WordList = ({
           query: deleteWordList,
           variables: { input: { id } },
         }))
+        console.log(wordLists)
       setWordLists(wordLists.filter(list => list.id !== id))
     } catch (error) {
       setSnackMessage('Error deleting list: ' + error)
