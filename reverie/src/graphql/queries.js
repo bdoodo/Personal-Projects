@@ -5,6 +5,7 @@ export const getWordList = /* GraphQL */ `
   query GetWordList($id: ID!) {
     getWordList(id: $id) {
       id
+      name
       words {
         items {
           id
@@ -15,10 +16,6 @@ export const getWordList = /* GraphQL */ `
           owner
         }
         nextToken
-      }
-      associations {
-        label
-        occurrences
       }
       createdAt
       updatedAt
@@ -35,12 +32,9 @@ export const listWordLists = /* GraphQL */ `
     listWordLists(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
+        name
         words {
           nextToken
-        }
-        associations {
-          label
-          occurrences
         }
         createdAt
         updatedAt

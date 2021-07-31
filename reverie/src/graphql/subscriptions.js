@@ -5,6 +5,7 @@ export const onCreateWordList = /* GraphQL */ `
   subscription OnCreateWordList($owner: String!) {
     onCreateWordList(owner: $owner) {
       id
+      name
       words {
         items {
           id
@@ -15,10 +16,6 @@ export const onCreateWordList = /* GraphQL */ `
           owner
         }
         nextToken
-      }
-      associations {
-        label
-        occurrences
       }
       createdAt
       updatedAt
@@ -30,6 +27,7 @@ export const onUpdateWordList = /* GraphQL */ `
   subscription OnUpdateWordList($owner: String!) {
     onUpdateWordList(owner: $owner) {
       id
+      name
       words {
         items {
           id
@@ -40,10 +38,6 @@ export const onUpdateWordList = /* GraphQL */ `
           owner
         }
         nextToken
-      }
-      associations {
-        label
-        occurrences
       }
       createdAt
       updatedAt
@@ -55,6 +49,7 @@ export const onDeleteWordList = /* GraphQL */ `
   subscription OnDeleteWordList($owner: String!) {
     onDeleteWordList(owner: $owner) {
       id
+      name
       words {
         items {
           id
@@ -65,10 +60,6 @@ export const onDeleteWordList = /* GraphQL */ `
           owner
         }
         nextToken
-      }
-      associations {
-        label
-        occurrences
       }
       createdAt
       updatedAt

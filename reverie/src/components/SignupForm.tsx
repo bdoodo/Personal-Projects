@@ -159,6 +159,7 @@ export const SignupForm = ({
                 <TextField
                   variant="filled"
                   label="Password"
+                  type="password"
                   onChange={setPassword}
                 />
               </DialogContent>
@@ -182,6 +183,7 @@ export const SignupForm = ({
                 <TextField
                   variant="filled"
                   label="Password"
+                  type="password"
                   onChange={setPassword}
                 />
               </DialogContent>

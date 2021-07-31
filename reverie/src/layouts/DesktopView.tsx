@@ -96,6 +96,7 @@ export const DesktopView = ({
           </Typography>
           <Button
             className={styles.signIn}
+            color="inherit"
             onClick={() =>
               !user.isSignedIn ? setSignInPopup(true) : signOut()
             }

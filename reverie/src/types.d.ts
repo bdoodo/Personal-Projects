@@ -37,3 +37,9 @@ interface Association {
   name: string,
   occurrences: number
 }
+
+interface User {
+  email: string | undefined
+  password: string | undefined
+  isSignedIn: boolean
+}

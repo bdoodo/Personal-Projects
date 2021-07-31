@@ -119,6 +119,7 @@ export const WordList = ({
       setInactiveWords([...inactiveWords, word])
       setFormState({ name: '' })
     } catch (err) {
+      setSnackMessage('error creating word: ' + err)
       console.log('error creating word:', err)
     }
   }
@@ -195,14 +196,17 @@ export const WordList = ({
       //If user is signed in and this word was already created in the database, don't make it again
       if (word.createdAt) return word
 
-      const newActiveWord = user.isSignedIn ?
-      (await API.graphql({
-        query: createWord,
-        variables: { input: word },
-      })) as { data: { createWord: { id: string } } }
-      : undefined
+      const newActiveWord = user.isSignedIn
+        ? ((await API.graphql({
+            query: createWord,
+            variables: { input: word },
+          })) as { data: { createWord: { id: string } } })
+        : undefined
 
-      return { ...word, id: newActiveWord?.data.createWord.id || Math.random().toString() } as Word
+      return {
+        ...word,
+        id: newActiveWord?.data.createWord.id || Math.random().toString(),
+      } as Word
     })
 
     const resolvedNewActiveWords = await Promise.all(newActiveWords)
@@ -253,7 +257,7 @@ export const WordList = ({
           query: deleteWordList,
           variables: { input: { id } },
         }))
-        console.log(wordLists)
+      console.log(wordLists)
       setWordLists(wordLists.filter(list => list.id !== id))
     } catch (error) {
       setSnackMessage('Error deleting list: ' + error)
