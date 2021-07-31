@@ -67,6 +67,7 @@ export const MessageList = (props: {
         }
       )
 
+      //If this was shown in details, remove it
       if (detailsContent === deletedMessage.id) setDetailsContent(undefined)
 
       //Remove the deleted message from messages

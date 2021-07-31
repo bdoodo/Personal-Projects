@@ -1,4 +1,3 @@
-import './App.css'
 import { useState, useEffect } from 'react'
 import { DesktopView, MobileView } from './layouts'
 import { useMediaQuery, useTheme } from '@material-ui/core'

@@ -7,9 +7,3 @@ interface IndexedMessage {
   sender: string,
   receiver: string
 }
-
-interface ComposedMessage {
-  title: string,
-  body: string,
-  receiver: string
-}
