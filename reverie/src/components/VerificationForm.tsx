@@ -52,7 +52,9 @@ export const VerificationForm = ({
     }
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
     try {
       await Auth.confirmSignUp(email, code)
       setUser({ ...user, isSignedIn: true })

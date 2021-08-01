@@ -101,7 +101,7 @@ export const MobileView = ({
             <Typography className={styles.title} variant="h6">
               Reverie
             </Typography>
-            <Button onClick={() =>
+            <Button color="inherit" onClick={() =>
               !user.isSignedIn ? setSignInPopup(true) : signOut()
             }>Sign in</Button>
           </Toolbar>
