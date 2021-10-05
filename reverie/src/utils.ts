@@ -20,50 +20,61 @@ const client = new RekognitionClient({
 export const fetchUrlLists = async (words: Word[]) => {
   //for each word, fetch a list of image urls and store it in an array (urlLists)
   const urlLists = words.map(async word => {
-    const url =
-      `https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/Search/ImageSearchAPI?` +
-      new URLSearchParams([
-        ['q', word.name],
-        ['pageNumber', 1],
-        ['pageSize', 50],
-        ['autoCorrect', false],
-        ['safeSearch', true],
-      ] as string[][]).toString()
+    try {
+      const url =
+        `https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/Search/ImageSearchAPI?` +
+        new URLSearchParams([
+          ['q', word.name],
+          ['pageNumber', 1],
+          ['pageSize', 50],
+          ['autoCorrect', false],
+          ['safeSearch', true],
+        ] as string[][]).toString()
 
-    const res = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'x-rapidapi-key': process.env.REACT_APP_RAPIDAPI_KEY!,
-        'x-rapidapi-host': process.env.REACT_APP_RAPIDAPI_HOST!,
-      },
-    })
-    const data = (await res.json()) as {
-      value: { url: string; title: string }[]
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'x-rapidapi-key': process.env.REACT_APP_RAPIDAPI_KEY!,
+          'x-rapidapi-host': process.env.REACT_APP_RAPIDAPI_HOST!,
+        },
+      })
+      const data = (await res.json()) as {
+        value: { url: string; title: string }[]
+      }
+
+      const acceptedFormats = [
+        '.png',
+        '.jpg',
+        '.jpeg',
+        '.jfif',
+        '.pjpeg',
+        '.pjp',
+      ]
+
+      //Filter out urls either not hosted on https or not
+      //containing an image of a valid format for Rekognition
+      const goodResults = data.value.flatMap(result => {
+        const isCorrectFormat = acceptedFormats.some(format =>
+          result.url.includes(format)
+        )
+
+        return url.startsWith('https') && isCorrectFormat
+          ? [{ url: result.url, title: result.title }]
+          : []
+      })
+
+      const wordImages = {
+        word: word,
+        images: goodResults.map(result => ({
+          url: result.url,
+          title: result.title,
+        })),
+      } as WordImages
+
+      return wordImages
+    } catch (error) {
+      return error
     }
-
-    const acceptedFormats = ['.png', '.jpg', '.jpeg', '.jfif', '.pjpeg', '.pjp']
-
-    //Filter out urls either not hosted on https or not
-    //containing an image of a valid format for Rekognition
-    const goodResults = data.value.flatMap(result => {
-      const isCorrectFormat = acceptedFormats.some(format =>
-        result.url.includes(format)
-      )
-
-      return url.startsWith('https') && isCorrectFormat
-        ? [{ url: result.url, title: result.title }]
-        : []
-    })
-
-    const wordImages = {
-      word: word,
-      images: goodResults.map(result => ({
-        url: result.url,
-        title: result.title,
-      })),
-    } as WordImages
-
-    return wordImages
   })
 
   return await Promise.all(urlLists)
@@ -84,10 +95,9 @@ export const imagesToBytes = async (wordImagesList: WordImages[]) => {
         //This abort controller is to set a timeout on fetching.
         const controller = new AbortController()
         const signal = controller.signal
-        
+
         setTimeout(() => controller.abort(), 2000)
         const res = await fetch(image.url, { signal })
-        
 
         const bytes = await res.arrayBuffer()
         const ua = new Uint8Array(bytes)
@@ -124,7 +134,7 @@ export const imagesToBytes = async (wordImagesList: WordImages[]) => {
  */
 export const analyzeImages = async (wordImagesList: WordImages[]) => {
   const updatedWordImagesList = wordImagesList.map(async wordImages => {
-  //Process each wordImages
+    //Process each wordImages
 
     const WordImagesLabels = wordImages.images.map(async image => {
       try {
