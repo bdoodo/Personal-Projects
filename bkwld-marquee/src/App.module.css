@@ -1,0 +1,90 @@
+body {
+  background-color: black;
+}
+
+.App {
+  max-width: 1440px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+  padding: 0 8rem;
+  font-family: 'Helvetica Neue', Helvetica;
+  justify-content: space-between;
+  overflow-x: hidden;
+}
+
+@media screen and (max-width: 1000px) {
+  .App {
+    padding: 0 4rem;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .App {
+    padding: 1rem;
+  }
+}
+
+a {
+  text-decoration: none;
+  color: white;
+}
+
+a:hover {
+  color: #ffc004;
+}
+
+.active-link {
+  color: #ffc004;
+}
+
+.App-header {
+  display: flex;
+  justify-content: space-between;
+  color: white;
+  width: 100%;
+  padding-top: 2rem;
+}
+
+.rectangle {
+  width: 8.688rem;
+  height: 2.625rem;
+  border: solid 1px white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+.rectangle:hover {
+  border: solid 1px #ffc004;
+  color: #ffc004
+}
+
+.contact {
+  width: 8.625rem;
+  height: 1.125rem;
+  font-size: 0.938rem;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: center;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  width: 4.563rem;
+  height: 4.875rem;
+  font-size: 0.875rem;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.86;
+  letter-spacing: normal;
+  color: var(--white);
+}
