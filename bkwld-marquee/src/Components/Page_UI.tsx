@@ -29,6 +29,8 @@ export const Page_UI = (props: {
 
       //Used to color the active menu link
       props.setCurrentLink(`/${slug}`)
+
+      if (page) document.title = `abc - ${page.title}`
     })()
   }, [slug])
 
@@ -42,7 +44,7 @@ export const Page_UI = (props: {
 
       {pageInfo === null ? (
         <h1 className={styles['not-found']}>404 😭</h1>
-      ) : (
+      ) : pageInfo && (
         <>
           <LazyImage
             src={`/backgrounds/${block?.background}`}

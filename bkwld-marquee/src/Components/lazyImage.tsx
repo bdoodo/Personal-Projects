@@ -7,7 +7,7 @@ export const LazyImage = (props: {
   src: string
   width: number
   height: number
-  classes: string
+  classes: string | undefined
 }) => {
   const { src, width, height, classes } = props
 

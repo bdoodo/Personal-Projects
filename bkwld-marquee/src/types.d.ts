@@ -1,11 +1,11 @@
 interface PageInfo {
-  title: String
-  slug: String
+  title: string
+  slug: string
   blocks: {
-    type: String
-    headline: String
-    subhead: String
-    cta: String
-    background: String
+    type: string
+    headline: string
+    subhead: string
+    cta: string
+    background: string
   }[]
 }
