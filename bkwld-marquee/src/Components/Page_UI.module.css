@@ -5,12 +5,13 @@
 .background {
   z-index: -99;
   position: fixed;
-  width: 100vh / 1920px;
   height: 100vh;
   top: 0;
   object-fit: contain;
   background-color: black;
   left: -5vw;
+  opacity: 0;
+  animation: fade-in 0.1s ease-out forwards;
 }
 
 .headers {
@@ -19,6 +20,8 @@
   align-items: flex-start;
   margin-top: 273px;
   flex-wrap: wrap;
+  opacity: 0;
+  animation: slide-up 0.15s ease-in forwards;
 }
 
 .headline {
@@ -48,6 +51,7 @@
 
 .cta-block {
   width: 100%;
+  opacity: 0;
   margin-top: 10rem;
   padding: 4.625rem 8.5rem 4.563rem 4.813rem;
   background-color: white;
@@ -57,6 +61,7 @@
   justify-content: space-around;
   color: black;
   flex-wrap: wrap;
+  animation: fade-in 0.1s ease-in 0.5s forwards;
 }
 
 .cta {
@@ -127,4 +132,14 @@
   .cta-block {
     padding: 4rem 1rem 4rem 1rem;
   }
+}
+
+@keyframes fade-in {
+  from {opacity: 0}
+  to {opacity: 1}
+}
+
+@keyframes slide-up {
+  from {opacity: 0; transform: translateY(1rem)}
+  to {opacity: 1; transform: translateY(0%)}
 }

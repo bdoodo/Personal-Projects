@@ -30,10 +30,12 @@ body {
 a {
   text-decoration: none;
   color: white;
+  transition: color 0.3s ease-in;
 }
 
 a:hover {
   color: #ffc004;
+  transition: color 0.1s ease-in;
 }
 
 .active-link {
@@ -56,11 +58,13 @@ a:hover {
   justify-content: center;
   align-items: center;
   color: white;
+  transition: color 0.3s ease-in;
 }
 
 .rectangle:hover {
   border: solid 1px #ffc004;
-  color: #ffc004
+  color: #ffc004;
+  transition: color 0.1s ease-in;
 }
 
 .contact {
