@@ -115,14 +115,26 @@
 
 
 @media screen and (max-width: 1245px) {
-  .sub-head {
+  .headers_sub-head {
     margin-top: 1rem;
   }
 }
 
 @media screen and (max-width: 1031px) {
-  .lets-talk {
+  .cta-block_lets-talk {
     padding-top: 2rem;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .headers_headline {
+    font-size: 4rem;
+  }
+}
+
+@media screen and (max-width: 350px) {
+  .headers_headline {
+    font-size: 3.5rem;
   }
 }
 
