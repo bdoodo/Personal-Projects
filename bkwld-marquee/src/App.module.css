@@ -9,22 +9,10 @@ body {
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
-  padding: 0 8rem;
+  padding: 0 8vw;
   font-family: 'Helvetica Neue', Helvetica;
   justify-content: space-between;
   overflow-x: hidden;
-}
-
-@media screen and (max-width: 1000px) {
-  .App {
-    padding: 0 4rem;
-  }
-}
-
-@media screen and (max-width: 600px) {
-  .App {
-    padding: 1rem;
-  }
 }
 
 a {

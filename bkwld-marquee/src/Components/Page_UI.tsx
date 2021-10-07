@@ -8,6 +8,7 @@ export const Page_UI = (props: {
 }) => {
   const [pageInfo, setPageInfo] = useState<PageInfo | null | undefined>()
 
+  //The current URL route
   const { slug } = useParams() as { slug: String }
 
   //Fetch new page info on first render and whenever the URL changes
@@ -20,11 +21,13 @@ export const Page_UI = (props: {
       )
       const pages = (await pagesData.json()).pages as PageInfo[]
 
-      //Set page info to null if nothing came up (indicating a bad URL)
+      //Find the corresponding page info or set page info
+      //to null if nothing came up (indicating a bad URL)
       const page = pages.find(p => p.slug === slug) || null
 
       setPageInfo(page)
 
+      //Used to color the active menu link
       props.setCurrentLink(`/${slug}`)
     })()
   }, [slug])
@@ -33,10 +36,12 @@ export const Page_UI = (props: {
 
   return (
     <main className={styles.root}>
-      {pageInfo === undefined ? (
-        'Loading ...'
-      ) : pageInfo === null ? (
-        'Bad url 🙁'
+      {/*I decided not to include any 'loading' text 
+      or icon since the site as is matches your 
+      elegant minimalist design concept more */}
+
+      {pageInfo === null ? (
+        <h1 className={styles['not-found']}>404 😭</h1>
       ) : (
         <>
           <LazyImage
@@ -46,16 +51,16 @@ export const Page_UI = (props: {
             classes={`${styles.background}`}
           />
           <div className={styles.headers}>
-            <div className={styles.headline}>{block?.headline}</div>
-            <div className={styles['sub-head']}>{block?.subhead}</div>
+            <div className={styles['headers_headline']}>{block?.headline}</div>
+            <div className={styles['headers_sub-head']}>{block?.subhead}</div>
           </div>
           <div className={styles['cta-block']}>
-            <div className={styles.cta}>{block?.cta}</div>
-            <a href="" className={styles['questions-lets-talk']}>
+            <div className={styles['cta-block_cta']}>{block?.cta}</div>
+            <a href="" className={styles['cta-block_lets-talk']}>
               <span>LET'S TALK.</span>
               <div className={styles.arrow}>
-                <div className={styles['arrow-stem']}></div>
-                <div className={styles['arrow-point']}></div>
+                <div className={styles['arrow_arrow-stem']}></div>
+                <div className={styles['arrow_arrow-point']}></div>
               </div>
             </a>
           </div>

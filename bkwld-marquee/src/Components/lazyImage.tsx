@@ -1,5 +1,8 @@
 import { useState } from 'react'
 
+//This component creates an HTML img node then returns 
+//it once it finishes loading. This avoids the jarring screen paint
+
 export const LazyImage = (props: {
   src: string
   width: number
@@ -17,3 +20,4 @@ export const LazyImage = (props: {
 
   return <>{imgLoaded && <img src={src} className={classes} />}</>
 }
+

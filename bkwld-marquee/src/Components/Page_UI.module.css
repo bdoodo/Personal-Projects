@@ -18,13 +18,13 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-top: 273px;
   flex-wrap: wrap;
   opacity: 0;
   animation: slide-up 0.15s ease-in forwards;
+  margin: 10rem 0;
 }
 
-.headline {
+.headers_headline {
   max-width: 38.25rem;
   font-size: 5.25rem;
   font-weight: bold;
@@ -33,9 +33,10 @@
   line-height: 1;
   letter-spacing: -2.2px;
   color: white;
+  margin-right: 5rem;
 }
 
-.sub-head {
+.headers_sub-head {
   width: 22.5rem;
   font-size: 0.875rem;
   font-weight: normal;
@@ -52,19 +53,18 @@
 .cta-block {
   width: 100%;
   opacity: 0;
-  margin-top: 10rem;
-  padding: 4.625rem 8.5rem 4.563rem 4.813rem;
+  padding: 6vw 8vw;
   background-color: white;
   box-sizing: border-box;
   display: flex;
   align-items: flex-start;
-  justify-content: space-around;
+  justify-content: flex-start;
   color: black;
   flex-wrap: wrap;
   animation: fade-in 0.1s ease-in 0.5s forwards;
 }
 
-.cta {
+.cta-block_cta {
   width: 30.188rem;
   font-size: 1.5rem;
   font-weight: bold;
@@ -72,9 +72,10 @@
   font-style: normal;
   line-height: 1.33;
   letter-spacing: -0.63px;
+  margin-right: 5rem;
 }
 
-.questions-lets-talk {
+.cta-block_lets-talk {
   color: black;
   padding-top: 0.3rem;
   font-weight: 600;
@@ -85,7 +86,7 @@
   margin-left: 1rem;
 }
 
-.arrow-point {
+.arrow_arrow-point {
   border: solid #ffc004;
   border-width: 0 2.5px 2.5px 0;
   display: inline-block;
@@ -94,7 +95,7 @@
   -webkit-transform: rotate(-45deg);
 }
 
-.arrow-stem {
+.arrow_arrow-stem {
   border: solid #ffc004;
   border-width: 0px 16px 2px 3px;
   display: inline-block;
@@ -103,34 +104,25 @@
   left: 8px;
 }
 
+.not-found {
+  color: white;
+  position: absolute;
+  left: 0;
+  top: 45%;
+  text-align: center;
+  width: 100%;
+}
+
 
 @media screen and (max-width: 1245px) {
-  .headers {
-    margin-top: 8rem;
-  }
   .sub-head {
     margin-top: 1rem;
   }
 }
 
-@media screen and (max-width: 918px) {
-  .questions-lets-talk {
+@media screen and (max-width: 1031px) {
+  .lets-talk {
     padding-top: 2rem;
-  }
-}
-
-@media screen and (max-width: 800px) {
-  .headline {
-    font-size: 4rem;
-  }
-}
-
-@media screen and (max-width: 500px) {
-  .headline {
-    font-size: 3rem;
-  }
-  .cta-block {
-    padding: 4rem 1rem 4rem 1rem;
   }
 }
 

@@ -10,30 +10,38 @@ import {
 import { useState } from 'react'
 
 const App = () => {
+  //All component logic here is used to render menu links,
+  //which includes manipulating their colors
+
   const [currentLink, setCurrentLink] = useState('/industries ')
 
   const activeColor = (slug: String) =>
     currentLink === slug ? styles['active-link'] : undefined
+
+  const pages = ['Industries', 'Services', 'About Us']
+
+  const slug = (pageName: string) => pageName.toLowerCase().replace(' ', '-')
 
   return (
     <div className={styles.App}>
       <Router>
         <header className={styles['App-header']}>
           <div>
-            <a href='/'><img src={Logo} /></a>
+            <a href="/">
+              <img src={Logo} />
+            </a>
             <div className={`${styles.menu} ${styles['text-style-3']}`}>
-              <Link className={activeColor('/industries')} to="/industries">
-                Industries
-              </Link>
-              <Link className={activeColor('/services')} to="/services">
-                Services
-              </Link>
-              <Link className={activeColor('/about-us')} to="/about-us">
-                About Us
-              </Link>
+              {pages.map(page => (
+                <Link
+                  className={activeColor(`/${slug(page)}`)}
+                  to={`/${slug(page)}`}
+                >
+                  {page}
+                </Link>
+              ))}
             </div>
           </div>
-          <a href='' className={styles.rectangle}>
+          <a href="" className={styles.rectangle}>
             <span className={styles.contact}>Contact Us</span>
           </a>
         </header>
