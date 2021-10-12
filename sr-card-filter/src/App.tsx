@@ -1,10 +1,9 @@
 import styles from './App.module.css'
-import React, { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { JobBox } from './components'
 
-function App(props: { jobs: JobInfo[] }) {
-  let { jobs } = props
-
+function App() {
+  //Only for demonstration. A JobInfo[] should be taken from a CMS
   let jobsTest: JobInfo[] = []
 
   for (let i = 0; i < 10; i++) {
