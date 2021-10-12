@@ -28,10 +28,11 @@
 }
 
 main {
-  padding: 5rem 10vw 0;
+  padding: 5rem 10vw;
   display: grid;
   gap: 2rem;
   grid-template-columns: repeat(4, 1fr);
+  height: 100% + 5rem;
 }
 
 a {
@@ -39,13 +40,13 @@ a {
 }
 
 @media screen and (max-width: 1410px) {
-  .main {
+  main {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media screen and (max-width: 1100px) {
-  .main {
+  main {
     grid-template-columns: repeat(2, 1fr);
   }
 }
