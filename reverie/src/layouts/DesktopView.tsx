@@ -23,7 +23,21 @@ import {
 import { useEffect } from 'react'
 import { Auth } from 'aws-amplify'
 
-export const DesktopView = (props: {
+export const DesktopView = ({
+  status,
+  setStatus,
+  wordLists,
+  setWordLists,
+  makeWordList,
+  activeListId,
+  setActiveListId,
+  expand,
+  isActive,
+  user,
+  setUser,
+  snackMessage,
+  setSnackMessage,
+}: {
   status: string
   setStatus: React.Dispatch<React.SetStateAction<string>>
   wordLists: WordList[]
@@ -48,27 +62,11 @@ export const DesktopView = (props: {
   snackMessage: string
   setSnackMessage: React.Dispatch<React.SetStateAction<string>>
 }) => {
-  const {
-    status,
-    setStatus,
-    wordLists,
-    setWordLists,
-    makeWordList,
-    activeListId,
-    setActiveListId,
-    expand,
-    isActive,
-    user,
-    setUser,
-    snackMessage,
-    setSnackMessage,
-  } = props
-
   const styles = setStyles()
 
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   useEffect(() => {
-    snackMessage && setSnackbarOpen(true)
+    snackMessage !== '' && setSnackbarOpen(true)
   }, [snackMessage])
 
   const [signInPopup, setSignInPopup] = useState(false)
@@ -161,7 +159,7 @@ export const DesktopView = (props: {
                     setActiveListId,
                     meta: wordList,
                     setSnackMessage,
-                    user,
+                    user
                   }}
                 />
               </div>

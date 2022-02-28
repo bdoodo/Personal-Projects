@@ -23,7 +23,22 @@ import {
 } from '../components'
 import { Auth } from 'aws-amplify'
 
-export const MobileView = (props: {
+
+export const MobileView = ({
+  status,
+  setStatus,
+  wordLists,
+  setWordLists,
+  makeWordList,
+  activeListId,
+  setActiveListId,
+  expand,
+  isActive,
+  user,
+  setUser,
+  setSnackMessage,
+  snackMessage,
+}: {
   status: string
   setStatus: React.Dispatch<React.SetStateAction<string>>
   wordLists: WordList[]
@@ -48,22 +63,6 @@ export const MobileView = (props: {
   setSnackMessage: React.Dispatch<React.SetStateAction<string>>
   snackMessage: string
 }) => {
-  const {
-    status,
-    setStatus,
-    wordLists,
-    setWordLists,
-    makeWordList,
-    activeListId,
-    setActiveListId,
-    expand,
-    isActive,
-    user,
-    setUser,
-    setSnackMessage,
-    snackMessage,
-  } = props
-
   const [tab, setTab] = useState<'wordList' | 'associations'>('wordList')
 
   const switchTabs = (_event: any, newValue: 'wordList' | 'associations') => {
@@ -102,14 +101,9 @@ export const MobileView = (props: {
             <Typography className={styles.title} variant="h6">
               Reverie
             </Typography>
-            <Button
-              color="inherit"
-              onClick={() =>
-                !user.isSignedIn ? setSignInPopup(true) : signOut()
-              }
-            >
-              Sign in
-            </Button>
+            <Button color="inherit" onClick={() =>
+              !user.isSignedIn ? setSignInPopup(true) : signOut()
+            }>Sign in</Button>
           </Toolbar>
           <TabList onChange={switchTabs} variant="fullWidth">
             <Tab label="Word lists" value="wordList" />
@@ -126,7 +120,7 @@ export const MobileView = (props: {
             setSnackMessage,
             setVerificationPopup,
             verificationPopup,
-            mobile: true,
+            mobile: true
           }}
           open={signInPopup}
         />
@@ -138,7 +132,7 @@ export const MobileView = (props: {
             setSnackMessage,
             user,
             setUser,
-            mobile: true,
+            mobile: true
           }}
         />
         <TabPanel value="wordList" className={styles.wordPanel}>
@@ -174,7 +168,7 @@ export const MobileView = (props: {
                         meta: wordList,
                         mobile: true,
                         setSnackMessage,
-                        user,
+                        user
                       }}
                     />
                   </div>
