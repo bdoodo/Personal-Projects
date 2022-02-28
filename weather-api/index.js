@@ -1,29 +1,18 @@
 import fetch from 'node-fetch'
-import http from 'http'
+import express from 'express'
+
+const app = express()
 const port = '3000'
 
-const server = http.createServer(async (req, res) => {
-  res.end(await routeFor(req))
+app.post('/current', async (req, res) => {
+  const {lat, lng} = req.query
+  const data = await getForecast(lat, lng)
+  res.send(JSON.stringify(data))
 })
 
-server.listen(port, () => {
+app.listen(port, () => {
   console.log(`listening on port ${port}`)
 })
-
-async function routeFor({url, method}) {
-  url = new URL(url, `http://localhost:${port}`)
-  if (url.pathname === '/current') {
-    if (method === 'POST') {
-      const params = url.searchParams
-      const lat = params.get('lat')
-      const lng = params.get('lng')
-
-      const data = await getForecast(lat, lng)
-
-      return JSON.stringify(data)
-    }
-  }
-}
 
 async function getForecast(lat, lng) {
   const response = await fetch(`https://api.weather.gov/points/${lat},${lng}`)
