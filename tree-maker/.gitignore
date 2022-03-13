@@ -3,7 +3,7 @@
 /test/
 custom-elements.json
 # top level source
-my-element.js
-my-element.js.map
-my-element.d.ts
-my-element.d.ts.map
+drawing-board.js
+drawing-board.js.map
+drawing-board.d.ts
+drawing-board.d.ts.map
